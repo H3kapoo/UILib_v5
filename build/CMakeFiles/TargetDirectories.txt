@@ -1,0 +1,3 @@
+/home/hekapoo/newTryAtUI/build/CMakeFiles/test.dir
+/home/hekapoo/newTryAtUI/build/CMakeFiles/edit_cache.dir
+/home/hekapoo/newTryAtUI/build/CMakeFiles/rebuild_cache.dir

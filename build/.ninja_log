@@ -1,0 +1,12 @@
+# ninja log v5
+5	4455	1712602513471200242	CMakeFiles/test.dir/src/components/Div.cpp.o	da55e3e1266f0076
+6	4932	1712602513951203724	CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o	a3ca8c13724fb101
+12	5279	1712602514303206278	CMakeFiles/test.dir/src/components/ComponentManager.cpp.o	4dbe177acf48069
+4	5277	1712602514299206250	CMakeFiles/test.dir/main.cpp.o	88224d1971de4ba8
+3	512	1712602540115394540	../debug/test	dc5e11a93eaa13a3
+2	694	1712410444382239558	CMakeFiles/test.dir/src/inputManagement/Input.cpp.o	cbdbfd42fd1d4d9b
+4	4892	1712603308425562272	CMakeFiles/test.dir/src/components/Div.cpp.o	da55e3e1266f0076
+4	5183	1712603308721564775	CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o	a3ca8c13724fb101
+5	5778	1712603309317569813	CMakeFiles/test.dir/src/components/ComponentManager.cpp.o	4dbe177acf48069
+3	5922	1712603309457570996	CMakeFiles/test.dir/main.cpp.o	88224d1971de4ba8
+5922	6229	1712603309765573601	../debug/test	dc5e11a93eaa13a3
