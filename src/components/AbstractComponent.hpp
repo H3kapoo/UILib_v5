@@ -4,6 +4,7 @@
 
 #include "../UIState.hpp"
 #include "../mesh/IMesh.hpp"
+#include "../shaderManagement/ShaderLoader.hpp"
 
 namespace components
 {
@@ -106,8 +107,9 @@ private:
 
     // uniforms and shaders
     UIState* state{nullptr};
-    mesh::IMesh* mesh{nullptr} /* Internally managed */;
-    int depth{0}; /* 0 depth means it's root node of tree */
+    unsigned int meshVao{0};
+    shaderManagement::shaderIdPtr compShaderPtr{nullptr}; /* Pointer due to hot-reload */
+    int depth{0};                                         /* 0 depth means it's root node of tree */
     int id{1};
     bool isRuntimeInitialized{false};
     bool isParented{false};

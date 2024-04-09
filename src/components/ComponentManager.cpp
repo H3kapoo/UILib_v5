@@ -13,12 +13,12 @@ ComponentManager::ComponentManager()
 
 ComponentManager::~ComponentManager()
 {
-    println("Deleting ComponentManager..");
+    printlni("Deleting ComponentManager..");
 }
 
 void ComponentManager::setRoot(AbstractComponent* newRoot)
 {
-    if (root) { println("[WRN] Root node already set to {}. Use removeRoot() first.", root->getId()); }
+    if (root) { printlnw("Root node already set to {}. Use removeRoot() first.", root->getId()); }
     root = newRoot;
     root->isParented = true; /* Parented to invisible object higher than root */
     root->setState(&state);
@@ -26,9 +26,9 @@ void ComponentManager::setRoot(AbstractComponent* newRoot)
 
 void ComponentManager::removeRoot()
 {
-    if (!root) { println("[WRN] Root of component manager not set."); }
+    if (!root) { printlnw("Root of component manager not set."); }
 
-    println("[INF] removeRoot() not implemented yet.");
+    printlni("removeRoot() not implemented yet.");
 }
 
 void ComponentManager::render() {}
@@ -77,13 +77,12 @@ void ComponentManager::updateInternalStructure(const std::string& action)
 
 void ComponentManager::flattenRootIfNeeded()
 {
-    println("[INF] Flattening tree due to {}", state.lastActionOnTree);
+    printlni("Flattening tree due to {}", state.lastActionOnTree);
     flattenedNodes.clear();
     recursivelyPushNodes(root);
 
     std::ranges::sort(flattenedNodes,
         [](const AbstractComponent* a, const AbstractComponent* b) { return a->getDepth() > b->getDepth(); });
-    printf("Flattened size %zu\n", flattenedNodes.size());
 }
 
 void ComponentManager::recursivelyPushNodes(AbstractComponent* comp)

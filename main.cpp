@@ -24,31 +24,6 @@ int main()
     const auto startWindowHeight = 720;
     const auto appName = "Another App";
 
-    ComponentManager* cm = new ComponentManager();
-
-    Div* div = new Div();
-    Div* div2 = new Div();
-    Div* div3 = new Div();
-    Div* div4 = new Div();
-    Div* div5 = new Div();
-    Div* div6 = new Div();
-
-    cm->setRoot(div);
-
-    div->append({div3, div2});
-
-    div3->append(div4);
-    div4->append(div5);
-
-    div->onClickListener(
-        [&div5, &div6](int x, int y, MouseButton z)
-        {
-            // div5->append(div6);
-            println("EE aaa {} {} {}", x, y, (int)z);
-        });
-
-    // div->showTree();
-
     /* Init glfw */
     if (glfwInit() == GLFW_FALSE)
     {
@@ -78,6 +53,31 @@ int main()
         println("[ERR] GLEW failed to initialize");
         return -1;
     }
+
+    ComponentManager* cm = new ComponentManager();
+
+    Div* div = new Div();
+    Div* div2 = new Div();
+    Div* div3 = new Div();
+    Div* div4 = new Div();
+    Div* div5 = new Div();
+    Div* div6 = new Div();
+
+    // cm->setRoot(div);
+
+    // div->append({div3, div2});
+
+    // div3->append(div4);
+    // div4->append(div5);
+
+    // div->onClickListener(
+    //     [&div5, &div6](int x, int y, MouseButton z)
+    //     {
+    //         // div5->append(div6);
+    //         println("EE aaa {} {} {}", x, y, (int)z);
+    //     });
+
+    // div->showTree();
 
     inputManagement::InputHelper::get().observe(window);
     inputManagement::InputHelper::get().registerOnMouseButtonAction(
@@ -135,6 +135,7 @@ int main()
     glfwDestroyWindow(window);
     glfwTerminate();
 
+    // deallocateFast({div});
     deallocateFast({div, div2, div3, div4, div5, div6});
     delete cm;
 

@@ -10,7 +10,7 @@ Div::Div()
 
 Div::~Div()
 {
-    println("Deleting {} id {} ..", getType(), getId());
+    printlni("Deleting {} id {} ..", getType(), getId());
 }
 
 void Div::onClickListener(std::function<void(int, int, MouseButton)> func)
@@ -33,6 +33,6 @@ void Div::onMoveEvent()
 
 void Div::onStart()
 {
-    println("[INF] I am node {} and onStart() called", getId());
+    printlni("[INF] I am node {} and onStart() called", getId());
 }
 } // namespace components

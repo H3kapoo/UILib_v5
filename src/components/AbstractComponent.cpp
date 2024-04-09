@@ -11,12 +11,14 @@ AbstractComponent::AbstractComponent(const std::string& compType)
 {
     id = generateNextId();
     type = compType;
-    mesh = new mesh::QuadMesh();
+    meshVao = mesh::QuadMesh::get().generateMesh();
+    compShaderPtr =
+        shaderManagement::ShaderLoader::get().loadFromPath("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl");
 }
 
 AbstractComponent::~AbstractComponent()
 {
-    delete mesh;
+    // printlni("Virtual Dtor called for {}", getId());
 }
 
 bool AbstractComponent::append(AbstractComponent* comp)

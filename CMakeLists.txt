@@ -27,6 +27,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         src/components/AbstractComponent.cpp
         src/components/ComponentManager.cpp
         src/inputManagement/Input.cpp
+        src/mesh/QuadMesh.cpp
+        src/shaderManagement/ShaderLoader.cpp
     )
     target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
