@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../renderer/Renderer.hpp"
 #include "AbstractComponent.hpp"
 
 namespace components
@@ -77,7 +78,7 @@ private:
     void flattenRootIfNeeded();
     void recursivelyPushNodes(AbstractComponent* comp);
 
-    // Renderer renderer;
+    renderer::Renderer renderer;
 
     /* UI State storage */
     UIState state;

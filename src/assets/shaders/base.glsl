@@ -19,13 +19,13 @@ void main()
 #version 330 core
 
 uniform vec3 res;
-uniform vec4 color;
+uniform vec4 uColor;
 uniform float uTime;
 
 in vec2 texOut;
 
 void main()
 {
-   gl_FragColor = color;
+   gl_FragColor = uColor;
    // gl_FragColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
 }

@@ -31,6 +31,11 @@
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/renderer/Renderer.cpp.o -c /home/hekapoo/newTryAtUI/src/renderer/Renderer.cpp",
+  "file": "/home/hekapoo/newTryAtUI/src/renderer/Renderer.cpp"
+},
+{
+  "directory": "/home/hekapoo/newTryAtUI/build",
   "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o -c /home/hekapoo/newTryAtUI/src/shaderManagement/ShaderLoader.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/shaderManagement/ShaderLoader.cpp"
 }

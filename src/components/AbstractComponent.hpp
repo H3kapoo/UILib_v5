@@ -3,8 +3,9 @@
 #include <vector>
 
 #include "../UIState.hpp"
-#include "../mesh/IMesh.hpp"
+#include "../shaderManagement/ShaderDataTracker.hpp"
 #include "../shaderManagement/ShaderLoader.hpp"
+#include "utils/BoxModel.hpp"
 
 namespace components
 {
@@ -41,6 +42,15 @@ public:
      *
      * @return True if at least one comp got appended successfully. False otherwise.
      */
+    bool append(const std::vector<AbstractComponent*>& comps);
+
+    /**
+     * @brief Append multiple components to this component.
+     *
+     * @param comps - trivial
+     *
+     * @return True if at least one comp got appended successfully. False otherwise.
+     */
     bool append(std::vector<AbstractComponent*>&& comps);
 
     /**
@@ -51,6 +61,15 @@ public:
      * @return True if comp exists and got removed. False otherwise.
      */
     bool remove(AbstractComponent* comp);
+
+    /**
+     * @brief Remove multiple components from this component.
+     *
+     * @param comp - trivial
+     *
+     * @return True if at least one comp exists and got removed, False otherwise.
+     */
+    bool remove(const std::vector<AbstractComponent*>& nodes);
 
     /**
      * @brief Remove multiple components from this component.
@@ -90,6 +109,10 @@ public:
     int getDepth() const;
     int getId() const;
     const std::string& getType() const;
+    unsigned int getVaoId() const;
+    shaderManagement::ShaderDataTracker& getKeeper();
+    shaderManagement::shaderId getShaderId() const;
+    utils::BoxModel& getBoxModel();
 
 private:
     /* Internal helpers */
@@ -107,7 +130,10 @@ private:
 
     // uniforms and shaders
     UIState* state{nullptr};
+
+    utils::BoxModel boxModel;
     unsigned int meshVao{0};
+    shaderManagement::ShaderDataTracker shaderDataTracker{};
     shaderManagement::shaderIdPtr compShaderPtr{nullptr}; /* Pointer due to hot-reload */
     int depth{0};                                         /* 0 depth means it's root node of tree */
     int id{1};
@@ -121,6 +147,7 @@ protected:
     /* Virtuals called by CM */
     virtual void onClickEvent();
     virtual void onMoveEvent();
+    virtual void onRenderDone();
     virtual void onStart();
 };
 } // namespace components

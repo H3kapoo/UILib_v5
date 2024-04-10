@@ -22,16 +22,26 @@ void ComponentManager::setRoot(AbstractComponent* newRoot)
     root = newRoot;
     root->isParented = true; /* Parented to invisible object higher than root */
     root->setState(&state);
+    updateInternalStructure("RootAdition");
 }
 
 void ComponentManager::removeRoot()
 {
     if (!root) { printlnw("Root of component manager not set."); }
 
-    printlni("removeRoot() not implemented yet.");
+    printlne("removeRoot() not implemented yet.");
 }
 
-void ComponentManager::render() {}
+void ComponentManager::render()
+{
+    // TODO: Now this is a hard decision..when to render..
+    renderer.clearScreen();
+    for (const auto& childNode : flattenedNodes)
+    {
+        renderer.renderComponent(*childNode);
+        childNode->onRenderDone();
+    }
+}
 
 void ComponentManager::mouseClickEvent(MouseButton button, KeyAction action, ActiveModifiersBits mods)
 {
@@ -64,6 +74,10 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
 {
     state.windowWidth = newWidth;
     state.windowHeight = newHeight;
+    glm::mat4 projMatrix = glm::ortho(0.0f, (float)newWidth, (float)newHeight, 0.0f, renderer::Renderer::MAX_LAYERS,
+        0.0f);
+
+    renderer.setProjectionMatrix(projMatrix);
 }
 
 void ComponentManager::updateInternalStructure(const std::string& action)

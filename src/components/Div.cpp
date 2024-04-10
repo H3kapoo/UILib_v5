@@ -6,7 +6,9 @@ namespace components
 {
 Div::Div()
     : AbstractComponent("Div")
-{}
+{
+    getKeeper().watch("uColor", &color);
+}
 
 Div::~Div()
 {
@@ -20,8 +22,12 @@ void Div::onClickListener(std::function<void(int, int, MouseButton)> func)
 
 void Div::onClickEvent()
 {
-    // println("Div element id {} has been clicked!", getId());
+    println("Div element id {} has been clicked!", getId());
     const auto& s = getState();
+
+    auto& bm = getBoxModel();
+    bm.pos = {s->mouseX - bm.scale.x / 2, s->mouseY - bm.scale.y / 2, 1.0f};
+
     if (mouseClickCb) mouseClickCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
 };
 

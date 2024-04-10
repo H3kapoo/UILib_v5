@@ -31,6 +31,18 @@ bool AbstractComponent::append(AbstractComponent* comp)
     return false;
 }
 
+bool AbstractComponent::append(const std::vector<AbstractComponent*>& comps)
+{
+    bool didAppendSomething = false;
+    for (const auto& comp : comps)
+    {
+        didAppendSomething = appendAux(comp);
+    }
+    state->triggerTreeUpdate("AppendMany");
+
+    return didAppendSomething;
+}
+
 bool AbstractComponent::append(std::vector<AbstractComponent*>&& comps)
 {
     bool didAppendSomething = false;
@@ -51,6 +63,18 @@ bool AbstractComponent::remove(AbstractComponent* comp)
         return true;
     }
     return false;
+}
+
+bool AbstractComponent::remove(const std::vector<AbstractComponent*>& comps)
+{
+    bool didRemoveSomething = false;
+    for (const auto& comp : comps)
+    {
+        didRemoveSomething = remove(comp);
+    }
+    state->triggerTreeUpdate("RemoveMany");
+
+    return didRemoveSomething;
 }
 
 bool AbstractComponent::remove(std::vector<AbstractComponent*>&& comps)
@@ -119,6 +143,26 @@ int AbstractComponent::getId() const
 const std::string& AbstractComponent::getType() const
 {
     return type;
+}
+
+unsigned int AbstractComponent::getVaoId() const
+{
+    return meshVao;
+}
+
+shaderManagement::ShaderDataTracker& AbstractComponent::getKeeper()
+{
+    return shaderDataTracker;
+}
+
+shaderManagement::shaderId AbstractComponent::getShaderId() const
+{
+    return *compShaderPtr;
+}
+
+utils::BoxModel& AbstractComponent::getBoxModel()
+{
+    return boxModel;
 }
 
 bool AbstractComponent::appendAux(AbstractComponent* node)
@@ -223,5 +267,6 @@ void AbstractComponent::setState(UIState* newState)
 
 void AbstractComponent::onClickEvent() {}
 void AbstractComponent::onMoveEvent() {}
+void AbstractComponent::onRenderDone() {}
 void AbstractComponent::onStart() {}
 } // namespace components

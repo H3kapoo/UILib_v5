@@ -1,3 +1,6 @@
+#include <cstdio>
+#include <memory>
+#include <string>
 #include <vector>
 
 #include <GL/glew.h>
@@ -45,7 +48,7 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    // glfwSwapInterval(0); // zero to disable Vsync
+    glfwSwapInterval(0); // zero to disable Vsync
 
     /* Init glew after glfw (we need to have a valid context bound first) */
     if (glewInit() != GLEW_OK)
@@ -63,7 +66,7 @@ int main()
     Div* div5 = new Div();
     Div* div6 = new Div();
 
-    // cm->setRoot(div);
+    cm->setRoot(div);
 
     // div->append({div3, div2});
 
@@ -77,11 +80,11 @@ int main()
     //         println("EE aaa {} {} {}", x, y, (int)z);
     //     });
 
-    // div->showTree();
+    div->showTree();
 
     inputManagement::InputHelper::get().observe(window);
     inputManagement::InputHelper::get().registerOnMouseButtonAction(
-        [&cm](int btn, int act, int mod)
+        [&cm](int btn, int act, int)
         {
             MouseButton b = MouseButton::None;
             KeyAction a = KeyAction::Released;
@@ -112,7 +115,7 @@ int main()
                 a = KeyAction::Released;
             }
 
-            println("Pressed int {} action {} mod {}", btn, act, mod);
+            // println("Pressed int {} action {} mod {}", btn, act, mod);
             cm->mouseClickEvent(b, a, 0);
         });
 
@@ -123,10 +126,32 @@ int main()
 
     cm->resizeEvent(startWindowWidth, startWindowHeight);
 
+    printf("Looping..\n");
+    glEnable(GL_DEPTH_TEST);
+
+    int frameCount = 0;
+    double previousTime = 0;
     while (!glfwWindowShouldClose(window))
     {
+        double currentTime = glfwGetTime();
+        double delta = currentTime - previousTime;
+        frameCount++;
+        if (delta >= 1.0)
+        { // If last cout was more than 1 sec ago
+
+            double fps = double(frameCount) / delta;
+
+            std::string title = "FPS: " + std::to_string(fps);
+            glfwSetWindowTitle(window, title.c_str());
+
+            frameCount = 0;
+            previousTime = currentTime;
+        }
+
+        cm->render();
         glfwSwapBuffers(window);
         glfwWaitEvents();
+        // glfwPollEvents();
     }
 
     /* Free no longer needed init window. User must make sure now there's a context bound
@@ -135,7 +160,7 @@ int main()
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    // deallocateFast({div});
+    // deallocateFast(std::move(divs));
     deallocateFast({div, div2, div3, div4, div5, div6});
     delete cm;
 
