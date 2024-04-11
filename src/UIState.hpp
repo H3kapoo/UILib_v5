@@ -1,3 +1,5 @@
+#pragma once
+
 #include <functional>
 #include <string>
 
@@ -29,6 +31,7 @@ enum MouseButton
     Middle,
     Right
 };
+// TODO: ^^^^ Shall move those away from here ^^^^^^
 
 struct UIState
 {

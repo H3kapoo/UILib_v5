@@ -6,20 +6,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "App.hpp"
 #include "src/Utility.hpp"
-#include "src/components/AbstractComponent.hpp"
-#include "src/components/ComponentManager.hpp"
-#include "src/components/Div.hpp"
 #include "src/inputManagement/Input.hpp"
-
-using namespace components;
-using namespace inputManagement;
-
-void deallocateFast(std::vector<AbstractComponent*>&& obj)
-{
-    for (auto&& o : obj)
-        delete o;
-}
 
 int frameCount = 0;
 double previousTime = 0;
@@ -43,6 +32,7 @@ void frameCounter(GLFWwindow* window)
 
 int main()
 {
+    App app;
     const auto startWindowWidth = 1280;
     const auto startWindowHeight = 720;
     const auto appName = "Another App";
@@ -77,41 +67,9 @@ int main()
         return -1;
     }
 
-    ComponentManager* cm = new ComponentManager();
-
-    Div* div = new Div();
-    // Div* div2 = new Div();
-    // Div* div3 = new Div();
-    // Div* div4 = new Div();
-    // Div* div5 = new Div();
-    // Div* div6 = new Div();
-
-    cm->setRoot(div);
-
-    std::vector<AbstractComponent*> divs;
-    divs.push_back(div);
-
-    for (int i = 0; i < 0; i++)
-    {
-        divs.push_back(new Div());
-    }
-    div->append(divs);
-
-    // div3->append(div4);
-    // div4->append(div5);
-
-    // div->onClickListener(
-    //     [&div5, &div6](int x, int y, MouseButton z)
-    //     {
-    //         // div5->append(div6);
-    //         println("EE aaa {} {} {}", x, y, (int)z);
-    //     });
-
-    // div->showTree();
-
     inputManagement::InputHelper::get().observe(window);
     inputManagement::InputHelper::get().registerOnMouseButtonAction(
-        [&cm](int btn, int act, int)
+        [&app](int btn, int act, int)
         {
             MouseButton b = MouseButton::None;
             KeyAction a = KeyAction::Released;
@@ -141,28 +99,24 @@ int main()
             default:
                 a = KeyAction::Released;
             }
-
-            // println("Pressed int {} action {} mod {}", btn, act, mod);
-            cm->mouseClickEvent(b, a, 0);
+            app.mouseClickEvent(b, a, 0);
         });
 
-    inputManagement::InputHelper::get().registerOnMouseMoveAction(std::bind(&ComponentManager::mouseMoveEvent, cm,
+    inputManagement::InputHelper::get().registerOnMouseMoveAction(std::bind(&App::mouseMoveEvent, &app,
         std::placeholders::_1, std::placeholders::_2));
-    inputManagement::InputHelper::get().registerOnWindowResizeAction(std::bind(&ComponentManager::resizeEvent, cm,
+    inputManagement::InputHelper::get().registerOnWindowResizeAction(std::bind(&App::resizeEvent, &app,
         std::placeholders::_1, std::placeholders::_2));
 
-    cm->resizeEvent(startWindowWidth, startWindowHeight);
+    app.start(startWindowWidth, startWindowHeight);
 
-    printf("Looping..\n");
     glEnable(GL_DEPTH_TEST);
-
     while (!glfwWindowShouldClose(window))
     {
         frameCounter(window);
 
-        // glfwWaitEvents();
-        glfwPollEvents();
-        cm->render();
+        glfwWaitEvents();
+        // glfwPollEvents();
+        app.update();
         glfwSwapBuffers(window);
     }
 
@@ -172,9 +126,7 @@ int main()
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    deallocateFast(std::move(divs));
     // deallocateFast({div, div2, div3, div4, div5, div6});
-    delete cm;
 
     return 0;
 }

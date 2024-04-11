@@ -23,6 +23,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     add_executable(${PROJECT_NAME}
         main.cpp
+        App.cpp
         src/components/Div.cpp
         src/components/AbstractComponent.cpp
         src/components/ComponentManager.cpp
