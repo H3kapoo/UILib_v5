@@ -123,64 +123,65 @@ void ShaderLoader::reloadFromPath(const std::string& shaderPath)
 
 void ShaderLoader::setInt(const char* location, int value)
 {
-    int loc = glGetUniformLocation(gActiveShaderId, location);
+    int loc = glGetUniformLocation(activeShaderId, location);
     if (loc == -1) return handleNotFound(location);
     glUniform1i(loc, value);
 }
 
 void ShaderLoader::setIntVec(const char* location, uint32_t amount, int* flatValues)
 {
-    int loc = glGetUniformLocation(gActiveShaderId, location);
+    int loc = glGetUniformLocation(activeShaderId, location);
     if (loc == -1) return handleNotFound(location);
     glUniform1iv(loc, amount, flatValues);
 }
 
 void ShaderLoader::setVec1f(const char* location, float value)
 {
-    int loc = glGetUniformLocation(gActiveShaderId, location);
+    int loc = glGetUniformLocation(activeShaderId, location);
     if (loc == -1) return handleNotFound(location);
     glUniform1f(loc, value);
 }
 
 void ShaderLoader::setVec2f(const char* location, glm::vec2 value)
 {
-    int loc = glGetUniformLocation(gActiveShaderId, location);
+    int loc = glGetUniformLocation(activeShaderId, location);
     if (loc == -1) return handleNotFound(location);
     glUniform2f(loc, value.x, value.y);
 }
 
 void ShaderLoader::setVec3f(const char* location, glm::vec3 value)
 {
-    int loc = glGetUniformLocation(gActiveShaderId, location);
+    int loc = glGetUniformLocation(activeShaderId, location);
     if (loc == -1) return handleNotFound(location);
     glUniform3f(loc, value.x, value.y, value.z);
 }
 
-void ShaderLoader::setVec4f(const char* location, glm::vec4 value)
+void ShaderLoader::setVec4f(const char* location, glm::vec4& value) const
 {
-    int loc = glGetUniformLocation(gActiveShaderId, location);
+    int loc = glGetUniformLocation(activeShaderId, location);
     if (loc == -1) return handleNotFound(location);
     glUniform4f(loc, value.r, value.g, value.b, value.a);
 }
 
 void ShaderLoader::setMatrix4(const char* location, const glm::mat4 value)
 {
-    int loc = glGetUniformLocation(gActiveShaderId, location);
+    int loc = glGetUniformLocation(activeShaderId, location);
     if (loc == -1) return handleNotFound(location);
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 void ShaderLoader::setMatrix4Vec(const char* location, uint32_t amount, const float* flatValues)
 {
-    int loc = glGetUniformLocation(gActiveShaderId, location);
+    int loc = glGetUniformLocation(activeShaderId, location);
     if (loc == -1) return handleNotFound(location);
     glUniformMatrix4fv(loc, amount, GL_FALSE, flatValues);
 }
 
 void ShaderLoader::setActiveShaderId(const shaderId id)
 {
-    gActiveShaderId = id;
-    glUseProgram(gActiveShaderId);
+    if (activeShaderId == id) { return; }
+    activeShaderId = id;
+    glUseProgram(activeShaderId);
 }
 
 void ShaderLoader::resetBoundShader() const
@@ -190,26 +191,26 @@ void ShaderLoader::resetBoundShader() const
 
 shaderId ShaderLoader::getActiveShaderId() const
 {
-    return gActiveShaderId;
+    return activeShaderId;
 }
 
 int ShaderLoader::linkShaders(int vertShaderId, int fragShaderId)
 {
     if (vertShaderId == -1 || fragShaderId == -1) { return -1; }
 
-    gActiveShaderId = glCreateProgram();
+    auto shId = glCreateProgram();
 
-    glAttachShader(gActiveShaderId, vertShaderId);
-    glAttachShader(gActiveShaderId, fragShaderId);
-    glLinkProgram(gActiveShaderId);
+    glAttachShader(shId, vertShaderId);
+    glAttachShader(shId, fragShaderId);
+    glLinkProgram(shId);
 
     int success;
     char infoLog[512];
-    glGetProgramiv(gActiveShaderId, GL_LINK_STATUS, &success);
+    glGetProgramiv(shId, GL_LINK_STATUS, &success);
 
     if (!success)
     {
-        glGetProgramInfoLog(gActiveShaderId, 512, nullptr, infoLog);
+        glGetProgramInfoLog(shId, 512, nullptr, infoLog);
         printlne("Could not link program because:\n\t{}\n", infoLog);
 #if EXIT_ON_ERROR == 1
         exit(1);
@@ -220,7 +221,7 @@ int ShaderLoader::linkShaders(int vertShaderId, int fragShaderId)
     glDeleteShader(vertShaderId);
     glDeleteShader(fragShaderId);
 
-    return gActiveShaderId;
+    return shId;
 }
 
 int ShaderLoader::compileShader(const std::string& sourcePath, int32_t shaderType)
@@ -269,13 +270,13 @@ int ShaderLoader::compileShaderData(const std::string& data, int32_t shaderType)
 }
 
 #if UNIFORMS_DEBUG_PRINT == 1
-void ShaderLoader::handleNotFound(const char* location)
+void ShaderLoader::handleNotFound(const char* location) const
 {
-    printlne("Uniform '{}' has not been found in bound shader: {}\n", location, gActiveShaderId);
+    printlne("Uniform '{}' has not been found in bound shader: {}\n", location, activeShaderId);
     exit(1);
 }
 #elif UNIFORMS_DEBUG_PRINT == 2
-void ShaderLoader::handleNotFound(const char* location)
+void ShaderLoader::handleNotFound(const char* location) const
 {
     printlne("Uniform '{}' has not been found in bound shader: {}\n", location, gActiveShaderId);
 }

@@ -34,10 +34,10 @@ void ComponentManager::removeRoot()
 
 void ComponentManager::render()
 {
-    // TODO: Now this is a hard decision..when to render..
     renderer.clearScreen();
     for (const auto& childNode : flattenedNodes)
     {
+        childNode->onPrepareToRender();
         renderer.renderComponent(*childNode);
         childNode->onRenderDone();
     }
@@ -74,10 +74,15 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
 {
     state.windowWidth = newWidth;
     state.windowHeight = newHeight;
+    printlni("Resizing...");
     glm::mat4 projMatrix = glm::ortho(0.0f, (float)newWidth, (float)newHeight, 0.0f, renderer::Renderer::MAX_LAYERS,
         0.0f);
 
     renderer.setProjectionMatrix(projMatrix);
+
+    /* glViewport is needed after changing the ortho matrix or else
+       the NDC coordinates will not be mapped correctly to screen coordinates. */
+    glViewport(0, 0, newWidth, newHeight);
 }
 
 void ComponentManager::updateInternalStructure(const std::string& action)

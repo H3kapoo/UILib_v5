@@ -11,9 +11,10 @@ public:
     Div();
     ~Div();
 
-    void onClickListener(std::function<void(int, int, MouseButton)> func);
+    void addClickListener(std::function<void(int, int, MouseButton)> func);
 
 private:
+    void onPrepareToRender() override;
     void onClickEvent() override;
     void onMoveEvent() override;
     void onStart() override;

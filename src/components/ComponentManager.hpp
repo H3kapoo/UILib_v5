@@ -32,6 +32,14 @@ public:
      */
     void removeRoot();
 
+    /**
+     * @brief Render the components associated with the currently bound root.
+     *
+     * There are 3 passes for each component: preRender, actual render and post render pass.
+     * PreRender pass gives compoenent time to setup associated shader uniforms, for example.
+     * Render pass actually sends data to the gpu and draw calls.
+     * PostRender pass can be used by the component to render additional assets on top of it, for example.
+     */
     void render();
 
     /* Events handlers */

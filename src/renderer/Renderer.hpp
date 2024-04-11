@@ -49,6 +49,7 @@ public:
 private:
     shaderManagement::ShaderLoader& shaderLoader; /* Justified use of ref& */
 
+    unsigned int boundVao{0};
     glm::mat4 projectionMatrix;
 };
 } // namespace renderer

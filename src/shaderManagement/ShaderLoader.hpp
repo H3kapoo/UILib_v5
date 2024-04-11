@@ -194,7 +194,7 @@ public:
      *
      * @return Doesn't return anything.
      */
-    void setVec4f(const char* location, glm::vec4 value);
+    void setVec4f(const char* location, glm::vec4& value) const;
 
     /**
      * @brief Load 4x4 Matrix uniform to currently active shader **Id**.
@@ -243,7 +243,7 @@ private:
      *
      * @return Nothing.
      */
-    void handleNotFound(const char* location);
+    void handleNotFound(const char* location) const;
 
     /**
      * @brief Link shader stages.
@@ -273,6 +273,6 @@ private:
        is to reset parameters/values that we don't want for that particular object.*/
     std::map<std::string, int*> shaderPathToGenId;
 
-    shaderId gActiveShaderId{0};
+    shaderId activeShaderId{-1};
 };
 } // namespace shaderManagement

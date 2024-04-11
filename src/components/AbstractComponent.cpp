@@ -12,8 +12,7 @@ AbstractComponent::AbstractComponent(const std::string& compType)
     id = generateNextId();
     type = compType;
     meshVao = mesh::QuadMesh::get().generateMesh();
-    compShaderPtr =
-        shaderManagement::ShaderLoader::get().loadFromPath("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl");
+    compShaderPtr = shaderLoaderRef.loadFromPath("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl");
 }
 
 AbstractComponent::~AbstractComponent()
@@ -150,9 +149,9 @@ unsigned int AbstractComponent::getVaoId() const
     return meshVao;
 }
 
-shaderManagement::ShaderDataTracker& AbstractComponent::getKeeper()
+shaderManagement::ShaderLoader& AbstractComponent::getShader()
 {
-    return shaderDataTracker;
+    return shaderLoaderRef;
 }
 
 shaderManagement::shaderId AbstractComponent::getShaderId() const
@@ -160,7 +159,16 @@ shaderManagement::shaderId AbstractComponent::getShaderId() const
     return *compShaderPtr;
 }
 
-utils::BoxModel& AbstractComponent::getBoxModel()
+utils::BoxModel& AbstractComponent::getBoxModelRW()
+{
+    /* Note: Marking it dirty because 99% of the time we will modify something on it, so better to mark it dirty as soon
+       as we get the object.
+       In case it's 100% known we only want to read it and not modify it, explicitly call getBoxModelRead(). */
+    boxModel.markDirty();
+    return boxModel;
+}
+
+utils::BoxModel& AbstractComponent::getBoxModelRead()
 {
     return boxModel;
 }
@@ -234,6 +242,7 @@ void AbstractComponent::showTree(int currentDepth)
     {
         print("    ");
     }
+
     print("\\---");
     details();
 
@@ -267,6 +276,11 @@ void AbstractComponent::setState(UIState* newState)
 
 void AbstractComponent::onClickEvent() {}
 void AbstractComponent::onMoveEvent() {}
+void AbstractComponent::onPrepareToRender()
+{
+    // TODO: In shader loader make sure we dont bind the same shader thats already bound.
+    // shaderLoaderRef.setActiveShaderId(*compShaderPtr);
+}
 void AbstractComponent::onRenderDone() {}
 void AbstractComponent::onStart() {}
 } // namespace components

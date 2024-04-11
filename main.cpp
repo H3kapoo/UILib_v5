@@ -21,6 +21,26 @@ void deallocateFast(std::vector<AbstractComponent*>&& obj)
         delete o;
 }
 
+int frameCount = 0;
+double previousTime = 0;
+void frameCounter(GLFWwindow* window)
+{
+    double currentTime = glfwGetTime();
+    double delta = currentTime - previousTime;
+    frameCount++;
+    if (delta >= 1.0)
+    { // If last cout was more than 1 sec ago
+
+        double fps = double(frameCount) / delta;
+
+        std::string title = "FPS: " + std::to_string(fps);
+        glfwSetWindowTitle(window, title.c_str());
+
+        frameCount = 0;
+        previousTime = currentTime;
+    }
+}
+
 int main()
 {
     const auto startWindowWidth = 1280;
@@ -60,15 +80,22 @@ int main()
     ComponentManager* cm = new ComponentManager();
 
     Div* div = new Div();
-    Div* div2 = new Div();
-    Div* div3 = new Div();
-    Div* div4 = new Div();
-    Div* div5 = new Div();
-    Div* div6 = new Div();
+    // Div* div2 = new Div();
+    // Div* div3 = new Div();
+    // Div* div4 = new Div();
+    // Div* div5 = new Div();
+    // Div* div6 = new Div();
 
     cm->setRoot(div);
 
-    // div->append({div3, div2});
+    std::vector<AbstractComponent*> divs;
+    divs.push_back(div);
+
+    for (int i = 0; i < 0; i++)
+    {
+        divs.push_back(new Div());
+    }
+    div->append(divs);
 
     // div3->append(div4);
     // div4->append(div5);
@@ -80,7 +107,7 @@ int main()
     //         println("EE aaa {} {} {}", x, y, (int)z);
     //     });
 
-    div->showTree();
+    // div->showTree();
 
     inputManagement::InputHelper::get().observe(window);
     inputManagement::InputHelper::get().registerOnMouseButtonAction(
@@ -129,29 +156,14 @@ int main()
     printf("Looping..\n");
     glEnable(GL_DEPTH_TEST);
 
-    int frameCount = 0;
-    double previousTime = 0;
     while (!glfwWindowShouldClose(window))
     {
-        double currentTime = glfwGetTime();
-        double delta = currentTime - previousTime;
-        frameCount++;
-        if (delta >= 1.0)
-        { // If last cout was more than 1 sec ago
+        frameCounter(window);
 
-            double fps = double(frameCount) / delta;
-
-            std::string title = "FPS: " + std::to_string(fps);
-            glfwSetWindowTitle(window, title.c_str());
-
-            frameCount = 0;
-            previousTime = currentTime;
-        }
-
+        // glfwWaitEvents();
+        glfwPollEvents();
         cm->render();
         glfwSwapBuffers(window);
-        glfwWaitEvents();
-        // glfwPollEvents();
     }
 
     /* Free no longer needed init window. User must make sure now there's a context bound
@@ -160,8 +172,8 @@ int main()
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    // deallocateFast(std::move(divs));
-    deallocateFast({div, div2, div3, div4, div5, div6});
+    deallocateFast(std::move(divs));
+    // deallocateFast({div, div2, div3, div4, div5, div6});
     delete cm;
 
     return 0;

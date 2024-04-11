@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "../UIState.hpp"
-#include "../shaderManagement/ShaderDataTracker.hpp"
 #include "../shaderManagement/ShaderLoader.hpp"
 #include "utils/BoxModel.hpp"
 
@@ -110,9 +109,10 @@ public:
     int getId() const;
     const std::string& getType() const;
     unsigned int getVaoId() const;
-    shaderManagement::ShaderDataTracker& getKeeper();
+    shaderManagement::ShaderLoader& getShader();
     shaderManagement::shaderId getShaderId() const;
-    utils::BoxModel& getBoxModel();
+    utils::BoxModel& getBoxModelRW();
+    utils::BoxModel& getBoxModelRead();
 
 private:
     /* Internal helpers */
@@ -128,14 +128,15 @@ private:
     /* Should only be used for the tree Root node. Accessible only via CM */
     void setState(UIState* newState);
 
-    // uniforms and shaders
-    UIState* state{nullptr};
-
+    /* Rendering related */
     utils::BoxModel boxModel;
     unsigned int meshVao{0};
-    shaderManagement::ShaderDataTracker shaderDataTracker{};
     shaderManagement::shaderIdPtr compShaderPtr{nullptr}; /* Pointer due to hot-reload */
-    int depth{0};                                         /* 0 depth means it's root node of tree */
+    shaderManagement::ShaderLoader& shaderLoaderRef{shaderManagement::ShaderLoader::get()};
+
+    /* Tree component structure related */
+    UIState* state{nullptr};
+    int depth{0}; /* 0 depth means it's root node of tree */
     int id{1};
     bool isRuntimeInitialized{false};
     bool isParented{false};
@@ -147,6 +148,7 @@ protected:
     /* Virtuals called by CM */
     virtual void onClickEvent();
     virtual void onMoveEvent();
+    virtual void onPrepareToRender();
     virtual void onRenderDone();
     virtual void onStart();
 };
