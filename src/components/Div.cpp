@@ -16,7 +16,7 @@ Div::~Div()
 void Div::onPrepareToRender()
 {
     getShader().setActiveShaderId(getShaderId());
-    getShader().setVec4f("uColor", color);
+    getShader().setVec4f("uColor", style.color);
 }
 
 void Div::addClickListener(std::function<void(int, int, MouseButton)> func)
@@ -27,10 +27,8 @@ void Div::addClickListener(std::function<void(int, int, MouseButton)> func)
 void Div::onClickEvent()
 {
     // println("Div element id {} has been clicked!", getId());
-    const auto& s = getState();
 
-    auto& bm = getBoxModelRW();
-    bm.pos = {s->mouseX - bm.scale.x / 2, s->mouseY - bm.scale.y / 2, 1.0f};
+    const auto& s = getState();
     if (mouseClickCb) mouseClickCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
 };
 
@@ -42,6 +40,13 @@ void Div::onMoveEvent()
 
 void Div::onStart()
 {
+    // getBoxModelRW().pos.z = getDepth(); // TODO: Shall not exist
     // printlni("[INF] I am node {} and onStart() called", getId());
 }
+
+void Div::onLayoutUpdate()
+{
+    layoutCalc.calculate(style.someOption);
+}
+
 } // namespace components

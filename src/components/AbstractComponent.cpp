@@ -6,6 +6,9 @@
 namespace components
 {
 
+struct SomeStyle
+{};
+
 // TODO: In the future, ctor could take a configuration object
 AbstractComponent::AbstractComponent(const std::string& compType)
 {
@@ -106,7 +109,7 @@ void AbstractComponent::details()
 {
     const auto pid = parent ? std::to_string(parent->getId()) : "N/A";
     const auto dep = depth ? std::to_string(depth) : "Root(0)";
-    println("{{id: {}, pid={}, depth={}, type: {}}}", id, pid, dep, type);
+    utils::println("{{id: {}, pid={}, depth={}, type: {}}}", id, pid, dep, type);
 }
 
 void AbstractComponent::showTree()
@@ -159,7 +162,7 @@ shaderManagement::shaderId AbstractComponent::getShaderId() const
     return *compShaderPtr;
 }
 
-utils::BoxModel& AbstractComponent::getBoxModelRW()
+computils::BoxModel& AbstractComponent::getBoxModelRW()
 {
     /* Note: Marking it dirty because 99% of the time we will modify something on it, so better to mark it dirty as soon
        as we get the object.
@@ -168,7 +171,7 @@ utils::BoxModel& AbstractComponent::getBoxModelRW()
     return boxModel;
 }
 
-utils::BoxModel& AbstractComponent::getBoxModelRead()
+computils::BoxModel& AbstractComponent::getBoxModelRead()
 {
     return boxModel;
 }
@@ -177,19 +180,19 @@ bool AbstractComponent::appendAux(AbstractComponent* node)
 {
     if (!node)
     {
-        println("[ERR] Tried to append an uninitialized node");
+        utils::println("[ERR] Tried to append an uninitialized node");
         return false;
     }
 
     if (node->isParented)
     {
-        println("[ERR] Tried to append already parented nId {} to {}", node->id, id);
+        utils::println("[ERR] Tried to append already parented nId {} to {}", node->id, id);
         return false;
     }
 
     if (!state)
     {
-        println("[ERR] Tried to append without state being set in nId: {} (maybe orphan node)", id);
+        utils::println("[ERR] Tried to append without state being set in nId: {} (maybe orphan node)", id);
         return false;
     }
 
@@ -207,7 +210,7 @@ bool AbstractComponent::removeAux(AbstractComponent* node)
     if (children.empty()) { return false; }
     if (!node)
     {
-        println("[ERR] Passed nullptr node for removal");
+        utils::println("[ERR] Passed nullptr node for removal");
         return false;
     }
 
@@ -240,10 +243,10 @@ void AbstractComponent::showTree(int currentDepth)
 {
     for (int i = 0; i < currentDepth; i++)
     {
-        print("    ");
+        utils::print("    ");
     }
 
-    print("\\---");
+    utils::print("\\---");
     details();
 
     for (const auto& node : children)
@@ -259,6 +262,9 @@ void AbstractComponent::updateNodeStructure()
     {
         /* Init needs to be set first thing to avoid infinite loops in case nodes spawn children inside them */
         isRuntimeInitialized = true;
+
+        /* Feed layer position so it knows on top of what to render */
+        boxModel.layer = getDepth();
         onStart();
     };
 
@@ -283,4 +289,6 @@ void AbstractComponent::onPrepareToRender()
 }
 void AbstractComponent::onRenderDone() {}
 void AbstractComponent::onStart() {}
+void AbstractComponent::onLayoutUpdate() {}
+
 } // namespace components

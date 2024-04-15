@@ -1,13 +1,15 @@
 # ninja log v5
 12	5198	1712818915190152287	CMakeFiles/test.dir/src/inputManagement/Input.cpp.o	cbdbfd42fd1d4d9b
-7	3684	1712856675897298949	CMakeFiles/test.dir/App.cpp.o	4ad6da24a738d852
-7145	7416	1712856679629358357	../debug/test	40e2de673d887b
-7	6821	1712856679033348875	CMakeFiles/test.dir/main.cpp.o	88224d1971de4ba8
-9	7145	1712856679357354030	CMakeFiles/test.dir/src/components/ComponentManager.cpp.o	4dbe177acf48069
-8	6844	1712856679053349193	CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o	a3ca8c13724fb101
-10	5433	1712856677645326782	CMakeFiles/test.dir/src/renderer/Renderer.cpp.o	2de5fd38586be029
-8	4930	1712856677145318823	CMakeFiles/test.dir/src/components/Div.cpp.o	da55e3e1266f0076
-5	2692	1712818994319480103	CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o	bb8acf239b26adc0
+4	3500	1713198784422957048	CMakeFiles/test.dir/App.cpp.o	4ad6da24a738d852
+2839	3085	1713198820547349514	../debug/test	2e6f42664a4abb0b
+4	4896	1713198785818972211	CMakeFiles/test.dir/main.cpp.o	88224d1971de4ba8
+4	1755	1713198401610813772	CMakeFiles/test.dir/src/components/layoutCalc/LayoutCalculator.cpp.o	e0711d3abb207746
+4	2839	1713198820299346819	CMakeFiles/test.dir/src/components/ComponentManager.cpp.o	4dbe177acf48069
+6	5587	1713128307700276239	CMakeFiles/test.dir/src/components/layoutCalc/SimpleLC.cpp.o	8ca5066c23f3ffe4
+5	6889	1713188471756101444	CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o	a3ca8c13724fb101
+7	5983	1713188470852091828	CMakeFiles/test.dir/src/renderer/Renderer.cpp.o	2de5fd38586be029
+5	5595	1713188470460087658	CMakeFiles/test.dir/src/components/Div.cpp.o	da55e3e1266f0076
+4	2695	1713112918583429417	CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o	bb8acf239b26adc0
 13	5843	1712818915834163356	CMakeFiles/test.dir/src/mesh/QuadMesh.cpp.o	d8bf2dacd8fef23d
-4	3732	1712856707673802734	CMakeFiles/test.dir/src/components/Div.cpp.o	da55e3e1266f0076
-3732	4002	1712856707945807027	../debug/test	40e2de673d887b
+3	2908	1713198828983441194	CMakeFiles/test.dir/src/components/ComponentManager.cpp.o	4dbe177acf48069
+2908	3233	1713198829307444715	../debug/test	2e6f42664a4abb0b

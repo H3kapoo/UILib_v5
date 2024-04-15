@@ -4,7 +4,7 @@
 
 #include "../UIState.hpp"
 #include "../shaderManagement/ShaderLoader.hpp"
-#include "utils/BoxModel.hpp"
+#include "compUtils/BoxModel.hpp"
 
 namespace components
 {
@@ -28,6 +28,8 @@ public:
     /**
      * @brief Append single component to this component.
      *
+     * @note DO NOT APPEND if parent isnt part of the tree yet. This will set depth incorrectly.
+     *
      * @param comp - trivial
      *
      * @return True if comp got appended successfully. False otherwise.
@@ -36,6 +38,8 @@ public:
 
     /**
      * @brief Append multiple components to this component.
+     *
+     * @note DO NOT APPEND if parent isnt part of the tree yet. This will set depth incorrectly.
      *
      * @param comps - trivial
      *
@@ -54,6 +58,8 @@ public:
 
     /**
      * @brief Remove single component from this component.
+     *
+     * @note DO NOT APPEND if parent isnt part of the tree yet. This will set depth incorrectly.
      *
      * @param comp - trivial
      *
@@ -111,8 +117,8 @@ public:
     unsigned int getVaoId() const;
     shaderManagement::ShaderLoader& getShader();
     shaderManagement::shaderId getShaderId() const;
-    utils::BoxModel& getBoxModelRW();
-    utils::BoxModel& getBoxModelRead();
+    computils::BoxModel& getBoxModelRW();
+    computils::BoxModel& getBoxModelRead();
 
 private:
     /* Internal helpers */
@@ -129,14 +135,14 @@ private:
     void setState(UIState* newState);
 
     /* Rendering related */
-    utils::BoxModel boxModel;
+    computils::BoxModel boxModel;
     unsigned int meshVao{0};
     shaderManagement::shaderIdPtr compShaderPtr{nullptr}; /* Pointer due to hot-reload */
     shaderManagement::ShaderLoader& shaderLoaderRef{shaderManagement::ShaderLoader::get()};
 
     /* Tree component structure related */
     UIState* state{nullptr};
-    int depth{0}; /* 0 depth means it's root node of tree */
+    int depth{1}; /* 1 depth means it's root node of tree */
     int id{1};
     bool isRuntimeInitialized{false};
     bool isParented{false};
@@ -151,5 +157,6 @@ protected:
     virtual void onPrepareToRender();
     virtual void onRenderDone();
     virtual void onStart();
+    virtual void onLayoutUpdate();
 };
 } // namespace components

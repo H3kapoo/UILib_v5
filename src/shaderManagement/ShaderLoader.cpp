@@ -19,8 +19,8 @@ ShaderLoader::~ShaderLoader()
     /* Free shaderIdPtr memory */
     for (auto& [key, value] : shaderPathToGenId)
     {
-        if (!value || *value == -1) { printlnw("Unloading shader that failed to load: {}", key); }
-        else { printlni("Unloading shader Id {} for key {}", *value, key); }
+        if (!value || *value == -1) { utils::printlnw("Unloading shader that failed to load: {}", key); }
+        else { utils::printlni("Unloading shader Id {} for key {}", *value, key); }
         delete value;
     }
 }
@@ -38,7 +38,7 @@ shaderIdPtr ShaderLoader::loadFromImmediate(
         compileShaderData(fragCode, GL_FRAGMENT_SHADER));
 
     shaderPathToGenId[key] = newId;
-    if (*newId != -1) { printlni("Loaded shader Id {} from key {}", *newId, key.c_str()); }
+    if (*newId != -1) { utils::printlni("Loaded shader Id {} from key {}", *newId, key.c_str()); }
 
     return newId;
 }
@@ -51,7 +51,7 @@ shaderIdPtr ShaderLoader::loadFromPath(const std::string& shaderPath)
     std::ifstream shaderFile(shaderPath);
     if (!shaderFile)
     {
-        printlne("Could not open shader file at {}\n", shaderPath.c_str());
+        utils::printlne("Could not open shader file at {}\n", shaderPath.c_str());
 #if EXIT_ON_ERROR == 1
         exit(1);
 #endif
@@ -82,7 +82,7 @@ shaderIdPtr ShaderLoader::loadFromPath(const std::string& vertPath, const std::s
 
     shaderPathToGenId[combinedPath] = newId;
 
-    if (*newId != -1) { printlni("Loaded shader {}: {} + {}", *newId, vertPath.c_str(), fragPath.c_str()); }
+    if (*newId != -1) { utils::printlni("Loaded shader {}: {} + {}", *newId, vertPath.c_str(), fragPath.c_str()); }
 
     return newId;
 }
@@ -211,7 +211,7 @@ int ShaderLoader::linkShaders(int vertShaderId, int fragShaderId)
     if (!success)
     {
         glGetProgramInfoLog(shId, 512, nullptr, infoLog);
-        printlne("Could not link program because:\n\t{}\n", infoLog);
+        utils::printlne("Could not link program because:\n\t{}\n", infoLog);
 #if EXIT_ON_ERROR == 1
         exit(1);
 #endif
@@ -230,7 +230,7 @@ int ShaderLoader::compileShader(const std::string& sourcePath, int32_t shaderTyp
     std::ifstream shaderFile(sourcePath);
     if (!shaderFile)
     {
-        printlne("Could not open {} shader file at {}\n", type.c_str(), sourcePath.c_str());
+        utils::printlne("Could not open {} shader file at {}\n", type.c_str(), sourcePath.c_str());
 #if EXIT_ON_ERROR == 1
         exit(1);
 #endif
@@ -259,7 +259,7 @@ int ShaderLoader::compileShaderData(const std::string& data, int32_t shaderType)
     {
         glGetShaderInfoLog(shaderPart, 512, NULL, infoLog);
         std::string type = shaderType == GL_VERTEX_SHADER ? "VERTEX" : "FRAG";
-        printlne("Compile failed for shader {} because:\n\t{}", type.c_str(), infoLog);
+        utils::printlne("Compile failed for shader {} because:\n\t{}", type.c_str(), infoLog);
 #if EXIT_ON_ERROR == 1
         exit(1);
 #endif
@@ -272,13 +272,13 @@ int ShaderLoader::compileShaderData(const std::string& data, int32_t shaderType)
 #if UNIFORMS_DEBUG_PRINT == 1
 void ShaderLoader::handleNotFound(const char* location) const
 {
-    printlne("Uniform '{}' has not been found in bound shader: {}\n", location, activeShaderId);
+    utils::printlne("Uniform '{}' has not been found in bound shader: {}\n", location, activeShaderId);
     exit(1);
 }
 #elif UNIFORMS_DEBUG_PRINT == 2
 void ShaderLoader::handleNotFound(const char* location) const
 {
-    printlne("Uniform '{}' has not been found in bound shader: {}\n", location, gActiveShaderId);
+    utils::printlne("Uniform '{}' has not been found in bound shader: {}\n", location, gActiveShaderId);
 }
 #else
 void ShaderLoader::handleNotFound(const char* location) {}

@@ -1,4 +1,5 @@
 #include "App.hpp"
+#include "src/Utility.hpp"
 
 App::~App()
 {
@@ -8,41 +9,50 @@ App::~App()
 
 void App::start(int initialWidth, int initialHeight)
 {
-    // Div* div2 = new Div();
-    // Div* div3 = new Div();
-    // Div* div4 = new Div();
-    // Div* div5 = new Div();
-    // Div* div6 = new Div();
+    /* Create objects with known long lifetime */
+    // rootDiv = new Div();
+    // div2 = new Div();
 
-    rootDiv = new Div();
-    cm.setRoot(rootDiv);
+    /* Root needs to be set before performing any append/rm operation */
+    componentManager.setRoot(&rootDiv);
+    // rootDiv.append({&div2, &div3, &div4});
 
-    divs.push_back(rootDiv);
-    for (int i = 0; i < 5'000; i++)
+    rootDiv.style.color = utils::hexToVec4("#125ea9ff");
+    // div2.style.color = utils::hexToVec4("#9212a9ff");
+    // rootDiv.layoutOptions.someOption = true;
+    // divs.push_back(&rootDiv);
+    for (int i = 0; i < 10; i++)
     {
-        divs.push_back(new Div());
+        const auto div = new Div();
+        div->style.color = utils::hexToVec4("#9212a9ff");
+        divs.push_back(div);
     }
-    rootDiv->append(divs);
+    rootDiv.append(divs);
 
-    cm.resizeEvent(initialWidth, initialHeight);
+    rootDiv.showTree();
+
+    /* Trigger initial resize event to "stabilize" the scene */
+    componentManager.resizeEvent(initialWidth, initialHeight);
 }
 
 void App::update()
 {
-    cm.render();
+    // TODO: This needs to be carefully thought when it should be called and on what
+    componentManager.updateLayout();
+    componentManager.render();
 }
 
 void App::mouseClickEvent(MouseButton button, KeyAction action, ActiveModifiersBits mods)
 {
-    cm.mouseClickEvent(button, action, mods);
+    componentManager.mouseClickEvent(button, action, mods);
 }
 
 void App::mouseMoveEvent(double mouseX, double mouseY)
 {
-    cm.mouseMoveEvent(mouseX, mouseY);
+    componentManager.mouseMoveEvent(mouseX, mouseY);
 }
 
 void App::resizeEvent(int newWidth, int newHeight)
 {
-    cm.resizeEvent(newWidth, newHeight);
+    componentManager.resizeEvent(newWidth, newHeight);
 }

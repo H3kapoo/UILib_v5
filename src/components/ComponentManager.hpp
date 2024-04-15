@@ -32,6 +32,9 @@ public:
      */
     void removeRoot();
 
+    // EXPERIMENTAL
+    void updateLayout();
+
     /**
      * @brief Render the components associated with the currently bound root.
      *
@@ -92,7 +95,7 @@ private:
     UIState state;
 
     /* These will be deallocated trivially*/
-    AbstractComponent* root;
+    AbstractComponent* root{nullptr};
     std::vector<AbstractComponent*> flattenedNodes;
 };
 } // namespace components

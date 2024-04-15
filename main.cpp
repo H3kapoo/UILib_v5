@@ -32,7 +32,6 @@ void frameCounter(GLFWwindow* window)
 
 int main()
 {
-    App app;
     const auto startWindowWidth = 1280;
     const auto startWindowHeight = 720;
     const auto appName = "Another App";
@@ -40,7 +39,7 @@ int main()
     /* Init glfw */
     if (glfwInit() == GLFW_FALSE)
     {
-        println("[ERR] Something happened while trying to initialize GLFW");
+        utils::printlne("Something happened while trying to initialize GLFW");
         return -1;
     }
 
@@ -52,7 +51,7 @@ int main()
     GLFWwindow* window = glfwCreateWindow(startWindowWidth, startWindowHeight, appName, NULL, NULL);
     if (window == NULL)
     {
-        println("[ERR] Failed to create glew initializing window");
+        utils::printlne("Failed to create glew initializing window");
         glfwTerminate();
         return -1;
     }
@@ -63,9 +62,11 @@ int main()
     /* Init glew after glfw (we need to have a valid context bound first) */
     if (glewInit() != GLEW_OK)
     {
-        println("[ERR] GLEW failed to initialize");
+        utils::printlne("GLEW failed to initialize");
         return -1;
     }
+
+    App app;
 
     inputManagement::InputHelper::get().observe(window);
     inputManagement::InputHelper::get().registerOnMouseButtonAction(
@@ -114,8 +115,8 @@ int main()
     {
         frameCounter(window);
 
-        glfwWaitEvents();
-        // glfwPollEvents();
+        // glfwWaitEvents();
+        glfwPollEvents();
         app.update();
         glfwSwapBuffers(window);
     }

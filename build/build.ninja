@@ -79,6 +79,13 @@ build CMakeFiles/test.dir/src/components/ComponentManager.cpp.o: CXX_COMPILER__t
   OBJECT_DIR = CMakeFiles/test.dir
   OBJECT_FILE_DIR = CMakeFiles/test.dir/src/components
 
+build CMakeFiles/test.dir/src/components/layoutCalc/LayoutCalculator.cpp.o: CXX_COMPILER__test_ /home/hekapoo/newTryAtUI/src/components/layoutCalc/LayoutCalculator.cpp || cmake_object_order_depends_target_test
+  DEP_FILE = CMakeFiles/test.dir/src/components/layoutCalc/LayoutCalculator.cpp.o.d
+  FLAGS = -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23
+  INCLUDES = -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include
+  OBJECT_DIR = CMakeFiles/test.dir
+  OBJECT_FILE_DIR = CMakeFiles/test.dir/src/components/layoutCalc
+
 build CMakeFiles/test.dir/src/inputManagement/Input.cpp.o: CXX_COMPILER__test_ /home/hekapoo/newTryAtUI/src/inputManagement/Input.cpp || cmake_object_order_depends_target_test
   DEP_FILE = CMakeFiles/test.dir/src/inputManagement/Input.cpp.o.d
   FLAGS = -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23
@@ -115,7 +122,7 @@ build CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o: CXX_COMPILER_
 #############################################
 # Link the executable ../debug/test
 
-build ../debug/test: CXX_EXECUTABLE_LINKER__test_ CMakeFiles/test.dir/main.cpp.o CMakeFiles/test.dir/App.cpp.o CMakeFiles/test.dir/src/components/Div.cpp.o CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o CMakeFiles/test.dir/src/components/ComponentManager.cpp.o CMakeFiles/test.dir/src/inputManagement/Input.cpp.o CMakeFiles/test.dir/src/mesh/QuadMesh.cpp.o CMakeFiles/test.dir/src/renderer/Renderer.cpp.o CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o
+build ../debug/test: CXX_EXECUTABLE_LINKER__test_ CMakeFiles/test.dir/main.cpp.o CMakeFiles/test.dir/App.cpp.o CMakeFiles/test.dir/src/components/Div.cpp.o CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o CMakeFiles/test.dir/src/components/ComponentManager.cpp.o CMakeFiles/test.dir/src/components/layoutCalc/LayoutCalculator.cpp.o CMakeFiles/test.dir/src/inputManagement/Input.cpp.o CMakeFiles/test.dir/src/mesh/QuadMesh.cpp.o CMakeFiles/test.dir/src/renderer/Renderer.cpp.o CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o
   FLAGS = -Wall -Wextra -Wshadow -ggdb -g
   LINK_LIBRARIES = -Wl,-rpath,/home/hekapoo/Downloads/glew-2.1.0/lib:/home/hekapoo/Downloads/glfw-3.3.8/src  -lglfw3  -lGLEW  -lGL  -lX11  -lXrandr  -lpthread  -ldl  -lfreetype
   LINK_PATH = -L/home/hekapoo/Downloads/glew-2.1.0/lib   -L/home/hekapoo/Downloads/glfw-3.3.8/src

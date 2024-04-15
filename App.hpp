@@ -23,8 +23,7 @@ public:
     void resizeEvent(int newWidth, int newHeight);
 
 private:
-    Div* rootDiv;
+    ComponentManager componentManager;
+    Div rootDiv;
     std::vector<AbstractComponent*> divs;
-
-    ComponentManager cm;
 };

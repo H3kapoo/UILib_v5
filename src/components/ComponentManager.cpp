@@ -1,6 +1,7 @@
 #include "ComponentManager.hpp"
 
 #include <algorithm>
+#include <ranges>
 
 #include "../Utility.hpp"
 
@@ -13,12 +14,13 @@ ComponentManager::ComponentManager()
 
 ComponentManager::~ComponentManager()
 {
-    printlni("Deleting ComponentManager..");
+    utils::printlni("Deleting ComponentManager..");
 }
 
 void ComponentManager::setRoot(AbstractComponent* newRoot)
 {
-    if (root) { printlnw("Root node already set to {}. Use removeRoot() first.", root->getId()); }
+    if (!root) { utils::printlne("Provided root is null"); }
+    if (root) { utils::printlnw("Root node already set to {}. Use removeRoot() first.", root->getId()); }
     root = newRoot;
     root->isParented = true; /* Parented to invisible object higher than root */
     root->setState(&state);
@@ -27,9 +29,18 @@ void ComponentManager::setRoot(AbstractComponent* newRoot)
 
 void ComponentManager::removeRoot()
 {
-    if (!root) { printlnw("Root of component manager not set."); }
+    if (!root) { utils::printlnw("Root of component manager not set."); }
 
-    printlne("removeRoot() not implemented yet.");
+    utils::printlne("removeRoot() not implemented yet.");
+}
+
+void ComponentManager::updateLayout()
+{
+    for (const auto& childNode : flattenedNodes | std::views::reverse)
+    {
+        if (childNode->getNodes().empty()) { return; }
+        childNode->onLayoutUpdate();
+    }
 }
 
 void ComponentManager::render()
@@ -72,9 +83,9 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
 
 void ComponentManager::resizeEvent(int newWidth, int newHeight)
 {
+    // utils::printlni("Resizing...");
     state.windowWidth = newWidth;
     state.windowHeight = newHeight;
-    printlni("Resizing...");
     glm::mat4 projMatrix = glm::ortho(0.0f, (float)newWidth, (float)newHeight, 0.0f, renderer::Renderer::MAX_LAYERS,
         0.0f);
 
@@ -83,6 +94,9 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
     /* glViewport is needed after changing the ortho matrix or else
        the NDC coordinates will not be mapped correctly to screen coordinates. */
     glViewport(0, 0, newWidth, newHeight);
+
+    /* Keeps root the same size as the window */
+    root->getBoxModelRW().scale = {newWidth, newHeight};
 }
 
 void ComponentManager::updateInternalStructure(const std::string& action)
@@ -96,7 +110,7 @@ void ComponentManager::updateInternalStructure(const std::string& action)
 
 void ComponentManager::flattenRootIfNeeded()
 {
-    printlni("Flattening tree due to {}", state.lastActionOnTree);
+    utils::printlni("Flattening tree due to {}", state.lastActionOnTree);
     flattenedNodes.clear();
     recursivelyPushNodes(root);
 

@@ -27,6 +27,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         src/components/Div.cpp
         src/components/AbstractComponent.cpp
         src/components/ComponentManager.cpp
+        src/components/layoutCalc/LayoutCalculator.cpp
         src/inputManagement/Input.cpp
         src/mesh/QuadMesh.cpp
         src/renderer/Renderer.cpp

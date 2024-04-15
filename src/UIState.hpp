@@ -46,6 +46,8 @@ struct UIState
     int windowWidth{0};
     int windowHeight{0};
 
+    int dirtySubtreeId{0}; // TODO: Will be used in the future
+
     /* Child nodes will call this so that root gets updated */
     std::function<void(const std::string&)> triggerTreeUpdate{nullptr};
     std::string lastActionOnTree{"Nothing"};
