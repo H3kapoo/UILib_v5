@@ -3,6 +3,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <string>
+#include <unordered_map>
+
 #include "../components/AbstractComponent.hpp"
 #include "../shaderManagement/ShaderLoader.hpp"
 
@@ -36,6 +39,13 @@ public:
      */
     void renderComponent(components::AbstractComponent& comp);
 
+    // Experimental attempt at batch rendering. It looked like for simple quads it didnt do anything
+    // Better luck with text i hope
+    void batchRenderCall();
+    void beginBatch(components::AbstractComponent& comp);
+    void endBatch();
+    void pushToBatch(components::AbstractComponent& comp);
+
     /**
      * @brief Clear currently bound window depth and color bit.
      *
@@ -45,6 +55,14 @@ public:
     Renderer();
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
+
+    std::unordered_map<std::string, std::vector<glm::vec4>> vec4s;
+    // std::vector<glm::mat4> transformMat4s;
+    glm::mat4 transformMat4s[100];
+    int batchShaderId{0};
+    int batchVao{0};
+    unsigned int batchSize{100};
+    unsigned int currentBatchSize{0};
 
 private:
     shaderManagement::ShaderLoader& shaderLoader; /* Justified use of ref& */

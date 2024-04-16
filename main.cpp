@@ -14,6 +14,7 @@ int frameCount = 0;
 double previousTime = 0;
 void frameCounter(GLFWwindow* window)
 {
+    ZoneScoped;
     double currentTime = glfwGetTime();
     double delta = currentTime - previousTime;
     frameCount++;
@@ -113,6 +114,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
+        ZoneScoped;
         frameCounter(window);
 
         // glfwWaitEvents();

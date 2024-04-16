@@ -16,6 +16,7 @@ AbstractComponent::AbstractComponent(const std::string& compType)
     type = compType;
     meshVao = mesh::QuadMesh::get().generateMesh();
     compShaderPtr = shaderLoaderRef.loadFromPath("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl");
+    // compShaderPtr = shaderLoaderRef.loadFromPath("/home/hekapoo/newTryAtUI/src/assets/shaders/baseInstanced.glsl");
 }
 
 AbstractComponent::~AbstractComponent()
@@ -282,11 +283,7 @@ void AbstractComponent::setState(UIState* newState)
 
 void AbstractComponent::onClickEvent() {}
 void AbstractComponent::onMoveEvent() {}
-void AbstractComponent::onPrepareToRender()
-{
-    // TODO: In shader loader make sure we dont bind the same shader thats already bound.
-    // shaderLoaderRef.setActiveShaderId(*compShaderPtr);
-}
+void AbstractComponent::onPrepareToRender(std::unordered_map<std::string, std::vector<glm::vec4>>& vec4s) {}
 void AbstractComponent::onRenderDone() {}
 void AbstractComponent::onStart() {}
 void AbstractComponent::onLayoutUpdate() {}

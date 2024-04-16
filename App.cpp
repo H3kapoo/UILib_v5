@@ -1,5 +1,6 @@
 #include "App.hpp"
 #include "src/Utility.hpp"
+#include "src/components/AbstractComponent.hpp"
 
 App::~App()
 {
@@ -21,24 +22,25 @@ void App::start(int initialWidth, int initialHeight)
     // div2.style.color = utils::hexToVec4("#9212a9ff");
     // rootDiv.layoutOptions.someOption = true;
     // divs.push_back(&rootDiv);
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 10000; i++)
     {
         const auto div = new Div();
         div->style.color = utils::hexToVec4("#9212a9ff");
         divs.push_back(div);
     }
     rootDiv.append(divs);
-
-    rootDiv.showTree();
+    utils::printlni("size of {}", sizeof(Div));
+    utils::printlni("size of {}", sizeof(AbstractComponent));
+    // rootDiv.showTree();
 
     /* Trigger initial resize event to "stabilize" the scene */
     componentManager.resizeEvent(initialWidth, initialHeight);
+    componentManager.updateLayout();
 }
 
 void App::update()
 {
     // TODO: This needs to be carefully thought when it should be called and on what
-    componentManager.updateLayout();
     componentManager.render();
 }
 
@@ -55,4 +57,5 @@ void App::mouseMoveEvent(double mouseX, double mouseY)
 void App::resizeEvent(int newWidth, int newHeight)
 {
     componentManager.resizeEvent(newWidth, newHeight);
+    componentManager.updateLayout();
 }

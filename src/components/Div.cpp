@@ -1,6 +1,8 @@
 #include "Div.hpp"
 
 #include "../Utility.hpp"
+#include "AbstractComponent.hpp"
+#include <unordered_map>
 
 namespace components
 {
@@ -13,7 +15,7 @@ Div::~Div()
     // printlni("Deleting {} id {} ..", getType(), getId());
 }
 
-void Div::onPrepareToRender()
+void Div::onPrepareToRender(std::unordered_map<std::string, std::vector<glm::vec4>>& vec4s)
 {
     getShader().setActiveShaderId(getShaderId());
     getShader().setVec4f("uColor", style.color);

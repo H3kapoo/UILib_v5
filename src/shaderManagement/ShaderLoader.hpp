@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <map>
 #include <string>
 
@@ -195,6 +196,9 @@ public:
      * @return Doesn't return anything.
      */
     void setVec4f(const char* location, glm::vec4& value) const;
+
+    // TODO:
+    void setVec4fVec(const char* location, uint32_t amount, const float* value) const;
 
     /**
      * @brief Load 4x4 Matrix uniform to currently active shader **Id**.

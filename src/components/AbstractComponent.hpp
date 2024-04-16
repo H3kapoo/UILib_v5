@@ -1,10 +1,17 @@
 #pragma once
 
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "../UIState.hpp"
 #include "../shaderManagement/ShaderLoader.hpp"
 #include "compUtils/BoxModel.hpp"
+
+namespace renderer
+{
+class Renderer;
+};
 
 namespace components
 {
@@ -13,6 +20,7 @@ class AbstractComponent
     /* Needed so that ComponentManager can access the some functions of AbstractComponent that shall only be used by
      * CM (e.g. setRoot/onEventX)*/
     friend class ComponentManager;
+    friend class renderer::Renderer;
 
 public:
     /* Constructors */
@@ -154,7 +162,7 @@ protected:
     /* Virtuals called by CM */
     virtual void onClickEvent();
     virtual void onMoveEvent();
-    virtual void onPrepareToRender();
+    virtual void onPrepareToRender(std::unordered_map<std::string, std::vector<glm::vec4>>& vec4s);
     virtual void onRenderDone();
     virtual void onStart();
     virtual void onLayoutUpdate();

@@ -19,7 +19,7 @@ ComponentManager::~ComponentManager()
 
 void ComponentManager::setRoot(AbstractComponent* newRoot)
 {
-    if (!root) { utils::printlne("Provided root is null"); }
+    if (!newRoot) { utils::printlne("Provided root is null"); }
     if (root) { utils::printlnw("Root node already set to {}. Use removeRoot() first.", root->getId()); }
     root = newRoot;
     root->isParented = true; /* Parented to invisible object higher than root */
@@ -36,6 +36,7 @@ void ComponentManager::removeRoot()
 
 void ComponentManager::updateLayout()
 {
+    ZoneScoped;
     for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
         if (childNode->getNodes().empty()) { return; }
@@ -45,12 +46,29 @@ void ComponentManager::updateLayout()
 
 void ComponentManager::render()
 {
+    ZoneScoped;
     renderer.clearScreen();
+    // renderer.beginBatch(*flattenedNodes[0]);
+    // for (const auto& childNode : flattenedNodes)
+    // {
+    //     renderer.pushToBatch(*childNode);
+    // }
+    // renderer.endBatch();
+
     for (const auto& childNode : flattenedNodes)
     {
-        childNode->onPrepareToRender();
-        renderer.renderComponent(*childNode);
-        childNode->onRenderDone();
+        {
+            // ZoneNamedN(Zone1, "onPrepareToRender", true);
+            childNode->onPrepareToRender(renderer.vec4s);
+        }
+        {
+            // ZoneNamedN(Zone2, "renderComponent", true);
+            renderer.renderComponent(*childNode);
+        }
+        {
+            // ZoneNamedN(Zone3, "onRenderDone", true);
+            childNode->onRenderDone();
+        }
     }
 }
 

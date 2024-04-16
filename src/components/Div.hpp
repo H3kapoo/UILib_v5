@@ -23,7 +23,7 @@ public:
     Style style;
 
 private:
-    void onPrepareToRender() override;
+    void onPrepareToRender(std::unordered_map<std::string, std::vector<glm::vec4>>&) override;
     void onClickEvent() override;
     void onMoveEvent() override;
     void onStart() override;

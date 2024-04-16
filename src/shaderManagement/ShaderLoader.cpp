@@ -163,6 +163,13 @@ void ShaderLoader::setVec4f(const char* location, glm::vec4& value) const
     glUniform4f(loc, value.r, value.g, value.b, value.a);
 }
 
+void ShaderLoader::setVec4fVec(const char* location, uint32_t amount, const float* flatValues) const
+{
+    int loc = glGetUniformLocation(activeShaderId, location);
+    if (loc == -1) return handleNotFound(location);
+    glUniform4fv(loc, amount, flatValues);
+}
+
 void ShaderLoader::setMatrix4(const char* location, const glm::mat4 value)
 {
     int loc = glGetUniformLocation(activeShaderId, location);

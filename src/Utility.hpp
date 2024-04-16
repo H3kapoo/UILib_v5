@@ -3,6 +3,9 @@
 #include <format>
 #include <glm/glm.hpp>
 
+// Just for now
+#include "/home/hekapoo/Downloads/tracy/public/tracy/Tracy.hpp"
+
 namespace utils
 {
 
