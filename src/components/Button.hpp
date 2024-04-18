@@ -3,22 +3,20 @@
 #include "AbstractComponent.hpp"
 #include "layoutCalc/LayoutCalculator.hpp"
 
-#include "Button.hpp"
-
 namespace components
 {
 
-class Div : public AbstractComponent
+class Button : public AbstractComponent
 {
 public:
     struct Style
     {
         glm::vec4 color{0.0f};
-        int someOption{false};
+        int someOption{0};
     };
 
-    Div();
-    ~Div();
+    Button();
+    ~Button();
 
     void addClickListener(std::function<void(int, int, MouseButton)> func);
 
@@ -32,7 +30,7 @@ private:
     void onLayoutUpdate() override;
 
     /* Layout related */
-    layoutcalc::LayoutCalculator layoutCalc{this}; // TODO: Singleton
+    layoutcalc::LayoutCalculator layoutCalc{this};
     std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
 };
 } // namespace components

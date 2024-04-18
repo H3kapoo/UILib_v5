@@ -1,50 +1,51 @@
-#include "Div.hpp"
+#include "Button.hpp"
 
 #include "../Utility.hpp"
 
 namespace components
 {
-Div::Div()
-    : AbstractComponent("Div")
+Button::Button()
+    : AbstractComponent("Button")
 {}
 
-Div::~Div()
+Button::~Button()
 {
     // printlni("Deleting {} id {} ..", getType(), getId());
 }
 
-void Div::onPrepareToRender()
+void Button::onPrepareToRender()
 {
     getShader().setActiveShaderId(getShaderId());
     getShader().setVec4f("uColor", style.color);
 }
 
-void Div::addClickListener(std::function<void(int, int, MouseButton)> func)
+void Button::addClickListener(std::function<void(int, int, MouseButton)> func)
 {
     mouseClickCb = func;
 }
 
-void Div::onClickEvent()
+void Button::onClickEvent()
 {
-    // println("Div element id {} has been clicked!", getId());
+    // println("Button element id {} has been clicked!", getId());
 
     const auto& s = getState();
     if (mouseClickCb) mouseClickCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
 };
 
-void Div::onMoveEvent()
+void Button::onMoveEvent()
 {
     // const auto& s = getState();
-    // println("For div {} mouse position is {}-{}", getId(), s->mouseX, s->mouseY);
+    // println("For Button {} mouse position is {}-{}", getId(), s->mouseX, s->mouseY);
 }
 
-void Div::onStart()
+void Button::onStart()
 {
+    style.someOption = 10;
     // getBoxModelRW().pos.z = getDepth(); // TODO: Shall not exist
     // printlni("[INF] I am node {} and onStart() called", getId());
 }
 
-void Div::onLayoutUpdate()
+void Button::onLayoutUpdate()
 {
     layoutCalc.calculate(style.someOption);
 }

@@ -199,7 +199,8 @@ bool AbstractComponent::appendAux(AbstractComponent* node)
 
     node->setState(state);
     node->parent = this;
-    node->depth = depth + 1;
+    node->depth = depth +
+                  1; // this should be deduced at "runtime", we shouldn't depend on "node" already having a parent
     node->isParented = true;
     children.push_back(node);
 
@@ -283,7 +284,7 @@ void AbstractComponent::setState(UIState* newState)
 
 void AbstractComponent::onClickEvent() {}
 void AbstractComponent::onMoveEvent() {}
-void AbstractComponent::onPrepareToRender(std::unordered_map<std::string, std::vector<glm::vec4>>& vec4s) {}
+void AbstractComponent::onPrepareToRender() {}
 void AbstractComponent::onRenderDone() {}
 void AbstractComponent::onStart() {}
 void AbstractComponent::onLayoutUpdate() {}

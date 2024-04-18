@@ -162,7 +162,7 @@ protected:
     /* Virtuals called by CM */
     virtual void onClickEvent();
     virtual void onMoveEvent();
-    virtual void onPrepareToRender(std::unordered_map<std::string, std::vector<glm::vec4>>& vec4s);
+    virtual void onPrepareToRender();
     virtual void onRenderDone();
     virtual void onStart();
     virtual void onLayoutUpdate();

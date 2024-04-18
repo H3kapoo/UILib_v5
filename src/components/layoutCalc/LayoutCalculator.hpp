@@ -14,7 +14,7 @@ class LayoutCalculator
 {
 public:
     LayoutCalculator(AbstractComponent* comp);
-    void calculate(const bool ceva);
+    void calculate(const int ceva);
 
 private:
     /* TODO: Maybe in the future this root can be removed and class can be made static so we are fully stateless */

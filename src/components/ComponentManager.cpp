@@ -36,7 +36,6 @@ void ComponentManager::removeRoot()
 
 void ComponentManager::updateLayout()
 {
-    ZoneScoped;
     for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
         if (childNode->getNodes().empty()) { return; }
@@ -46,29 +45,12 @@ void ComponentManager::updateLayout()
 
 void ComponentManager::render()
 {
-    ZoneScoped;
     renderer.clearScreen();
-    // renderer.beginBatch(*flattenedNodes[0]);
-    // for (const auto& childNode : flattenedNodes)
-    // {
-    //     renderer.pushToBatch(*childNode);
-    // }
-    // renderer.endBatch();
-
     for (const auto& childNode : flattenedNodes)
     {
-        {
-            // ZoneNamedN(Zone1, "onPrepareToRender", true);
-            childNode->onPrepareToRender(renderer.vec4s);
-        }
-        {
-            // ZoneNamedN(Zone2, "renderComponent", true);
-            renderer.renderComponent(*childNode);
-        }
-        {
-            // ZoneNamedN(Zone3, "onRenderDone", true);
-            childNode->onRenderDone();
-        }
+        childNode->onPrepareToRender();
+        renderer.renderComponent(*childNode);
+        childNode->onRenderDone();
     }
 }
 
@@ -115,6 +97,7 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
 
     /* Keeps root the same size as the window */
     root->getBoxModelRW().scale = {newWidth, newHeight};
+    updateLayout();
 }
 
 void ComponentManager::updateInternalStructure(const std::string& action)

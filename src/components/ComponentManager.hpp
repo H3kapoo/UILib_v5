@@ -32,9 +32,6 @@ public:
      */
     void removeRoot();
 
-    // EXPERIMENTAL
-    void updateLayout();
-
     /**
      * @brief Render the components associated with the currently bound root.
      *
@@ -72,6 +69,13 @@ public:
 
 private:
     /* Internal helpers */
+
+    /**
+     * @brief Calls to each component to reposition itself and it's children to the desired layout
+     *
+     */
+    void updateLayout();
+
     /**
      * @brief Updates node structure by calling the update function on every node and child node of the tree. Also
      * flattens the nodes in a depth descending way suited for fast click detection.
