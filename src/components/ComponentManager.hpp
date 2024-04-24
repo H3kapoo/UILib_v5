@@ -82,7 +82,7 @@ private:
      *
      * @param action - action that was performed to trigger this function.
      */
-    void updateInternalStructure(const std::string& action);
+    void updateInternalTreeStructure(const std::string& action);
 
     /**
      * @brief Flattens the nodes in a depth descending way suited for fast click detection.
@@ -90,7 +90,7 @@ private:
      * time it's a leaf node we click on and in this project leafs have increasing depth values. By sorting nodes in a
      * vector in a depth descending order, click/hover detection can happen without traversing the tree at all.
      */
-    void flattenRootIfNeeded();
+    void flattenRoot();
     void recursivelyPushNodes(AbstractComponent* comp);
 
     renderer::Renderer renderer;

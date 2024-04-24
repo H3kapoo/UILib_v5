@@ -39,6 +39,7 @@ struct UIState
     int mouseX{0};
     int mouseY{0};
     int selectedId{0};
+    int prevHoveredId{0}, hoveredId{0};
 
     KeyAction keyAction{KeyAction::Released};
     ActiveModifiersBits activeMods{0};
@@ -51,4 +52,7 @@ struct UIState
     /* Child nodes will call this so that root gets updated */
     std::function<void(const std::string&)> triggerTreeUpdate{nullptr};
     std::string lastActionOnTree{"Nothing"};
+
+    /* Child nodes will call this to trigger a layout update at any time*/
+    std::function<void()> triggerLayoutUpdate{nullptr};
 };

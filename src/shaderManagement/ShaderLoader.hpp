@@ -137,6 +137,15 @@ public:
 
     /* Uniforms */
     /**
+     * @brief Set the active texture unit and upload **location** uniform with **textureId** id.
+     *
+     * @param location - Location of uniform to be set in the shader.
+     * @param textureId - Id of the loaded texture to be referenced by **textureUnit**.
+     * @param textureUnit - Texture unit to be enabled. Starts from GL_TEXTURE0.
+     */
+    void set2DTextureUnit(const char* location, uint32_t textureId, uint32_t textureUnit);
+
+    /**
      * @brief Load integer uniform to currently active shader **Id**.
      *
      * @param location Location of uniform to be set in the shader.

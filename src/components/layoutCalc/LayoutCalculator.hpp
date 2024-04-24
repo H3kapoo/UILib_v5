@@ -17,6 +17,14 @@ public:
     void calculate(const int ceva);
 
 private:
+    struct Bounds
+    {
+        glm::vec2 start{9999};
+        glm::vec2 end{-9999};
+    };
+
+    Bounds getChildrenBound(const std::vector<AbstractComponent*>& childComps);
+
     /* TODO: Maybe in the future this root can be removed and class can be made static so we are fully stateless */
     AbstractComponent* root;
 };

@@ -121,6 +121,14 @@ void ShaderLoader::reloadFromPath(const std::string& shaderPath)
     }
 }
 
+void ShaderLoader::set2DTextureUnit(const char* location, uint32_t textureId, uint32_t textureUnit)
+{
+    /* Shader needs texture unit location in ranges from [0..maxUnits], not from [GL_TEXTURE0..maxGL_TEXTURE] */
+    setInt(location, textureUnit - GL_TEXTURE0);
+    glActiveTexture(textureUnit);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+}
+
 void ShaderLoader::setInt(const char* location, int value)
 {
     int loc = glGetUniformLocation(activeShaderId, location);

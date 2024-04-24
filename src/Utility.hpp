@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdio>
 #include <format>
 #include <glm/glm.hpp>
 
@@ -30,21 +31,21 @@ template <typename... Args> void println(std::format_string<Args...> s, Args&&..
 template <typename... Args> void printlni(std::format_string<Args...> s, Args&&... args)
 {
 #if ENABLE_ALL_LOGGING == 1
-    printf("[INF] %s\n", std::format(s, std::forward<Args>(args)...).c_str());
+    printf("\033[38;5;15m[INF] %s\033[0m\n", std::format(s, std::forward<Args>(args)...).c_str());
 #endif
 }
 
 template <typename... Args> void printlnw(std::format_string<Args...> s, Args&&... args)
 {
 #if ENABLE_ALL_LOGGING == 1
-    printf("[WRN] %s\n", std::format(s, std::forward<Args>(args)...).c_str());
+    printf("\033[38;5;159m[WRN] %s\033[0m\n", std::format(s, std::forward<Args>(args)...).c_str());
 #endif
 }
 
 template <typename... Args> void printlne(std::format_string<Args...> s, Args&&... args)
 {
 #if ENABLE_ALL_LOGGING == 1
-    printf("[ERR] %s\n", std::format(s, std::forward<Args>(args)...).c_str());
+    printf("\033[38;5;196m[ERR] %s\033[0m\n", std::format(s, std::forward<Args>(args)...).c_str());
 #endif
 }
 

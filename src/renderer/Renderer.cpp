@@ -84,7 +84,7 @@ void Renderer::renderComponent(components::AbstractComponent& comp)
 {
     /* Set very common uniforms and activate shader id*/
     shaderLoader.setMatrix4("uProjMatrix", projectionMatrix);
-    shaderLoader.setMatrix4("uModelMatrix", comp.getBoxModelRead().getTransform());
+    shaderLoader.setMatrix4("uModelMatrix", comp.getTransformRead().getTransform());
 
     const auto compVao = comp.getVaoId();
     if (compVao != boundVao) { glBindVertexArray(compVao); }

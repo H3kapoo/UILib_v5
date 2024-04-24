@@ -9,7 +9,8 @@ namespace components
 {
 ComponentManager::ComponentManager()
 {
-    state.triggerTreeUpdate = std::bind(&ComponentManager::updateInternalStructure, this, std::placeholders::_1);
+    state.triggerTreeUpdate = std::bind(&ComponentManager::updateInternalTreeStructure, this, std::placeholders::_1);
+    state.triggerLayoutUpdate = std::bind(&ComponentManager::updateLayout, this);
 }
 
 ComponentManager::~ComponentManager()
@@ -24,7 +25,7 @@ void ComponentManager::setRoot(AbstractComponent* newRoot)
     root = newRoot;
     root->isParented = true; /* Parented to invisible object higher than root */
     root->setState(&state);
-    updateInternalStructure("RootAdition");
+    updateInternalTreeStructure("RootAdition");
 }
 
 void ComponentManager::removeRoot()
@@ -38,7 +39,8 @@ void ComponentManager::updateLayout()
 {
     for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
-        if (childNode->getNodes().empty()) { return; }
+        if (childNode->getNodes().empty()) { continue; }
+
         childNode->onLayoutUpdate();
     }
 }
@@ -48,6 +50,8 @@ void ComponentManager::render()
     renderer.clearScreen();
     for (const auto& childNode : flattenedNodes)
     {
+        if (!childNode->isComponentRenderable()) { continue; }
+
         childNode->onPrepareToRender();
         renderer.renderComponent(*childNode);
         childNode->onRenderDone();
@@ -56,28 +60,66 @@ void ComponentManager::render()
 
 void ComponentManager::mouseClickEvent(MouseButton button, KeyAction action, ActiveModifiersBits mods)
 {
+    state.clickedButton = button;
+    state.keyAction = action;
+    state.activeMods = mods;
+
     /* Will trigger the event top to bottom */
-    /* TODO: decide who actually got clicked */
     for (const auto& childNode : flattenedNodes)
     {
-        state.clickedButton = button;
-        state.keyAction = action;
-        state.activeMods = mods;
-        childNode->onClickEvent();
+        if (state.hoveredId == childNode->getId())
+        {
+            state.selectedId = childNode->getId();
+            childNode->onClickEvent();
+            break;
+        }
     }
 }
 
 void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
 {
-    /* Will trigger the event top to bottom */
-    /* TODO: decide who actually got clicked */
+    /* Conversion double -> int done here since in 99% of the cases we dont have fractional mouse position.
+       Might be different on MacOS, but I dont have one. */
+    state.mouseX = (int)mouseX;
+    state.mouseY = (int)mouseY;
+
+    /* Bellow two passes should in very worst case be O(2N) but in 95% of cases is much less than that */
+    bool shouldNotify = false;
     for (const auto& childNode : flattenedNodes)
     {
-        /* Conversion double -> int done here since in 99% of the cases we dont have fractional mouse position.
-           Might be different on MacOS, but I dont have one. */
-        state.mouseX = (int)mouseX;
-        state.mouseY = (int)mouseY;
-        childNode->onMoveEvent();
+        const auto& childBox = childNode->getTransformRead();
+        bool xConstraint = state.mouseX >= childBox.pos.x && state.mouseX <= childBox.pos.x + childBox.scale.x;
+        bool yConstraint = state.mouseY >= childBox.pos.y && state.mouseY <= childBox.pos.y + childBox.scale.y;
+        if (xConstraint && yConstraint)
+        {
+            /* This means we are still the currently hoeverd node, no need to do anything */
+            if (state.hoveredId == childNode->getId()) { break; }
+
+            /* Hovered node is now another one, set and notify */
+            state.prevHoveredId = state.hoveredId;
+            state.hoveredId = childNode->getId();
+            shouldNotify = true;
+            break;
+        }
+    }
+
+    if (!shouldNotify) { return; }
+
+    bool enterNotified = false, exitNotified = false;
+    for (const auto& childNode : flattenedNodes)
+    {
+        if (childNode->getId() == state.prevHoveredId)
+        {
+            exitNotified = true;
+            childNode->onMouseExitEvent();
+        }
+        if (childNode->getId() == state.hoveredId)
+        {
+            enterNotified = true;
+            childNode->onMouseEnterEvent();
+        }
+
+        if (enterNotified && exitNotified) { break; }
     }
 }
 
@@ -97,19 +139,24 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
 
     /* Keeps root the same size as the window */
     root->getBoxModelRW().scale = {newWidth, newHeight};
+
+    /* Layout also needs to be recalculated */
     updateLayout();
 }
 
-void ComponentManager::updateInternalStructure(const std::string& action)
+void ComponentManager::updateInternalTreeStructure(const std::string& action)
 {
     state.lastActionOnTree = action;
     root->updateNodeStructure();
 
     /* Tree can be dirty due to additions or removals */
-    flattenRootIfNeeded();
+    flattenRoot();
+
+    /* Layout also needs to be recalculated due to possible addition/removal */
+    updateLayout();
 };
 
-void ComponentManager::flattenRootIfNeeded()
+void ComponentManager::flattenRoot()
 {
     utils::printlni("Flattening tree due to {}", state.lastActionOnTree);
     flattenedNodes.clear();

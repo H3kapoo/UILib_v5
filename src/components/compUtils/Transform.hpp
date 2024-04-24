@@ -5,7 +5,7 @@
 
 namespace components::computils
 {
-class BoxModel
+class Transform
 {
 public:
     glm::mat4 getTransform()
@@ -22,20 +22,6 @@ public:
         isDirty = false;
         return modelMat;
     }
-
-    // BoxModel& setPos(const glm::vec2& newPos)
-    // {
-    //     pos.x = newPos.x;
-    //     pos.y = newPos.y;
-    //     return *this;
-    // }
-
-    // BoxModel& setScale(const glm::vec2& newScale)
-    // {
-    //     scale.x = newScale.x;
-    //     scale.y = newScale.y;
-    //     return *this;
-    // }
 
     void markDirty()
     {

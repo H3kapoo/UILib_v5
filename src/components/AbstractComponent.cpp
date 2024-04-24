@@ -6,16 +6,16 @@
 namespace components
 {
 
-struct SomeStyle
-{};
-
 // TODO: In the future, ctor could take a configuration object
-AbstractComponent::AbstractComponent(const std::string& compType)
+AbstractComponent::AbstractComponent(const Options& opts)
 {
     id = generateNextId();
-    type = compType;
+    options = opts;
+    type = opts.type;
     meshVao = mesh::QuadMesh::get().generateMesh();
-    compShaderPtr = shaderLoaderRef.loadFromPath("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl");
+    compShaderPtr = shaderLoaderRef.loadFromPath(opts.shaderPath);
+    // compShaderPtr = shaderLoaderRef.loadFromPath("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl");
+    // compShaderPtr = shaderLoaderRef.loadFromPath("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl");
     // compShaderPtr = shaderLoaderRef.loadFromPath("/home/hekapoo/newTryAtUI/src/assets/shaders/baseInstanced.glsl");
 }
 
@@ -28,7 +28,7 @@ bool AbstractComponent::append(AbstractComponent* comp)
 {
     if (appendAux(comp))
     {
-        state->triggerTreeUpdate("Append");
+        triggerTreeChangedAction("Append");
         return true;
     }
     return false;
@@ -41,7 +41,7 @@ bool AbstractComponent::append(const std::vector<AbstractComponent*>& comps)
     {
         didAppendSomething = appendAux(comp);
     }
-    state->triggerTreeUpdate("AppendMany");
+    triggerTreeChangedAction("AppendMany");
 
     return didAppendSomething;
 }
@@ -53,7 +53,7 @@ bool AbstractComponent::append(std::vector<AbstractComponent*>&& comps)
     {
         didAppendSomething = appendAux(comp);
     }
-    state->triggerTreeUpdate("AppendMany");
+    triggerTreeChangedAction("AppendMany");
 
     return didAppendSomething;
 }
@@ -62,7 +62,7 @@ bool AbstractComponent::remove(AbstractComponent* comp)
 {
     if (removeAux(comp))
     {
-        state->triggerTreeUpdate("Remove");
+        triggerTreeChangedAction("Remove");
         return true;
     }
     return false;
@@ -75,7 +75,7 @@ bool AbstractComponent::remove(const std::vector<AbstractComponent*>& comps)
     {
         didRemoveSomething = remove(comp);
     }
-    state->triggerTreeUpdate("RemoveMany");
+    triggerTreeChangedAction("RemoveMany");
 
     return didRemoveSomething;
 }
@@ -87,7 +87,7 @@ bool AbstractComponent::remove(std::vector<AbstractComponent*>&& comps)
     {
         didRemoveSomething = remove(comp);
     }
-    state->triggerTreeUpdate("RemoveMany");
+    triggerTreeChangedAction("RemoveMany");
 
     return didRemoveSomething;
 }
@@ -104,6 +104,14 @@ bool AbstractComponent::removeDeep(AbstractComponent* comp)
     }
 
     return false;
+}
+
+void AbstractComponent::updateLayout()
+{
+    /* If a node is added into a subtree that is not yet part of the big stateful tree, we will not
+       have a "state" object to update layout on, so we just don't do it now. Update for the whole new
+       subtree will be done when the root of this subtree is added to the main tree. */
+    state ? state->triggerLayoutUpdate() : void();
 }
 
 void AbstractComponent::details()
@@ -163,44 +171,47 @@ shaderManagement::shaderId AbstractComponent::getShaderId() const
     return *compShaderPtr;
 }
 
-computils::BoxModel& AbstractComponent::getBoxModelRW()
+computils::Transform& AbstractComponent::getBoxModelRW()
 {
     /* Note: Marking it dirty because 99% of the time we will modify something on it, so better to mark it dirty as soon
        as we get the object.
        In case it's 100% known we only want to read it and not modify it, explicitly call getBoxModelRead(). */
-    boxModel.markDirty();
-    return boxModel;
+    transform.markDirty();
+    return transform;
 }
 
-computils::BoxModel& AbstractComponent::getBoxModelRead()
+computils::Transform& AbstractComponent::getTransformRead()
 {
-    return boxModel;
+    return transform;
+}
+
+bool AbstractComponent::isComponentRenderable() const
+{
+    return isRenderable;
+}
+
+void AbstractComponent::setRenderable(const bool canBeRendered)
+{
+    isRenderable = canBeRendered;
 }
 
 bool AbstractComponent::appendAux(AbstractComponent* node)
 {
     if (!node)
     {
-        utils::println("[ERR] Tried to append an uninitialized node");
+        utils::printlne("Tried to append an uninitialized node");
         return false;
     }
 
     if (node->isParented)
     {
-        utils::println("[ERR] Tried to append already parented nId {} to {}", node->id, id);
-        return false;
-    }
-
-    if (!state)
-    {
-        utils::println("[ERR] Tried to append without state being set in nId: {} (maybe orphan node)", id);
+        utils::printlne("Tried to append already parented nId {} to {}", node->getId(), getId());
         return false;
     }
 
     node->setState(state);
+    node->depth = depth + 1;
     node->parent = this;
-    node->depth = depth +
-                  1; // this should be deduced at "runtime", we shouldn't depend on "node" already having a parent
     node->isParented = true;
     children.push_back(node);
 
@@ -212,12 +223,12 @@ bool AbstractComponent::removeAux(AbstractComponent* node)
     if (children.empty()) { return false; }
     if (!node)
     {
-        utils::println("[ERR] Passed nullptr node for removal");
+        utils::printlne("Passed nullptr node for removal");
         return false;
     }
 
-    // on remove, children shall be accounted for as well (e.g remove parent
-    // pointer and level depth)
+    // TODO: on remove X, we shall remove and reset state of all nodes underneath X
+    // For now, it's just a shallow remove
     const auto it = std::find_if(children.begin(), children.end(),
         [&node](AbstractComponent* n) { return n->getId() == node->getId(); });
 
@@ -257,6 +268,14 @@ void AbstractComponent::showTree(int currentDepth)
     }
 }
 
+void AbstractComponent::triggerTreeChangedAction(const std::string&& action)
+{
+    /* If a node is added into a subtree that is not yet part of the big stateful tree, we will not
+       have a "state" object to update tree on, so we just don't do it now. Update for the whole new
+       subtree will be done when the root of this subtree is added to the main tree. */
+    state ? state->triggerTreeUpdate(action) : void();
+}
+
 void AbstractComponent::updateNodeStructure()
 {
     /* Do stuff necessiting update */
@@ -265,14 +284,23 @@ void AbstractComponent::updateNodeStructure()
         /* Init needs to be set first thing to avoid infinite loops in case nodes spawn children inside them */
         isRuntimeInitialized = true;
 
-        /* Feed layer position so it knows on top of what to render */
-        boxModel.layer = getDepth();
         onStart();
     };
 
     /* Update the children aswell */
     for (const auto& node : children)
     {
+        /* When tree structure gets modified, update internal state and depth of nodes.
+           For now it's a bit redundant to do this because maybe most of the tree already has state/depth
+           set correctly. However this is a very fast operation anyway. We can still check that if state is set
+           means the node is already ok. */
+        if (!node->state)
+        {
+            utils::printlnw("Node nId {} came from unparented at that point subtree!", node->getId());
+            node->setState(state);
+            node->depth = getDepth() + 1;
+            node->getBoxModelRW().layer = getDepth();
+        }
         node->updateNodeStructure();
     }
 }
@@ -284,6 +312,8 @@ void AbstractComponent::setState(UIState* newState)
 
 void AbstractComponent::onClickEvent() {}
 void AbstractComponent::onMoveEvent() {}
+void AbstractComponent::onMouseEnterEvent() {}
+void AbstractComponent::onMouseExitEvent() {}
 void AbstractComponent::onPrepareToRender() {}
 void AbstractComponent::onRenderDone() {}
 void AbstractComponent::onStart() {}

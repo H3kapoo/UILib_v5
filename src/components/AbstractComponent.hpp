@@ -1,17 +1,12 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "../UIState.hpp"
 #include "../shaderManagement/ShaderLoader.hpp"
-#include "compUtils/BoxModel.hpp"
-
-namespace renderer
-{
-class Renderer;
-};
+#include "compUtils/Transform.hpp"
+#include "layoutCalc/LayoutData.hpp"
 
 namespace components
 {
@@ -20,7 +15,12 @@ class AbstractComponent
     /* Needed so that ComponentManager can access the some functions of AbstractComponent that shall only be used by
      * CM (e.g. setRoot/onEventX)*/
     friend class ComponentManager;
-    friend class renderer::Renderer;
+
+    struct Options
+    {
+        std::string type;
+        std::string shaderPath;
+    };
 
 public:
     /* Constructors */
@@ -29,7 +29,7 @@ public:
      *
      * @param compType - component type. Useful for creating custom components.
      */
-    AbstractComponent(const std::string& compType);
+    AbstractComponent(const Options& opts);
     virtual ~AbstractComponent();
 
     /* Funcs acting on node */
@@ -103,6 +103,15 @@ public:
     bool removeDeep(AbstractComponent* node);
 
     /**
+     * @brief Triggers instant recalculation of the layout starting from root.
+     *
+     * Function needs to be used in cases when user updates layout settings at runtime in order for those settings to
+     * get applied right now.
+     *
+     */
+    void updateLayout();
+
+    /**
      * @brief Show details about this component.
      *
      */
@@ -125,8 +134,15 @@ public:
     unsigned int getVaoId() const;
     shaderManagement::ShaderLoader& getShader();
     shaderManagement::shaderId getShaderId() const;
-    computils::BoxModel& getBoxModelRW();
-    computils::BoxModel& getBoxModelRead();
+    computils::Transform& getBoxModelRW();
+    computils::Transform& getTransformRead();
+    bool isComponentRenderable() const;
+
+    /* Trivial setters */
+    void setRenderable(const bool canBeRendered);
+
+    /* Direct getters */
+    layoutcalc::LayoutData layout;
 
 private:
     /* Internal helpers */
@@ -136,15 +152,22 @@ private:
     int generateNextId();
     void showTree(int currentDepth);
 
+    /* Self explanatory */
+    void triggerTreeChangedAction(const std::string&& action);
+
     /* Update tree from root down to bottom */
     void updateNodeStructure();
 
     /* Should only be used for the tree Root node. Accessible only via CM */
     void setState(UIState* newState);
 
+    /* Ctor options */
+    Options options;
+
     /* Rendering related */
-    computils::BoxModel boxModel;
+    bool isRenderable{true};
     unsigned int meshVao{0};
+    computils::Transform transform;
     shaderManagement::shaderIdPtr compShaderPtr{nullptr}; /* Pointer due to hot-reload */
     shaderManagement::ShaderLoader& shaderLoaderRef{shaderManagement::ShaderLoader::get()};
 
@@ -162,6 +185,8 @@ protected:
     /* Virtuals called by CM */
     virtual void onClickEvent();
     virtual void onMoveEvent();
+    virtual void onMouseEnterEvent();
+    virtual void onMouseExitEvent();
     virtual void onPrepareToRender();
     virtual void onRenderDone();
     virtual void onStart();
