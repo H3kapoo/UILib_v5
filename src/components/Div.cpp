@@ -1,6 +1,7 @@
 #include "Div.hpp"
 
 #include "../Utility.hpp"
+#include "compUtils/LightWeightDummy.hpp"
 
 namespace components
 {
@@ -8,13 +9,21 @@ Div::Div()
     // : AbstractComponent({.type = "Div", .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl"})
     : AbstractComponent({.type = "Div", .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
     , textureLoader(assetloaders::TextureLoader::get())
+// , dummy("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl")
 {
     // style.hIn = utils::hexToVec4("#932222ff");
+    // dummy.options.color = utils::hexToVec4("#ffaaffff");
+    // dummy.transform.layer = 3;
 }
 
 Div::~Div()
 {
     // printlni("Deleting {} id {} ..", getType(), getId());
+}
+
+void Div::onRenderDone()
+{
+    // lwr.render(getState()->projectionMatrix, dummy);
 }
 
 void Div::onPrepareToRender()
@@ -88,7 +97,7 @@ void Div::onStart()
 
 void Div::onLayoutUpdate()
 {
-    layoutCalc.calculate(style.color.x);
+    layoutCalc.calculate();
 }
 
 } // namespace components

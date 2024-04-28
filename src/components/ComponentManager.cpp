@@ -131,6 +131,7 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
     glm::mat4 projMatrix = glm::ortho(0.0f, (float)newWidth, (float)newHeight, 0.0f, renderer::Renderer::MAX_LAYERS,
         0.0f);
 
+    state.projectionMatrix = projMatrix;
     renderer.setProjectionMatrix(projMatrix);
 
     /* glViewport is needed after changing the ortho matrix or else
@@ -138,7 +139,7 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
     glViewport(0, 0, newWidth, newHeight);
 
     /* Keeps root the same size as the window */
-    root->getBoxModelRW().scale = {newWidth, newHeight};
+    root->getTransformRW().scale = {newWidth, newHeight};
 
     /* Layout also needs to be recalculated */
     updateLayout();

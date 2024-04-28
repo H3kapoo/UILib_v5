@@ -14,7 +14,7 @@ class LayoutCalculator
 {
 public:
     LayoutCalculator(AbstractComponent* comp);
-    void calculate(const int ceva);
+    void calculate();
 
 private:
     struct Bounds
@@ -22,6 +22,9 @@ private:
         glm::vec2 start{9999};
         glm::vec2 end{-9999};
     };
+
+    void calculateAndApplyScale(AbstractComponent* comp);
+    void calculateNextBasePosition(glm::vec2& currentXY, AbstractComponent* comp);
 
     Bounds getChildrenBound(const std::vector<AbstractComponent*>& childComps);
 

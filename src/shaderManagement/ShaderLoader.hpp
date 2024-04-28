@@ -217,7 +217,7 @@ public:
      *
      * @return Doesn't return anything.
      */
-    void setMatrix4(const char* location, const glm::mat4 value);
+    void setMatrix4(const char* location, const glm::mat4 value) const;
 
     /**
      * @brief Load 4x4 Matrix vector uniform to currently active shader **Id**.

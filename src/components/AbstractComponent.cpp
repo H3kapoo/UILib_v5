@@ -171,7 +171,7 @@ shaderManagement::shaderId AbstractComponent::getShaderId() const
     return *compShaderPtr;
 }
 
-computils::Transform& AbstractComponent::getBoxModelRW()
+computils::Transform& AbstractComponent::getTransformRW()
 {
     /* Note: Marking it dirty because 99% of the time we will modify something on it, so better to mark it dirty as soon
        as we get the object.
@@ -299,7 +299,7 @@ void AbstractComponent::updateNodeStructure()
             utils::printlnw("Node nId {} came from unparented at that point subtree!", node->getId());
             node->setState(state);
             node->depth = getDepth() + 1;
-            node->getBoxModelRW().layer = getDepth();
+            node->getTransformRW().layer = getDepth();
         }
         node->updateNodeStructure();
     }

@@ -47,7 +47,7 @@ void Button::onStart()
 
 void Button::onLayoutUpdate()
 {
-    layoutCalc.calculate(style.someOption);
+    layoutCalc.calculate();
 }
 
 } // namespace components

@@ -134,7 +134,7 @@ public:
     unsigned int getVaoId() const;
     shaderManagement::ShaderLoader& getShader();
     shaderManagement::shaderId getShaderId() const;
-    computils::Transform& getBoxModelRW();
+    computils::Transform& getTransformRW();
     computils::Transform& getTransformRead();
     bool isComponentRenderable() const;
 

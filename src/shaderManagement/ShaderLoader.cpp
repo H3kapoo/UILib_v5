@@ -178,7 +178,7 @@ void ShaderLoader::setVec4fVec(const char* location, uint32_t amount, const floa
     glUniform4fv(loc, amount, flatValues);
 }
 
-void ShaderLoader::setMatrix4(const char* location, const glm::mat4 value)
+void ShaderLoader::setMatrix4(const char* location, const glm::mat4 value) const
 {
     int loc = glGetUniformLocation(activeShaderId, location);
     if (loc == -1) return handleNotFound(location);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <glm/glm.hpp>
 #include <string>
 
 typedef int ActiveModifiersBits;
@@ -46,6 +47,7 @@ struct UIState
 
     int windowWidth{0};
     int windowHeight{0};
+    glm::mat4 projectionMatrix{1.0f};
 
     int dirtySubtreeId{0}; // TODO: Will be used in the future
 

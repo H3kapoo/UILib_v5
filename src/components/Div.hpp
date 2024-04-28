@@ -1,9 +1,11 @@
 #pragma once
 
 #include "AbstractComponent.hpp"
+#include "compUtils/LightWeightDummy.hpp"
 #include "layoutCalc/LayoutCalculator.hpp"
 
 #include "../assetLoaders/TextureLoader.hpp"
+#include "../renderer/LightWeightRenderer.hpp"
 
 namespace components
 {
@@ -32,6 +34,7 @@ public:
 
 private:
     void onPrepareToRender() override;
+    void onRenderDone() override;
     void onClickEvent() override;
     void onMouseEnterEvent() override;
     void onMouseExitEvent() override;
@@ -42,6 +45,9 @@ private:
     TextureLoader::TextureDataPtr textureData{nullptr};
     TextureLoader::TextureDataPtr textureData2{nullptr};
     TextureLoader& textureLoader;
+
+    // computils::LightWeightDummy dummy;
+    // renderer::LightWeightRenderer lwr;
 
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this}; // TODO: Singleton
