@@ -68,7 +68,6 @@ int main()
     }
 
     App app;
-
     inputManagement::InputHelper::get().observe(window);
     inputManagement::InputHelper::get().registerOnMouseButtonAction(
         [&app](int btn, int act, int)
@@ -112,13 +111,15 @@ int main()
     app.start(startWindowWidth, startWindowHeight);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     while (!glfwWindowShouldClose(window))
     {
-        ZoneScoped;
+        // ZoneScoped;
         frameCounter(window);
 
-        // glfwWaitEvents();
-        glfwPollEvents();
+        glfwWaitEvents();
+        // glfwPollEvents();
         app.update();
         glfwSwapBuffers(window);
     }

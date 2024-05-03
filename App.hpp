@@ -2,12 +2,15 @@
 
 #include "src/UIState.hpp"
 #include "src/components/AbstractComponent.hpp"
+#include "src/components/Button.hpp"
 #include "src/components/ComponentManager.hpp"
 #include "src/components/Div.hpp"
+#include "src/components/layoutCalc/LayoutData.hpp"
 #include "src/inputManagement/Input.hpp"
 
 using namespace components;
 using namespace inputManagement;
+using namespace layoutcalc;
 
 class App
 {
@@ -25,5 +28,6 @@ public:
 private:
     ComponentManager componentManager;
     Div rootDiv;
+    Div div2, div3, div4, div5;
     std::vector<AbstractComponent*> divs;
 };

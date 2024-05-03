@@ -24,6 +24,7 @@ BraceWrapping: {
     BeforeLambdaBody: 'true'
 }
 
+IndentCaseLabels: true
 AlignAfterOpenBracket: DontAlign
 BreakConstructorInitializersBeforeComma: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: false

@@ -24,7 +24,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     add_executable(${PROJECT_NAME}
         main.cpp
         App.cpp
+        src/assetLoaders/TextureLoader.cpp
         src/components/Div.cpp
+        src/components/Button.cpp
         src/components/AbstractComponent.cpp
         src/components/ComponentManager.cpp
         src/components/layoutCalc/LayoutCalculator.cpp
