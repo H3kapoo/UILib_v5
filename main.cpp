@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "App.hpp"
+#include "src/UIState.hpp"
 #include "src/Utility.hpp"
 #include "src/inputManagement/Input.hpp"
 
@@ -73,32 +74,32 @@ int main()
         [&app](int btn, int act, int)
         {
             MouseButton b = MouseButton::None;
-            KeyAction a = KeyAction::Released;
+            HIDAction a = HIDAction::Released;
             switch (btn)
             {
-            case 0:
-                b = MouseButton::Left;
-                break;
-            case 1:
-                b = MouseButton::Right;
-                break;
-            case 2:
-                b = MouseButton::Middle;
-                break;
-            default:
-                b = MouseButton::None;
+                case 0:
+                    b = MouseButton::Left;
+                    break;
+                case 1:
+                    b = MouseButton::Right;
+                    break;
+                case 2:
+                    b = MouseButton::Middle;
+                    break;
+                default:
+                    b = MouseButton::None;
             }
 
             switch (act)
             {
-            case 0:
-                a = KeyAction::Released;
-                break;
-            case 1:
-                a = KeyAction::Pressed;
-                break;
-            default:
-                a = KeyAction::Released;
+                case 0:
+                    a = HIDAction::Released;
+                    break;
+                case 1:
+                    a = HIDAction::Pressed;
+                    break;
+                default:
+                    a = HIDAction::Repeated;
             }
             app.mouseClickEvent(b, a, 0);
         });
@@ -107,7 +108,23 @@ int main()
         std::placeholders::_1, std::placeholders::_2));
     inputManagement::InputHelper::get().registerOnWindowResizeAction(std::bind(&App::resizeEvent, &app,
         std::placeholders::_1, std::placeholders::_2));
-
+    inputManagement::InputHelper::get().registerOnKeyAction(
+        [&app](int key, int, int action, int mods)
+        {
+            HIDAction a = HIDAction::Released;
+            switch (action)
+            {
+                case 0:
+                    a = HIDAction::Released;
+                    break;
+                case 1:
+                    a = HIDAction::Pressed;
+                    break;
+                default:
+                    a = HIDAction::Repeated;
+            }
+            app.keyEvent(key, a, mods);
+        });
     app.start(startWindowWidth, startWindowHeight);
 
     glEnable(GL_DEPTH_TEST);

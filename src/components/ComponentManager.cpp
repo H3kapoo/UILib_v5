@@ -58,11 +58,11 @@ void ComponentManager::render()
     }
 }
 
-void ComponentManager::mouseClickEvent(MouseButton button, KeyAction action, ActiveModifiersBits mods)
+void ComponentManager::mouseClickEvent(MouseButton button, HIDAction action, ActiveModifiersBits mods)
 {
     state.clickedButton = button;
-    state.keyAction = action;
-    state.activeMods = mods;
+    state.mouseAction = action;
+    state.activeMods |= mods;
 
     /* Will trigger the event top to bottom */
     for (const auto& childNode : flattenedNodes)
@@ -121,6 +121,24 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
 
         if (enterNotified && exitNotified) { break; }
     }
+}
+
+void ComponentManager::keyEvent(int key, HIDAction action, int mods)
+{
+    // TODO: Logic for clearing MODs bits needs to be introduced
+    state.keyboardActionState[key] = action;
+    state.activeMods |= mods;
+
+    /* Will trigger the event top to bottom */
+    for (const auto& childNode : flattenedNodes)
+    {
+        if (state.selectedId == childNode->getId())
+        {
+            childNode->onKeyEvent();
+            break;
+        }
+    }
+    // utils::printlne("key: {} act: {} mods: {}", key, (uint8_t)action, mods);
 }
 
 void ComponentManager::resizeEvent(int newWidth, int newHeight)

@@ -29,6 +29,7 @@ public:
     void addClickListener(std::function<void(int, int, MouseButton)>&& func);
     void addOnEnterListener(std::function<void()>&& func);
     void addOnExitListener(std::function<void()>&& func);
+    void addOnKeyListener(std::function<void(const HIDAction*)>&& func);
 
     Style style;
 
@@ -36,6 +37,7 @@ private:
     void onPrepareToRender() override;
     void onRenderDone() override;
     void onClickEvent() override;
+    void onKeyEvent() override;
     void onMouseEnterEvent() override;
     void onMouseExitEvent() override;
     void onMoveEvent() override;
@@ -54,6 +56,7 @@ private:
 
     /* Callbacks related*/
     std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
+    std::function<void(const HIDAction*)> keyEventCb{nullptr};
     std::function<void()> mouseEnterCb{nullptr};
     std::function<void()> mouseExitCb{nullptr};
 };

@@ -23,6 +23,7 @@ private:
         glm::vec2 end{-9999};
     };
 
+    float getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace);
     void calculateAndApplyScale(AbstractComponent* comp);
     void calculateNextBasePosition(glm::vec2& currentXY, AbstractComponent* comp);
 

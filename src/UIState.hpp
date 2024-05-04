@@ -18,7 +18,7 @@ enum ActiveModifiers
 };
 // clang-format on
 
-enum KeyAction
+enum HIDAction
 {
     Pressed = 0,
     Released,
@@ -42,7 +42,8 @@ struct UIState
     int selectedId{0};
     int prevHoveredId{0}, hoveredId{0};
 
-    KeyAction keyAction{KeyAction::Released};
+    HIDAction mouseAction{HIDAction::Released};
+    HIDAction keyboardActionState[348]; // GLFW_KEY_LAST
     ActiveModifiersBits activeMods{0};
 
     int windowWidth{0};

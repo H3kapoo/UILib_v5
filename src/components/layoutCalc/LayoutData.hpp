@@ -16,7 +16,8 @@ struct LayoutData
     enum class Orientation : uint8_t
     {
         Horizontal,
-        Vertical
+        Vertical,
+        COUNT
     };
 
     // clang-format off
@@ -40,7 +41,8 @@ struct LayoutData
     {
         Tightly,
         EvenlySpaced,
-        SpaceBetween
+        SpaceBetween,
+        COUNT
     };
 
     enum class ScalePolicy : uint8_t

@@ -312,6 +312,7 @@ void AbstractComponent::setState(UIState* newState)
 
 void AbstractComponent::onClickEvent() {}
 void AbstractComponent::onMoveEvent() {}
+void AbstractComponent::onKeyEvent() {}
 void AbstractComponent::onMouseEnterEvent() {}
 void AbstractComponent::onMouseExitEvent() {}
 void AbstractComponent::onPrepareToRender() {}

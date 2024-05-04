@@ -48,9 +48,9 @@ public:
      *
      * @param button - LMB-0 RMB-1 MMB-2
      * @param action - Released/0 Pressed/1
-     * @param mods   - modifier bits regarding CTRL/ALT/SHIFT being pressed or not
+     * @param mods   - modifier bits regarding CTRL/ALT/SHIFT being pressed or not.
      */
-    void mouseClickEvent(MouseButton button, KeyAction action, ActiveModifiersBits mods);
+    void mouseClickEvent(MouseButton button, HIDAction action, ActiveModifiersBits mods);
 
     /**
      * @brief Function to be called by Input management when mouse move happens.
@@ -59,6 +59,16 @@ public:
      * @param mouseY - trivial
      */
     void mouseMoveEvent(double mouseX, double mouseY);
+
+    /**
+     * @brief Function to be called by Input management when a key event happens.
+     *
+     * @param key - Key that triggered the event.
+     * @param action - trivial
+     * @param mods   - modifier bits regarding CTRL/ALT/SHIFT being pressed or not.
+     */
+    void keyEvent(int key, HIDAction action, int mods);
+
     /**
      * @brief Function to be called by Input management when window is resized.
      *

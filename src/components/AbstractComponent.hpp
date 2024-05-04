@@ -185,6 +185,7 @@ protected:
     /* Virtuals called by CM */
     virtual void onClickEvent();
     virtual void onMoveEvent();
+    virtual void onKeyEvent();
     virtual void onMouseEnterEvent();
     virtual void onMouseExitEvent();
     virtual void onPrepareToRender();

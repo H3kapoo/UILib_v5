@@ -37,148 +37,157 @@ void LayoutCalculator::calculate()
 
     const auto& rootBox = root->getTransformRead();
     glm::vec2 startXY = rootBox.pos;
+
     // TODO: take into accound margin/border/padd
     auto remainingSpace = root->getTransformRead().scale - accumulatedSize;
     remainingSpace.x -= (rootLeftBorder + rootRightBorder);
     remainingSpace.y -= (rootTopBorder + rootBotBorder);
     for (const auto& childNode : root->getNodes())
     {
+        auto& childPos = childNode->getTransformRW().pos;
+        auto& childScale = childNode->getTransformRW().scale;
         if (root->layout.orientation == LayoutData::Orientation::Horizontal)
         {
-            if (root->layout.fillPolicy == LayoutData::FillPolicy::EvenlySpaced)
-            {
-                const auto offset = remainingSpace.x / (root->getNodes().size() + 1);
-                startXY.x += offset;
-                childNode->getTransformRW().pos = startXY;
-                startXY.x += childNode->getTransformRead().scale.x;
-            }
-            else if (root->layout.fillPolicy == LayoutData::FillPolicy::Tightly)
-            {
-                childNode->getTransformRW().pos = startXY;
-                startXY.x += childNode->getTransformRead().scale.x;
-            }
+            childPos.x = getNextFillPolicyPosition(startXY.x, childScale.x, remainingSpace.x);
+            childPos.y = 0;
         }
         else if (root->layout.orientation == LayoutData::Orientation::Vertical)
         {
-            if (root->layout.fillPolicy == LayoutData::FillPolicy::EvenlySpaced)
-            {
-                const auto offset = remainingSpace.y / (root->getNodes().size() + 1);
-                startXY.y += offset;
-                childNode->getTransformRW().pos = startXY;
-                startXY.y += childNode->getTransformRead().scale.y;
-            }
-            else if (root->layout.fillPolicy == LayoutData::FillPolicy::Tightly)
-            {
-                childNode->getTransformRW().pos = startXY;
-                startXY.y += childNode->getTransformRead().scale.y;
-            }
+            childPos.x = 0;
+            childPos.y = getNextFillPolicyPosition(startXY.y, childScale.y, remainingSpace.y);
         }
     }
 
-    const auto bound = getChildrenBound(root->getNodes());
-    const auto boundsDiff = bound.end - bound.start;
+    // const auto bound = getChildrenBound(root->getNodes());
+    // const auto boundsDiff = bound.end - bound.start;
     glm::vec2 offset = {0, 0};
-    // for (const auto& childNode : root->getNodes())
-    // {
-    //     // clang-format off
-    //     switch (root->layout.childPos)
-    //     {
-    //         case LayoutData::ChildPos::TopLeft:
-    //         {
-    //             offset.x = rootLeftBorder;
-    //             offset.y = rootTopBorder;
-    //             break;
-    //         }
-    //         case LayoutData::ChildPos::TopCenter:
-    //         {
-    //             int halfDiffX = boundsDiff.x / 2;
-    //             int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
-    //             offset.x = spaceLeft / 2.0f - halfDiffX;
-    //             offset.y = rootTopBorder;
-    //             break;
-    //         }
-    //         case LayoutData::ChildPos::TopRight:
-    //         {
-    //             offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
-    //             offset.y = rootTopBorder;
-    //             break;
-    //         }
-    //         case LayoutData::ChildPos::MidLeft:
-    //         {
-    //             int halfDiffY = boundsDiff.y / 2;
-    //             int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
-    //             offset.y = spaceLeft / 2.0f - halfDiffY;
-    //             offset.x = rootLeftBorder;
-    //             break;
-    //         }
-    //         case LayoutData::ChildPos::MidCenter:
-    //         {
-    //             int halfDiffX = boundsDiff.x / 2;
-    //             int halfDiffY = boundsDiff.y / 2;
-    //             int spaceLeftX = rootBox.scale.x + rootLeftBorder - rootRightBorder;
-    //             int spaceLeftY = rootBox.scale.y + rootTopBorder - rootBotBorder;
-    //             offset.x = spaceLeftX / 2.0f - halfDiffX;
-    //             offset.y = spaceLeftY / 2.0f - halfDiffY;
-    //             break;
-    //         }
-    //         case LayoutData::ChildPos::MidRight:
-    //         {
-    //             int halfDiffY = boundsDiff.y / 2;
-    //             int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
-    //             offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
-    //             offset.y = spaceLeft / 2.0f - halfDiffY;
-    //             break;
-    //         }
-    //         case LayoutData::ChildPos::BottomLeft:
-    //         {
-    //             offset.x = rootLeftBorder;
-    //             offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
-    //             break;
-    //         }
-    //         case LayoutData::ChildPos::BottomCenter:
-    //         {
-    //             int halfDiffX = boundsDiff.x / 2;
-    //             int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
-    //             offset.x = spaceLeft / 2.0f - halfDiffX;
-    //             offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
-    //             break;
-    //         }
-    //         case LayoutData::ChildPos::BottomRight:
-    //         {
-    //             offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
-    //             offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
-    //             break;
-    //         }
-    //     }
-    //     // clang-format on
+    offset.x = rootLeftBorder;
+    offset.y = rootTopBorder;
+    for (const auto& childNode : root->getNodes())
+    {
+        //     //     // clang-format off
+        //     //     switch (root->layout.childPos)
+        //     //     {
+        //     //         case LayoutData::ChildPos::TopLeft:
+        //     //         {
+        //     //             break;
+        //     //         }
+        //     //         case LayoutData::ChildPos::TopCenter:
+        //     //         {
+        //     //             int halfDiffX = boundsDiff.x / 2;
+        //     //             int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
+        //     //             offset.x = spaceLeft / 2.0f - halfDiffX;
+        //     //             offset.y = rootTopBorder;
+        //     //             break;
+        //     //         }
+        //     //         case LayoutData::ChildPos::TopRight:
+        //     //         {
+        //     //             offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
+        //     //             offset.y = rootTopBorder;
+        //     //             break;
+        //     //         }
+        //     //         case LayoutData::ChildPos::MidLeft:
+        //     //         {
+        //     //             int halfDiffY = boundsDiff.y / 2;
+        //     //             int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
+        //     //             offset.y = spaceLeft / 2.0f - halfDiffY;
+        //     //             offset.x = rootLeftBorder;
+        //     //             break;
+        //     //         }
+        //     //         case LayoutData::ChildPos::MidCenter:
+        //     //         {
+        //     //             int halfDiffX = boundsDiff.x / 2;
+        //     //             int halfDiffY = boundsDiff.y / 2;
+        //     //             int spaceLeftX = rootBox.scale.x + rootLeftBorder - rootRightBorder;
+        //     //             int spaceLeftY = rootBox.scale.y + rootTopBorder - rootBotBorder;
+        //     //             offset.x = spaceLeftX / 2.0f - halfDiffX;
+        //     //             offset.y = spaceLeftY / 2.0f - halfDiffY;
+        //     //             break;
+        //     //         }
+        //     //         case LayoutData::ChildPos::MidRight:
+        //     //         {
+        //     //             int halfDiffY = boundsDiff.y / 2;
+        //     //             int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
+        //     //             offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
+        //     //             offset.y = spaceLeft / 2.0f - halfDiffY;
+        //     //             break;
+        //     //         }
+        //     //         case LayoutData::ChildPos::BottomLeft:
+        //     //         {
+        //     //             offset.x = rootLeftBorder;
+        //     //             offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
+        //     //             break;
+        //     //         }
+        //     //         case LayoutData::ChildPos::BottomCenter:
+        //     //         {
+        //     //             int halfDiffX = boundsDiff.x / 2;
+        //     //             int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
+        //     //             offset.x = spaceLeft / 2.0f - halfDiffX;
+        //     //             offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
+        //     //             break;
+        //     //         }
+        //     //         case LayoutData::ChildPos::BottomRight:
+        //     //         {
+        //     //             offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
+        //     //             offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
+        //     //             break;
+        //     //         }
+        //     //     }
+        //     //     // clang-format on
 
-    //     childNode->getTransformRW().pos += offset;
-    // }
+        childNode->getTransformRW().pos += offset;
+    }
+}
+
+float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace)
+{
+    float nextPos = 0;
+    switch (root->layout.fillPolicy)
+    {
+        case LayoutData::FillPolicy::Tightly: {
+            nextPos = bufferPos;
+            bufferPos += compScale;
+            break;
+        }
+        case LayoutData::FillPolicy::EvenlySpaced: {
+            const auto offset = remainingSpace / (root->getNodes().size() + 1);
+            bufferPos += offset;
+            nextPos = bufferPos;
+            bufferPos += compScale;
+            break;
+        }
+        case LayoutData::FillPolicy::SpaceBetween: {
+            // TODO: Treat division by zero. Currently this is ok due to .size() being size_t
+            nextPos = bufferPos;
+            const auto offset = remainingSpace / (root->getNodes().size() - 1);
+            bufferPos += offset + compScale;
+            break;
+        }
+    }
+    return nextPos;
 }
 
 void LayoutCalculator::calculateAndApplyScale(AbstractComponent* comp)
 {
-    if (comp->layout.scaling.horizontal.policy == LayoutData::ScalePolicy::Absolute)
+    if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
     {
         comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value;
     }
 
-    if (comp->layout.scaling.vertical.policy == LayoutData::ScalePolicy::Absolute)
+    if (comp->layout.scaling.vertical.policy == LdScalePolicy::Absolute)
     {
         comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value;
     }
 
-    if (comp->layout.scaling.horizontal.policy == LayoutData::ScalePolicy::Relative)
+    if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
     {
         const auto rootLeftBorder = root->layout.borderSize.z;
         const auto rootRightBorder = root->layout.borderSize.w;
-        // const auto rootTopBorder = root->layout.borderSize.x;
-        // const auto rootBotBorder = root->layout.borderSize.y;
         comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
                                          (root->getTransformRead().scale.x - (rootLeftBorder + rootRightBorder));
     }
 
-    if (comp->layout.scaling.vertical.policy == LayoutData::ScalePolicy::Relative)
+    if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
     {
         const auto rootTopBorder = root->layout.borderSize.x;
         const auto rootBotBorder = root->layout.borderSize.y;

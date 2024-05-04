@@ -51,23 +51,22 @@ void Div::addOnExitListener(std::function<void()>&& func)
     mouseExitCb = func;
 }
 
+void Div::addOnKeyListener(std::function<void(const HIDAction*)>&& func)
+{
+    keyEventCb = func;
+}
+
 void Div::onClickEvent()
 {
-
     const auto& s = getState();
-    if (s->clickedButton == MouseButton::Left && s->keyAction == KeyAction::Pressed)
-    {
-        utils::printlni("Div element id {} has been clicked!", getId());
-        //     if (getId() == 1)
-        //     {
-        //         utils::printlni("Switching texture..");
-        //         textureLoader.reloadFromPath("src/assets/textures/container.jpg");
-        //     }
-    }
-    else { return; }
+    if (mouseClickCb && s->mouseAction == HIDAction::Pressed) { mouseClickCb(s->mouseX, s->mouseY, s->clickedButton); }
+}
 
-    if (mouseClickCb) mouseClickCb(s->mouseX, s->mouseY, s->clickedButton);
-};
+void Div::onKeyEvent()
+{
+    const auto& s = getState();
+    if (keyEventCb) { keyEventCb(s->keyboardActionState); }
+}
 
 void Div::onMouseEnterEvent()
 {
