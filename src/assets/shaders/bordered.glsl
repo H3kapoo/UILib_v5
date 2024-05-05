@@ -21,6 +21,9 @@ void main()
 uniform vec2 uResolution;
 uniform vec4 uInnerColor;
 uniform vec4 uBorderColor;
+// uniform vec4 uBorderColorB;
+// uniform vec4 uBorderColorL;
+// uniform vec4 uBorderColorR;
 uniform vec4 uBorderSize;
 // uniform float uTime;
 
@@ -29,7 +32,7 @@ in vec2 texOut;
 void main()
 {
     float ar = uResolution.x / uResolution.y;
-    vec2 uv = texOut.xy;;
+    vec2 uv = texOut.xy;
     uv.x *= ar;
 
     float oneOverX = 1.0f / uResolution.x*ar;

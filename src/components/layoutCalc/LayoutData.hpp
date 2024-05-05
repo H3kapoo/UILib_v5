@@ -23,11 +23,12 @@ struct LayoutData
     // clang-format off
     enum class Align : uint8_t
     {
-        Top    = 0b00,
-        Left   = 0b00,
-        Bot    = 0b01,
-        Right  = 0b01,
-        Center = 0b10
+        Top    = 0b000,
+        Left   = 0b000,
+        Center = 0b001,
+        Bot    = 0b010,
+        Right  = 0b010,
+        COUNT  = 0b011
     };
     // clang-format on
 
@@ -69,6 +70,14 @@ struct LayoutData
         ScalePair vertical;
     };
 
+    struct BorderSize
+    {
+        uint16_t left{0};
+        uint16_t right{0};
+        uint16_t top{0};
+        uint16_t bottom{0};
+    };
+
     Orientation orientation{Orientation::Horizontal};
     FillPolicy fillPolicy{FillPolicy::Tightly};
     Alignment align{Alignment{Align::Left, Align::Top}};
@@ -76,11 +85,11 @@ struct LayoutData
     Scaling scaling{ScalePair{ScalePolicy::Absolute, 10}, ScalePair{ScalePolicy::Absolute, 10}};
     WrapMode wrap{WrapMode::NoWrap};
 
+    BorderSize borderSize{0};
     // glm::u16vec4 borderSize{0};
     // glm::u16vec4 marginSize{0};
     // glm::u16vec4 paddingSize{0};
 
-    glm::vec4 borderSize{0};
     glm::vec4 marginSize{0};
     glm::vec4 paddingSize{0};
 };

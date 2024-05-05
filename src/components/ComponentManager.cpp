@@ -4,6 +4,7 @@
 #include <ranges>
 
 #include "../Utility.hpp"
+#include "layoutCalc/LayoutCalculator.hpp"
 
 namespace components
 {
@@ -138,6 +139,7 @@ void ComponentManager::keyEvent(int key, HIDAction action, int mods)
             break;
         }
     }
+
     // utils::printlne("key: {} act: {} mods: {}", key, (uint8_t)action, mods);
 }
 

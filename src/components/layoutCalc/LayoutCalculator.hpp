@@ -14,7 +14,7 @@ class LayoutCalculator
 {
 public:
     LayoutCalculator(AbstractComponent* comp);
-    void calculate();
+    void calculate(const float overflowX = 0);
 
 private:
     struct Bounds
@@ -24,9 +24,13 @@ private:
     };
 
     float getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace);
-    void calculateAndApplyScale(AbstractComponent* comp);
+    void calculateAndApplyAlignOffset();
+    void calculateAndApplyPosition();
+    void calculateAndApplyScale();
     void calculateNextBasePosition(glm::vec2& currentXY, AbstractComponent* comp);
 
+    void resetPositions();
+    glm::vec2 getRemainingUsableSpace();
     Bounds getChildrenBound(const std::vector<AbstractComponent*>& childComps);
 
     /* TODO: Maybe in the future this root can be removed and class can be made static so we are fully stateless */

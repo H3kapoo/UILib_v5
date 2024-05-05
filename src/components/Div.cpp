@@ -1,5 +1,7 @@
 #include "Div.hpp"
 
+#include "GLFW/glfw3.h"
+
 #include "../Utility.hpp"
 #include "compUtils/LightWeightDummy.hpp"
 
@@ -28,10 +30,14 @@ void Div::onRenderDone()
 
 void Div::onPrepareToRender()
 {
+
+    auto border = glm::vec4(layout.borderSize.top, layout.borderSize.bottom, layout.borderSize.left,
+        layout.borderSize.right);
+
     getShader().setActiveShaderId(getShaderId());
     getShader().setVec4f("uInnerColor", style.color);
     getShader().setVec4f("uBorderColor", style.borderColor);
-    getShader().setVec4f("uBorderSize", layout.borderSize);
+    getShader().setVec4f("uBorderSize", border);
     getShader().setVec2f("uResolution", getTransformRead().scale);
     // getShader().set2DTextureUnit("uTexture", textureData->id, GL_TEXTURE0);
 }
@@ -65,7 +71,10 @@ void Div::onClickEvent()
 void Div::onKeyEvent()
 {
     const auto& s = getState();
-    if (keyEventCb) { keyEventCb(s->keyboardActionState); }
+    // if (keyEventCb) { keyEventCb(s->keyboardActionState); }
+    if (s->keyboardActionState[GLFW_KEY_A] == HIDAction::Pressed) { overflow -= 5; }
+    if (s->keyboardActionState[GLFW_KEY_D] == HIDAction::Pressed) { overflow += 5; }
+    s->triggerLayoutUpdate();
 }
 
 void Div::onMouseEnterEvent()
@@ -96,7 +105,7 @@ void Div::onStart()
 
 void Div::onLayoutUpdate()
 {
-    layoutCalc.calculate();
+    layoutCalc.calculate(overflow);
 }
 
 } // namespace components

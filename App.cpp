@@ -15,21 +15,22 @@ App::~App()
 void App::start(int initialWidth, int initialHeight)
 {
     rootDiv.style.color = utils::hexToVec4("#125ea9ff");
-    rootDiv.style.borderColor = utils::hexToVec4("#7210bcff");
-    rootDiv.layout.borderSize = glm::vec4(6, 12, 18, 50);
+    rootDiv.style.borderColor = utils::hexToVec4("#c85c0fff");
+    // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
-    rootDiv.layout.orientation = LdOrientation::Vertical;
+    rootDiv.layout.orientation = LdOrientation::Horizontal;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
     rootDiv.layout.align = LdAlignment{LdAlign::Left, LdAlign::Top};
     rootDiv.layout.internalAlign = LdAlign::Top;
     rootDiv.layout.wrap = LdWrapMode::NoWrap;
 
-    div3.style.borderColor = utils::hexToVec4("#0bb636ff");
-    // div3.layout.borderSize = glm::vec4(36, 12, 18, 50);
+    div3.style.borderColor = utils::hexToVec4("#13b613ff");
+    // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
+
     // div3.layout.marginSize = glm::vec4(6.0f);
-    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 100}, {LdScalePolicy::Absolute, 200}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 100}, {LdScalePolicy::Absolute, 100}};
-    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 100}};
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 200}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 250}, {LdScalePolicy::Absolute, 100}};
+    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
 
     div2.style.color = utils::hexToVec4("#6de025ff");
     div3.style.color = utils::hexToVec4("#bc115bff");
@@ -65,21 +66,23 @@ void App::start(int initialWidth, int initialHeight)
                 uint8_t x = (uint8_t)rootDiv.layout.fillPolicy + 1;
                 rootDiv.layout.fillPolicy = LdFillPolicy(x % (uint8_t)LdFillPolicy::COUNT);
             }
-            // rootDiv.layout.childPos = LayoutData::ChildPos::TopLeft;
             rootDiv.updateLayout();
         });
 
     rootDiv.addOnKeyListener(
         [this](const HIDAction* keyAction)
         {
-            if (keyAction[GLFW_KEY_A] == HIDAction::Pressed)
+            if (keyAction[GLFW_KEY_D] == HIDAction::Pressed)
             {
-                utils::printlni("Pressed A key");
-                uint8_t x = (uint8_t)rootDiv.layout.fillPolicy + 1;
-                rootDiv.layout.fillPolicy = LdFillPolicy(x % (uint8_t)LdFillPolicy::COUNT);
-                rootDiv.updateLayout();
+                uint8_t x = (uint8_t)rootDiv.layout.align.horizontal + 1;
+                rootDiv.layout.align.horizontal = LdAlign(x % (uint8_t)LdAlign::COUNT);
             }
-            else if (keyAction[GLFW_KEY_A] == HIDAction::Released) { utils::printlni("Released A key"); }
+            if (keyAction[GLFW_KEY_W] == HIDAction::Pressed)
+            {
+                uint8_t x = (uint8_t)rootDiv.layout.align.vertical + 1;
+                rootDiv.layout.align.vertical = LdAlign(x % (uint8_t)LdAlign::COUNT);
+            }
+            rootDiv.updateLayout();
         });
 }
 

@@ -9,134 +9,27 @@ LayoutCalculator::LayoutCalculator(AbstractComponent* comp)
     : root{comp}
 {}
 
-void LayoutCalculator::calculate()
+void LayoutCalculator::calculate(const float overflowX)
 {
-    /*
-        border:
-            x - top
-            y - bottom
-            z - left
-            w - right
-    */
+    /* Reset positions */
+    resetPositions();
 
-    const auto rootLeftBorder = root->layout.borderSize.z;
-    const auto rootRightBorder = root->layout.borderSize.w;
-    const auto rootTopBorder = root->layout.borderSize.x;
-    const auto rootBotBorder = root->layout.borderSize.y;
+    /* Calculate scale */
+    calculateAndApplyScale();
 
-    for (const auto& childNode : root->getNodes())
-    {
-        calculateAndApplyScale(childNode);
-    }
+    /* Calculate position based on FillPolicy & Orientation */
+    calculateAndApplyPosition();
 
-    glm::vec2 accumulatedSize = {0, 0};
-    for (const auto& childNode : root->getNodes())
-    {
-        accumulatedSize += childNode->getTransformRead().scale;
-    }
+    /* Calculate and add offset to the position based on Align & internalAlign */
+    calculateAndApplyAlignOffset();
 
-    const auto& rootBox = root->getTransformRead();
-    glm::vec2 startXY = rootBox.pos;
-
-    // TODO: take into accound margin/border/padd
-    auto remainingSpace = root->getTransformRead().scale - accumulatedSize;
-    remainingSpace.x -= (rootLeftBorder + rootRightBorder);
-    remainingSpace.y -= (rootTopBorder + rootBotBorder);
     for (const auto& childNode : root->getNodes())
     {
         auto& childPos = childNode->getTransformRW().pos;
-        auto& childScale = childNode->getTransformRW().scale;
-        if (root->layout.orientation == LayoutData::Orientation::Horizontal)
-        {
-            childPos.x = getNextFillPolicyPosition(startXY.x, childScale.x, remainingSpace.x);
-            childPos.y = 0;
-        }
-        else if (root->layout.orientation == LayoutData::Orientation::Vertical)
-        {
-            childPos.x = 0;
-            childPos.y = getNextFillPolicyPosition(startXY.y, childScale.y, remainingSpace.y);
-        }
+        childPos.x += overflowX;
     }
 
-    // const auto bound = getChildrenBound(root->getNodes());
-    // const auto boundsDiff = bound.end - bound.start;
-    glm::vec2 offset = {0, 0};
-    offset.x = rootLeftBorder;
-    offset.y = rootTopBorder;
-    for (const auto& childNode : root->getNodes())
-    {
-        //     //     // clang-format off
-        //     //     switch (root->layout.childPos)
-        //     //     {
-        //     //         case LayoutData::ChildPos::TopLeft:
-        //     //         {
-        //     //             break;
-        //     //         }
-        //     //         case LayoutData::ChildPos::TopCenter:
-        //     //         {
-        //     //             int halfDiffX = boundsDiff.x / 2;
-        //     //             int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
-        //     //             offset.x = spaceLeft / 2.0f - halfDiffX;
-        //     //             offset.y = rootTopBorder;
-        //     //             break;
-        //     //         }
-        //     //         case LayoutData::ChildPos::TopRight:
-        //     //         {
-        //     //             offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
-        //     //             offset.y = rootTopBorder;
-        //     //             break;
-        //     //         }
-        //     //         case LayoutData::ChildPos::MidLeft:
-        //     //         {
-        //     //             int halfDiffY = boundsDiff.y / 2;
-        //     //             int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
-        //     //             offset.y = spaceLeft / 2.0f - halfDiffY;
-        //     //             offset.x = rootLeftBorder;
-        //     //             break;
-        //     //         }
-        //     //         case LayoutData::ChildPos::MidCenter:
-        //     //         {
-        //     //             int halfDiffX = boundsDiff.x / 2;
-        //     //             int halfDiffY = boundsDiff.y / 2;
-        //     //             int spaceLeftX = rootBox.scale.x + rootLeftBorder - rootRightBorder;
-        //     //             int spaceLeftY = rootBox.scale.y + rootTopBorder - rootBotBorder;
-        //     //             offset.x = spaceLeftX / 2.0f - halfDiffX;
-        //     //             offset.y = spaceLeftY / 2.0f - halfDiffY;
-        //     //             break;
-        //     //         }
-        //     //         case LayoutData::ChildPos::MidRight:
-        //     //         {
-        //     //             int halfDiffY = boundsDiff.y / 2;
-        //     //             int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
-        //     //             offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
-        //     //             offset.y = spaceLeft / 2.0f - halfDiffY;
-        //     //             break;
-        //     //         }
-        //     //         case LayoutData::ChildPos::BottomLeft:
-        //     //         {
-        //     //             offset.x = rootLeftBorder;
-        //     //             offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
-        //     //             break;
-        //     //         }
-        //     //         case LayoutData::ChildPos::BottomCenter:
-        //     //         {
-        //     //             int halfDiffX = boundsDiff.x / 2;
-        //     //             int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
-        //     //             offset.x = spaceLeft / 2.0f - halfDiffX;
-        //     //             offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
-        //     //             break;
-        //     //         }
-        //     //         case LayoutData::ChildPos::BottomRight:
-        //     //         {
-        //     //             offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
-        //     //             offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
-        //     //             break;
-        //     //         }
-        //     //     }
-        //     //     // clang-format on
-
-        childNode->getTransformRW().pos += offset;
-    }
+    // TODO: Detect overflow:
 }
 
 float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace)
@@ -163,37 +56,151 @@ float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compS
             bufferPos += offset + compScale;
             break;
         }
+        case LayoutData::FillPolicy::COUNT:
+            break;
     }
     return nextPos;
 }
 
-void LayoutCalculator::calculateAndApplyScale(AbstractComponent* comp)
+void LayoutCalculator::calculateAndApplyAlignOffset()
 {
-    if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
+    const auto rootLeftBorder = root->layout.borderSize.left;
+    const auto rootRightBorder = root->layout.borderSize.right;
+    const auto rootTopBorder = root->layout.borderSize.top;
+    const auto rootBotBorder = root->layout.borderSize.bottom;
+
+    const auto& rootBox = root->getTransformRead();
+    const auto bound = getChildrenBound(root->getNodes());
+    const auto boundsDiff = bound.end - bound.start;
+    glm::vec2 offset = {0, 0};
+
+    for (const auto& childNode : root->getNodes())
     {
-        comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value;
+        switch (root->layout.align.horizontal)
+        {
+            case LdAlign::Left: {
+                offset.x = rootLeftBorder;
+                break;
+            }
+            case LdAlign::Center: {
+                int halfDiffX = boundsDiff.x / 2;
+                int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
+                offset.x = spaceLeft / 2.0f - halfDiffX;
+                break;
+            }
+            case LdAlign::Right: {
+                offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
+                break;
+            }
+            case LdAlign::COUNT:
+                break;
+        }
+
+        switch (root->layout.align.vertical)
+        {
+            case LdAlign::Top: {
+                offset.y = rootTopBorder;
+                break;
+            }
+            case LdAlign::Center: {
+                int halfDiffY = boundsDiff.y / 2;
+                int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
+                offset.y = spaceLeft / 2.0f - halfDiffY;
+                break;
+            }
+            case LdAlign::Bot: {
+                offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
+
+                break;
+            }
+            case LdAlign::COUNT:
+                break;
+        }
+
+        childNode->getTransformRW().pos += offset;
+    }
+}
+
+void LayoutCalculator::calculateAndApplyPosition()
+{
+    const auto& rootBox = root->getTransformRead();
+    glm::vec2 startXY = rootBox.pos;
+
+    auto remainingSpace = getRemainingUsableSpace();
+    for (const auto& childNode : root->getNodes())
+    {
+        auto& childPos = childNode->getTransformRW().pos;
+        auto& childScale = childNode->getTransformRW().scale;
+        if (root->layout.orientation == LayoutData::Orientation::Horizontal)
+        {
+            childPos.x = getNextFillPolicyPosition(startXY.x, childScale.x, remainingSpace.x);
+        }
+        else if (root->layout.orientation == LayoutData::Orientation::Vertical)
+        {
+            childPos.y = getNextFillPolicyPosition(startXY.y, childScale.y, remainingSpace.y);
+        }
+    }
+}
+
+void LayoutCalculator::calculateAndApplyScale()
+{
+    for (const auto& comp : root->getNodes())
+    {
+        if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
+        {
+            comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value;
+        }
+
+        if (comp->layout.scaling.vertical.policy == LdScalePolicy::Absolute)
+        {
+            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value;
+        }
+
+        if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
+        {
+            const auto rootLeftBorder = root->layout.borderSize.left;
+            const auto rootRightBorder = root->layout.borderSize.right;
+            comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
+                                             (root->getTransformRead().scale.x - (rootLeftBorder + rootRightBorder));
+        }
+
+        if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
+        {
+            const auto rootTopBorder = root->layout.borderSize.top;
+            const auto rootBotBorder = root->layout.borderSize.bottom;
+            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
+                                             (root->getTransformRead().scale.y - (rootTopBorder + rootBotBorder));
+        }
+    }
+}
+
+void LayoutCalculator::resetPositions()
+{
+    for (const auto& childNode : root->getNodes())
+    {
+        childNode->getTransformRW().pos = {0, 0};
+    }
+}
+
+glm::vec2 LayoutCalculator::getRemainingUsableSpace()
+{
+    const auto rootLeftBorder = root->layout.borderSize.left;
+    const auto rootRightBorder = root->layout.borderSize.right;
+    const auto rootTopBorder = root->layout.borderSize.top;
+    const auto rootBotBorder = root->layout.borderSize.bottom;
+
+    glm::vec2 accumulatedSize = {0, 0};
+    for (const auto& childNode : root->getNodes())
+    {
+        accumulatedSize += childNode->getTransformRead().scale;
     }
 
-    if (comp->layout.scaling.vertical.policy == LdScalePolicy::Absolute)
-    {
-        comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value;
-    }
+    // TODO: take into accound margin/border/padd
+    auto remainingSpace = root->getTransformRead().scale - accumulatedSize;
+    remainingSpace.x -= (rootLeftBorder + rootRightBorder);
+    remainingSpace.y -= (rootTopBorder + rootBotBorder);
 
-    if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
-    {
-        const auto rootLeftBorder = root->layout.borderSize.z;
-        const auto rootRightBorder = root->layout.borderSize.w;
-        comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
-                                         (root->getTransformRead().scale.x - (rootLeftBorder + rootRightBorder));
-    }
-
-    if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
-    {
-        const auto rootTopBorder = root->layout.borderSize.x;
-        const auto rootBotBorder = root->layout.borderSize.y;
-        comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
-                                         (root->getTransformRead().scale.y - (rootTopBorder + rootBotBorder));
-    }
+    return remainingSpace;
 }
 
 LayoutCalculator::Bounds LayoutCalculator::getChildrenBound(const std::vector<AbstractComponent*>& childComps)
@@ -218,6 +225,26 @@ LayoutCalculator::Bounds LayoutCalculator::getChildrenBound(const std::vector<Ab
             result.end.y = childTransform.pos.y + childTransform.scale.y;
         }
     }
+
+    /* Any other FillPolicy will take up the whole axis space */
+    if (root->layout.fillPolicy != LdFillPolicy::Tightly)
+    {
+        const auto rootLeftBorder = root->layout.borderSize.left;
+        const auto rootRightBorder = root->layout.borderSize.right;
+        const auto rootTopBorder = root->layout.borderSize.top;
+        const auto rootBotBorder = root->layout.borderSize.bottom;
+        if (root->layout.orientation == LdOrientation::Horizontal)
+        {
+            result.start.x = root->getTransformRead().pos.x + rootLeftBorder;
+            result.end.x = root->getTransformRead().scale.x - rootRightBorder;
+        }
+        else if (root->layout.orientation == LdOrientation::Vertical)
+        {
+            result.start.y = root->getTransformRead().pos.y + rootTopBorder;
+            result.end.y = root->getTransformRead().scale.y - rootBotBorder;
+        }
+    }
+
     return result;
 }
 } // namespace components::layoutcalc
