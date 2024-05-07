@@ -1,15 +1,16 @@
 #include "LayoutCalculator.hpp"
 #include "../../Utility.hpp"
 #include "LayoutData.hpp"
-#include <cstdint>
+#include <glm/fwd.hpp>
 
 namespace components::layoutcalc
 {
+
 LayoutCalculator::LayoutCalculator(AbstractComponent* comp)
     : root{comp}
 {}
 
-void LayoutCalculator::calculate(const float overflowX)
+glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX, const int scrollOffsetY)
 {
     /* Reset positions */
     resetPositions();
@@ -26,10 +27,14 @@ void LayoutCalculator::calculate(const float overflowX)
     for (const auto& childNode : root->getNodes())
     {
         auto& childPos = childNode->getTransformRW().pos;
-        childPos.x += overflowX;
+        childPos.x -= scrollOffsetX;
+        childPos.y -= scrollOffsetY;
     }
 
     // TODO: Detect overflow:
+    glm::vec2 b = getRemainingUsableSpace();
+
+    return {b.x < 0 ? std::abs(b.x) : 0, b.y < 0 ? std::abs(b.y) : 0};
 }
 
 float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace)

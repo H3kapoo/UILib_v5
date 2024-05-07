@@ -1,6 +1,7 @@
 #include "ComponentManager.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <ranges>
 
 #include "../Utility.hpp"
@@ -45,7 +46,6 @@ void ComponentManager::updateLayout()
         childNode->onLayoutUpdate();
     }
 }
-
 void ComponentManager::render()
 {
     renderer.clearScreen();
@@ -83,6 +83,12 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
        Might be different on MacOS, but I dont have one. */
     state.mouseX = (int)mouseX;
     state.mouseY = (int)mouseY;
+
+    // TODO: Notify only the hovered comp
+    for (const auto& childNode : flattenedNodes)
+    {
+        childNode->onMoveEvent();
+    }
 
     /* Bellow two passes should in very worst case be O(2N) but in 95% of cases is much less than that */
     bool shouldNotify = false;

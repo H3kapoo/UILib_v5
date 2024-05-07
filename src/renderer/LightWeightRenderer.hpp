@@ -16,6 +16,7 @@ public:
 
     void render(const glm::mat4& projMatrix, LightWeightDummy& dummy)
     {
+        // TODO: Check for NULL or make loading functions return 0 on error
         if (dummy.shaderId == 0) { dummy.shaderId = *shaderLoader.loadFromPath(dummy.options.shaderPath); }
         shaderLoader.setActiveShaderId(dummy.shaderId);
         shaderLoader.setMatrix4("uProjMatrix", projMatrix);

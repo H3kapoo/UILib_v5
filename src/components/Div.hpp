@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AbstractComponent.hpp"
-#include "compUtils/LightWeightDummy.hpp"
+#include "compUtils/ScrollBar.hpp"
 #include "layoutCalc/LayoutCalculator.hpp"
 
 #include "../assetLoaders/TextureLoader.hpp"
@@ -52,16 +52,17 @@ private:
     void onStart() override;
     void onLayoutUpdate() override;
 
-    TextureLoader::TextureDataPtr textureData{nullptr};
-    TextureLoader::TextureDataPtr textureData2{nullptr};
-    TextureLoader& textureLoader;
-
-    // computils::LightWeightDummy dummy;
-    // renderer::LightWeightRenderer lwr;
+    // TextureLoader::TextureDataPtr textureData{nullptr};
+    // TextureLoader::TextureDataPtr textureData2{nullptr};
+    // TextureLoader& textureLoader;
 
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this}; // TODO: Singleton
-    float overflow{0};
+    int overflow{0};
+    glm::i16vec2 deducedOverflow{0, 0};
+
+    computils::ScrollBar hsb{getTransformRead()};
+    computils::ScrollBar vsb{getTransformRead()};
 
     /* Callbacks related*/
     std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};

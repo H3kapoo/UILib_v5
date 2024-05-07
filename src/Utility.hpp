@@ -70,4 +70,21 @@ inline glm::vec4 hexToVec4(const std::string& hexColor)
 
     return normalizedColor;
 }
+
+inline float remap(float value, const float startA, const float endA, const float startB, const float endB)
+{
+    /*
+        [a,b]
+        [c,d]
+        x from [a,b]
+        t1 = (x-a)/(b-a)
+        y = (1-t1)*c + t1*d
+    */
+    if (value > endA) { return endB; }
+    if (value < startA) { return startB; }
+
+    const float t = (value - startA) / (endA - startA);
+    return (1.0f - t) * startB + t * endB;
+}
+
 } // namespace utils

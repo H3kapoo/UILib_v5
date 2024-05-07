@@ -16,13 +16,20 @@ class AbstractComponent
      * CM (e.g. setRoot/onEventX)*/
     friend class ComponentManager;
 
+public:
+    enum class CompType
+    {
+        Unknown,
+        Button,
+        Div,
+    };
+
     struct Options
     {
-        std::string type;
+        CompType type;
         std::string shaderPath;
     };
 
-public:
     /* Constructors */
     /**
      * @brief Construct a new AbstractComponent object of type.
@@ -130,13 +137,14 @@ public:
     UIState* getState();
     int getDepth() const;
     int getId() const;
-    const std::string& getType() const;
+    const CompType& getType() const;
     unsigned int getVaoId() const;
     shaderManagement::ShaderLoader& getShader();
     shaderManagement::shaderId getShaderId() const;
     computils::Transform& getTransformRW();
     computils::Transform& getTransformRead();
     bool isComponentRenderable() const;
+    bool isComponentParented() const;
 
     /* Trivial setters */
     void setRenderable(const bool canBeRendered);
@@ -177,7 +185,7 @@ private:
     int id{1};
     bool isRuntimeInitialized{false};
     bool isParented{false};
-    std::string type{"None"};
+    CompType type{CompType::Unknown};
     AbstractComponent* parent{nullptr};
     std::vector<AbstractComponent*> children;
 

@@ -5,7 +5,8 @@
 namespace components
 {
 Button::Button()
-    : AbstractComponent({.type = "Button", .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl"})
+    : AbstractComponent({.type = CompType::Button,
+          .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl"})
 {}
 
 Button::~Button()

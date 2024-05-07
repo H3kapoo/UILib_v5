@@ -118,7 +118,24 @@ void AbstractComponent::details()
 {
     const auto pid = parent ? std::to_string(parent->getId()) : "N/A";
     const auto dep = depth ? std::to_string(depth) : "Root(0)";
-    utils::println("{{id: {}, pid={}, depth={}, type: {}}}", id, pid, dep, type);
+    std::string stringType;
+
+    switch (type)
+    {
+        case CompType::Unknown:
+            stringType = "Unknown";
+            break;
+        case CompType::Div:
+            stringType = "Div";
+            break;
+        case CompType::Button:
+            stringType = "Button";
+            break;
+        default:
+            stringType = "Unknown";
+    }
+
+    utils::println("{{id: {}, pid={}, depth={}, type: {}}}", id, pid, dep, stringType);
 }
 
 void AbstractComponent::showTree()
@@ -151,7 +168,7 @@ int AbstractComponent::getId() const
     return id;
 }
 
-const std::string& AbstractComponent::getType() const
+const AbstractComponent::CompType& AbstractComponent::getType() const
 {
     return type;
 }
@@ -188,6 +205,11 @@ computils::Transform& AbstractComponent::getTransformRead()
 bool AbstractComponent::isComponentRenderable() const
 {
     return isRenderable;
+}
+
+bool AbstractComponent::isComponentParented() const
+{
+    return isParented;
 }
 
 void AbstractComponent::setRenderable(const bool canBeRendered)
