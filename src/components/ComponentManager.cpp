@@ -5,7 +5,6 @@
 #include <ranges>
 
 #include "../Utility.hpp"
-#include "layoutCalc/LayoutCalculator.hpp"
 
 namespace components
 {

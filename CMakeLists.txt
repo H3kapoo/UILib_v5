@@ -25,6 +25,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         main.cpp
         App.cpp
         src/assetLoaders/TextureLoader.cpp
+        src/components/compUtils/ScrollBar.cpp
         src/components/Div.cpp
         src/components/Button.cpp
         src/components/AbstractComponent.cpp

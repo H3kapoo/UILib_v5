@@ -15,6 +15,7 @@ class LayoutCalculator
 public:
     LayoutCalculator(AbstractComponent* comp);
     glm::i16vec2 calculate(const int scrollOffsetX = 0, const int scrollOffsetY = 0);
+    void scrollView(const int scrollOffsetX = 0, const int scrollOffsetY = 0);
 
 private:
     struct Bounds

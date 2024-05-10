@@ -65,6 +65,13 @@ build CMakeFiles/test.dir/src/assetLoaders/TextureLoader.cpp.o: CXX_COMPILER__te
   OBJECT_DIR = CMakeFiles/test.dir
   OBJECT_FILE_DIR = CMakeFiles/test.dir/src/assetLoaders
 
+build CMakeFiles/test.dir/src/components/compUtils/ScrollBar.cpp.o: CXX_COMPILER__test_ /home/hekapoo/newTryAtUI/src/components/compUtils/ScrollBar.cpp || cmake_object_order_depends_target_test
+  DEP_FILE = CMakeFiles/test.dir/src/components/compUtils/ScrollBar.cpp.o.d
+  FLAGS = -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23
+  INCLUDES = -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include
+  OBJECT_DIR = CMakeFiles/test.dir
+  OBJECT_FILE_DIR = CMakeFiles/test.dir/src/components/compUtils
+
 build CMakeFiles/test.dir/src/components/Div.cpp.o: CXX_COMPILER__test_ /home/hekapoo/newTryAtUI/src/components/Div.cpp || cmake_object_order_depends_target_test
   DEP_FILE = CMakeFiles/test.dir/src/components/Div.cpp.o.d
   FLAGS = -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23
@@ -143,7 +150,7 @@ build CMakeFiles/test.dir/home/hekapoo/Downloads/tracy/public/TracyClient.cpp.o:
 #############################################
 # Link the executable ../debug/test
 
-build ../debug/test: CXX_EXECUTABLE_LINKER__test_ CMakeFiles/test.dir/main.cpp.o CMakeFiles/test.dir/App.cpp.o CMakeFiles/test.dir/src/assetLoaders/TextureLoader.cpp.o CMakeFiles/test.dir/src/components/Div.cpp.o CMakeFiles/test.dir/src/components/Button.cpp.o CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o CMakeFiles/test.dir/src/components/ComponentManager.cpp.o CMakeFiles/test.dir/src/components/layoutCalc/LayoutCalculator.cpp.o CMakeFiles/test.dir/src/inputManagement/Input.cpp.o CMakeFiles/test.dir/src/mesh/QuadMesh.cpp.o CMakeFiles/test.dir/src/renderer/Renderer.cpp.o CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o CMakeFiles/test.dir/home/hekapoo/Downloads/tracy/public/TracyClient.cpp.o
+build ../debug/test: CXX_EXECUTABLE_LINKER__test_ CMakeFiles/test.dir/main.cpp.o CMakeFiles/test.dir/App.cpp.o CMakeFiles/test.dir/src/assetLoaders/TextureLoader.cpp.o CMakeFiles/test.dir/src/components/compUtils/ScrollBar.cpp.o CMakeFiles/test.dir/src/components/Div.cpp.o CMakeFiles/test.dir/src/components/Button.cpp.o CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o CMakeFiles/test.dir/src/components/ComponentManager.cpp.o CMakeFiles/test.dir/src/components/layoutCalc/LayoutCalculator.cpp.o CMakeFiles/test.dir/src/inputManagement/Input.cpp.o CMakeFiles/test.dir/src/mesh/QuadMesh.cpp.o CMakeFiles/test.dir/src/renderer/Renderer.cpp.o CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o CMakeFiles/test.dir/home/hekapoo/Downloads/tracy/public/TracyClient.cpp.o
   FLAGS = -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE
   LINK_LIBRARIES = -Wl,-rpath,/home/hekapoo/Downloads/glew-2.1.0/lib:/home/hekapoo/Downloads/glfw-3.3.8/src  -lglfw3  -lGLEW  -lGL  -lX11  -lXrandr  -lpthread  -ldl  -lfreetype
   LINK_PATH = -L/home/hekapoo/Downloads/glew-2.1.0/lib   -L/home/hekapoo/Downloads/glfw-3.3.8/src

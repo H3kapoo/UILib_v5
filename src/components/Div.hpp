@@ -6,6 +6,7 @@
 
 #include "../assetLoaders/TextureLoader.hpp"
 #include "../renderer/LightWeightRenderer.hpp"
+#include <functional>
 
 namespace components
 {
@@ -61,8 +62,11 @@ private:
     int overflow{0};
     glm::i16vec2 deducedOverflow{0, 0};
 
-    computils::ScrollBar hsb{getTransformRead()};
-    computils::ScrollBar vsb{getTransformRead()};
+    computils::ScrollBar hsb{getTransformRead(), std::bind(&layoutcalc::LayoutCalculator::scrollView,
+                                                     &layoutCalc,
+                                                     std::placeholders::_1,
+                                                     std::placeholders::_2)};
+    // computils::ScrollBar vsb{getTransformRead()};
 
     /* Callbacks related*/
     std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};

@@ -29,12 +29,12 @@ void App::start(int initialWidth, int initialHeight)
 
     // div3.layout.marginSize = glm::vec4(6.0f);
     div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 200}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 250}, {LdScalePolicy::Absolute, 100}};
-    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 550}, {LdScalePolicy::Absolute, 100}};
+    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 700}, {LdScalePolicy::Absolute, 250}};
 
     div2.style.color = utils::hexToVec4("#6de025ff");
     div3.style.color = utils::hexToVec4("#bc115bff");
-    div4.style.color = utils::hexToVec4("#b33970ff");
+    div4.style.color = utils::hexToVec4("#932758ff");
     div5.style.color = utils::hexToVec4("#d5317bff");
 
     componentManager.setRoot(&rootDiv);
@@ -54,40 +54,42 @@ void App::start(int initialWidth, int initialHeight)
     // div5.addOnEnterListener([this]() { div5.style.color = utils::hexToVec4("#336b55ff"); });
     // div5.addOnExitListener([this]() { div5.style.color = utils::hexToVec4("#3b1526ff"); });
     rootDiv.addClickListener(
-        [this](auto, auto, MouseButton btn)
+        [this](auto, auto, MouseButton)
         {
-            if (btn == MouseButton::Left)
-            {
-                uint8_t x = (uint8_t)rootDiv.layout.orientation + 1;
-                rootDiv.layout.orientation = LdOrientation(x % (uint8_t)LdOrientation::COUNT);
-            }
-            if (btn == MouseButton::Right)
-            {
-                uint8_t x = (uint8_t)rootDiv.layout.fillPolicy + 1;
-                rootDiv.layout.fillPolicy = LdFillPolicy(x % (uint8_t)LdFillPolicy::COUNT);
-            }
-            rootDiv.updateLayout();
+            // if (btn == MouseButton::Left)
+            // {
+            //     uint8_t x = (uint8_t)rootDiv.layout.orientation + 1;
+            //     rootDiv.layout.orientation = LdOrientation(x % (uint8_t)LdOrientation::COUNT);
+            // }
+            // if (btn == MouseButton::Right)
+            // {
+            //     uint8_t x = (uint8_t)rootDiv.layout.fillPolicy + 1;
+            //     rootDiv.layout.fillPolicy = LdFillPolicy(x % (uint8_t)LdFillPolicy::COUNT);
+            // }
+            // rootDiv.updateLayout();
         });
 
-    rootDiv.addOnKeyListener(
-        [this](const HIDAction* keyAction)
-        {
-            if (keyAction[GLFW_KEY_D] == HIDAction::Pressed)
-            {
-                uint8_t x = (uint8_t)rootDiv.layout.align.horizontal + 1;
-                rootDiv.layout.align.horizontal = LdAlign(x % (uint8_t)LdAlign::COUNT);
-            }
-            if (keyAction[GLFW_KEY_W] == HIDAction::Pressed)
-            {
-                uint8_t x = (uint8_t)rootDiv.layout.align.vertical + 1;
-                rootDiv.layout.align.vertical = LdAlign(x % (uint8_t)LdAlign::COUNT);
-            }
-            rootDiv.updateLayout();
-        });
+    // rootDiv.addOnKeyListener(
+    //     [this](const HIDAction* keyAction)
+    //     {
+    //         if (keyAction[GLFW_KEY_D] == HIDAction::Pressed)
+    //         {
+    //             uint8_t x = (uint8_t)rootDiv.layout.align.horizontal + 1;
+    //             rootDiv.layout.align.horizontal = LdAlign(x % (uint8_t)LdAlign::COUNT);
+    //         }
+    //         if (keyAction[GLFW_KEY_W] == HIDAction::Pressed)
+    //         {
+    //             uint8_t x = (uint8_t)rootDiv.layout.align.vertical + 1;
+    //             rootDiv.layout.align.vertical = LdAlign(x % (uint8_t)LdAlign::COUNT);
+    //         }
+    //         rootDiv.updateLayout();
+    //     });
 }
 
 void App::update()
 {
+    // rootDiv.updateLayout();
+
     // TODO: This needs to be carefully thought when it should be called and on what
     componentManager.render();
 }

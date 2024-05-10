@@ -24,6 +24,9 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX, const int scro
     /* Calculate and add offset to the position based on Align & internalAlign */
     calculateAndApplyAlignOffset();
 
+    // TODO: Detect overflow:
+    glm::vec2 b = getRemainingUsableSpace();
+
     for (const auto& childNode : root->getNodes())
     {
         auto& childPos = childNode->getTransformRW().pos;
@@ -31,10 +34,17 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX, const int scro
         childPos.y -= scrollOffsetY;
     }
 
-    // TODO: Detect overflow:
-    glm::vec2 b = getRemainingUsableSpace();
-
     return {b.x < 0 ? std::abs(b.x) : 0, b.y < 0 ? std::abs(b.y) : 0};
+}
+
+void LayoutCalculator::scrollView(const int scrollOffsetX, const int scrollOffsetY)
+{
+    for (const auto& childNode : root->getNodes())
+    {
+        auto& childPos = childNode->getTransformRW().pos;
+        childPos.x -= scrollOffsetX;
+        childPos.y -= scrollOffsetY;
+    }
 }
 
 float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace)

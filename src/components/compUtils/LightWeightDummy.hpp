@@ -1,6 +1,5 @@
 #pragma once
 
-#include <optional>
 #include <string>
 
 #include <glm/glm.hpp>
@@ -21,7 +20,7 @@ public:
 
     struct Options
     {
-        std::optional<glm::vec4> color{1.0f};
+        glm::vec4 color{1.0f};
         std::string shaderPath;
     };
 
