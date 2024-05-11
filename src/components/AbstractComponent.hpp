@@ -26,8 +26,8 @@ public:
 
     struct Options
     {
-        CompType type;
-        std::string shaderPath;
+        CompType type{CompType::Unknown};
+        std::string shaderPath{"SHADER_PATH_NON_EXISTENT"};
     };
 
     /* Constructors */

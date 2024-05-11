@@ -27,7 +27,7 @@ public:
         //     glm::vec4 bottom{0};
         // };
 
-        glm::vec4 borderColor;
+        glm::vec4 borderColor{0.0f};
         glm::vec4 color{0.0f};
         glm::vec4 hOut{0.0f};
     };
@@ -66,8 +66,10 @@ private:
                                                      &layoutCalc,
                                                      std::placeholders::_1,
                                                      std::placeholders::_2)};
-    // computils::ScrollBar vsb{getTransformRead()};
-
+    computils::ScrollBar vsb{getTransformRead(), std::bind(&layoutcalc::LayoutCalculator::scrollView,
+                                                     &layoutCalc,
+                                                     std::placeholders::_1,
+                                                     std::placeholders::_2)};
     /* Callbacks related*/
     std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
     std::function<void(const HIDAction*)> keyEventCb{nullptr};

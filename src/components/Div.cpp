@@ -4,7 +4,6 @@
 #include "GLFW/glfw3.h"
 
 #include "../Utility.hpp"
-#include "compUtils/LightWeightDummy.hpp"
 #include "layoutCalc/LayoutData.hpp"
 #include <algorithm>
 
@@ -15,20 +14,10 @@ Div::Div()
     : AbstractComponent({.type = CompType::Div,
           .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
 // , textureLoader(assetloaders::TextureLoader::get())
-// , dummy("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl")
 {
-    // style.hIn = utils::hexToVec4("#932222ff");
-    // dummy.options.color = utils::hexToVec4("#ffaaffff");
-    // dummy.transform.layer = 3;
 
     hsb.options.orientation = layoutcalc::LdOrientation::Horizontal;
-    // vsb.options.orientation = layoutcalc::LdOrientation::Vertical;
-    // TODO: This is a workaround for now
-    // append(&hsb);
-    // append(&vsb);
-    // TODO: Make scrollbars an utility again. Not a component in itself.
-    //  use onCLick/Release/Move and make them return values such that we know if they should receive
-    //  the input or the Div underneath
+    vsb.options.orientation = layoutcalc::LdOrientation::Vertical;
 }
 
 Div::~Div()
@@ -53,6 +42,7 @@ void Div::onPrepareToRender()
 void Div::onRenderDone()
 {
     hsb.show(getState()->projectionMatrix);
+    vsb.show(getState()->projectionMatrix);
 }
 
 void Div::addClickListener(std::function<void(int, int, MouseButton)>&& func)
@@ -80,14 +70,15 @@ void Div::onClickEvent()
     const auto& s = getState();
     if (s->mouseAction == HIDAction::Pressed && s->clickedButton == MouseButton::Left)
     {
-        if (hsb.onMouseClick(s->mouseX, s->mouseY))
-        {
-            updateLayout();
-            return;
-        }
+        if (hsb.onMouseClick(s->mouseX, s->mouseY)) { return; }
+        if (vsb.onMouseClick(s->mouseX, s->mouseY)) { return; }
     }
 
-    if (s->mouseAction == HIDAction::Released && s->clickedButton == MouseButton::Left) { hsb.onMouseRelease(); }
+    if (s->mouseAction == HIDAction::Released && s->clickedButton == MouseButton::Left)
+    {
+        hsb.onMouseRelease();
+        vsb.onMouseRelease();
+    }
 
     if (mouseClickCb && s->mouseAction == HIDAction::Pressed) { mouseClickCb(s->mouseX, s->mouseY, s->clickedButton); }
 }
@@ -126,12 +117,8 @@ void Div::onMouseExitEvent()
 void Div::onMoveEvent()
 {
     const auto& s = getState();
-    if (hsb.onMouseMove(s->mouseX, s->mouseY))
-    {
-        updateLayout();
-        return;
-    }
-    // println("For div {} mouse position is {}-{}", getId(), s->mouseX, s->mouseY);
+    if (hsb.onMouseMove(s->mouseX, s->mouseY)) { return; }
+    if (vsb.onMouseMove(s->mouseX, s->mouseY)) { return; }
 }
 
 void Div::onStart()
@@ -142,20 +129,9 @@ void Div::onStart()
 
 void Div::onLayoutUpdate()
 {
-    /*
-        Todo: calculate new scroll value in terms of where the knob is and the curr
-              overflow
-    */
-    // TODO: There's a problem with appending nodes at runtime in this function specifically
-    //       No ideea why tbh.
-
-    int sv = hsb.getScrollValue();
-    deducedOverflow = layoutCalc.calculate(sv, 0);
-
-    hsb.setOverflow(deducedOverflow.x);
-    hsb.setupLayout();
-
-    utils::printlne("Sv is {}", sv);
+    deducedOverflow = layoutCalc.calculate();
+    hsb.updateOverflow(deducedOverflow.x);
+    vsb.updateOverflow(deducedOverflow.y);
 }
 
 } // namespace components

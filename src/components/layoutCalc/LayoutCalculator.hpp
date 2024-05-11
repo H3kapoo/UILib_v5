@@ -14,8 +14,8 @@ class LayoutCalculator
 {
 public:
     LayoutCalculator(AbstractComponent* comp);
-    glm::i16vec2 calculate(const int scrollOffsetX = 0, const int scrollOffsetY = 0);
-    void scrollView(const int scrollOffsetX = 0, const int scrollOffsetY = 0);
+    glm::i16vec2 calculate();
+    void scrollView(const int scrollOffsetX, const int scrollOffsetY);
 
 private:
     struct Bounds
@@ -31,7 +31,7 @@ private:
     void calculateNextBasePosition(glm::vec2& currentXY, AbstractComponent* comp);
 
     void resetPositions();
-    glm::vec2 getRemainingUsableSpace();
+    glm::vec2 getRemainingSpaceAfterScale();
     Bounds getChildrenBound(const std::vector<AbstractComponent*>& childComps);
 
     /* TODO: Maybe in the future this root can be removed and class can be made static so we are fully stateless */

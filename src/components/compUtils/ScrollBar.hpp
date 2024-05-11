@@ -26,11 +26,12 @@ public:
     bool onMouseClick(const int x, const int y);
     void onMouseRelease();
 
-    void setupLayout();
+    int adjustKnob(const int x, const int y);
+    void notifyLayoutHasChanged();
 
     void show(const glm::mat4& projMatrix);
 
-    void setOverflow(int newOverflow);
+    void updateOverflow(int newOverflow);
 
     void setInactive();
     void setActive();

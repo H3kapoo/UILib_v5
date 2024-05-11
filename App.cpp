@@ -1,10 +1,8 @@
 #include "App.hpp"
-#include "GLFW/glfw3.h"
 #include "src/UIState.hpp"
 #include "src/Utility.hpp"
 #include "src/components/AbstractComponent.hpp"
 #include "src/components/layoutCalc/LayoutData.hpp"
-#include <cstdint>
 
 App::~App()
 {
@@ -18,7 +16,7 @@ void App::start(int initialWidth, int initialHeight)
     rootDiv.style.borderColor = utils::hexToVec4("#c85c0fff");
     // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
-    rootDiv.layout.orientation = LdOrientation::Horizontal;
+    rootDiv.layout.orientation = LdOrientation::Vertical;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
     rootDiv.layout.align = LdAlignment{LdAlign::Left, LdAlign::Top};
     rootDiv.layout.internalAlign = LdAlign::Top;
@@ -28,12 +26,17 @@ void App::start(int initialWidth, int initialHeight)
     // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
 
     // div3.layout.marginSize = glm::vec4(6.0f);
+    // div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 200}};
+    // div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 550}, {LdScalePolicy::Absolute, 100}};
+    // div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 700}, {LdScalePolicy::Absolute, 250}};
+
     div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 200}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 550}, {LdScalePolicy::Absolute, 100}};
-    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 700}, {LdScalePolicy::Absolute, 250}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 100}};
+    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
 
     div2.style.color = utils::hexToVec4("#6de025ff");
     div3.style.color = utils::hexToVec4("#bc115bff");
+    // div4.style.color = glm::vec4(0.4f, 0.2f, 0.9f, 1.0f); // utils::hexToVec4("#932758ff");
     div4.style.color = utils::hexToVec4("#932758ff");
     div5.style.color = utils::hexToVec4("#d5317bff");
 
