@@ -7,7 +7,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     set(CXX_STANDARD 23)
 
     # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE")
+    # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -ggdb -g")
 
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../debug)
     set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
@@ -25,7 +26,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         main.cpp
         App.cpp
         src/assetLoaders/TextureLoader.cpp
-        src/components/compUtils/ScrollBar.cpp
+        src/components/ScrollBar.cpp
         src/components/Div.cpp
         src/components/Button.cpp
         src/components/AbstractComponent.cpp

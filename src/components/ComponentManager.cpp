@@ -1,10 +1,10 @@
 #include "ComponentManager.hpp"
 
 #include <algorithm>
-#include <cstddef>
 #include <ranges>
 
 #include "../Utility.hpp"
+#include "AbstractComponent.hpp"
 
 namespace components
 {
@@ -38,7 +38,17 @@ void ComponentManager::removeRoot()
 
 void ComponentManager::updateLayout()
 {
+    /* Note: due to the fact that child.onLayoutUpdate can add/remove new nodes while this function is running, it can
+    invalidate "flattenedNodes | std::views::reverse" statement pointers. Basically addition/removal while iterating.
+    Solution for now is to cache "flattenedNodes" into a temp vector and iterate over the temp vector. */
+    std::vector<AbstractComponent*> tmpFlattenedNodes;
+    tmpFlattenedNodes.reserve(flattenedNodes.size());
     for (const auto& childNode : flattenedNodes | std::views::reverse)
+    {
+        tmpFlattenedNodes.push_back(childNode);
+    }
+
+    for (const auto& childNode : tmpFlattenedNodes)
     {
         if (childNode->getNodes().empty()) { continue; }
 
@@ -63,6 +73,9 @@ void ComponentManager::mouseClickEvent(MouseButton button, HIDAction action, Act
     state.clickedButton = button;
     state.mouseAction = action;
     state.activeMods |= mods;
+
+    // TODO: In case we click on X and move the mouse away from X to Y, for example, X will not get the release event,
+    // but Y will, because it is now the hovered element
 
     /* Will trigger the event top to bottom */
     for (const auto& childNode : flattenedNodes)

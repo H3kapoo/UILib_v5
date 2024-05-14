@@ -1,72 +1,72 @@
 [
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/main.cpp.o -c /home/hekapoo/newTryAtUI/main.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/main.cpp.o -c /home/hekapoo/newTryAtUI/main.cpp",
   "file": "/home/hekapoo/newTryAtUI/main.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/App.cpp.o -c /home/hekapoo/newTryAtUI/App.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/App.cpp.o -c /home/hekapoo/newTryAtUI/App.cpp",
   "file": "/home/hekapoo/newTryAtUI/App.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/assetLoaders/TextureLoader.cpp.o -c /home/hekapoo/newTryAtUI/src/assetLoaders/TextureLoader.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/assetLoaders/TextureLoader.cpp.o -c /home/hekapoo/newTryAtUI/src/assetLoaders/TextureLoader.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/assetLoaders/TextureLoader.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/components/compUtils/ScrollBar.cpp.o -c /home/hekapoo/newTryAtUI/src/components/compUtils/ScrollBar.cpp",
-  "file": "/home/hekapoo/newTryAtUI/src/components/compUtils/ScrollBar.cpp"
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/ScrollBar.cpp.o -c /home/hekapoo/newTryAtUI/src/components/ScrollBar.cpp",
+  "file": "/home/hekapoo/newTryAtUI/src/components/ScrollBar.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/components/Div.cpp.o -c /home/hekapoo/newTryAtUI/src/components/Div.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/Div.cpp.o -c /home/hekapoo/newTryAtUI/src/components/Div.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/components/Div.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/components/Button.cpp.o -c /home/hekapoo/newTryAtUI/src/components/Button.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/Button.cpp.o -c /home/hekapoo/newTryAtUI/src/components/Button.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/components/Button.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o -c /home/hekapoo/newTryAtUI/src/components/AbstractComponent.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o -c /home/hekapoo/newTryAtUI/src/components/AbstractComponent.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/components/AbstractComponent.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/components/ComponentManager.cpp.o -c /home/hekapoo/newTryAtUI/src/components/ComponentManager.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/ComponentManager.cpp.o -c /home/hekapoo/newTryAtUI/src/components/ComponentManager.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/components/ComponentManager.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/components/layoutCalc/LayoutCalculator.cpp.o -c /home/hekapoo/newTryAtUI/src/components/layoutCalc/LayoutCalculator.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/layoutCalc/LayoutCalculator.cpp.o -c /home/hekapoo/newTryAtUI/src/components/layoutCalc/LayoutCalculator.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/components/layoutCalc/LayoutCalculator.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/inputManagement/Input.cpp.o -c /home/hekapoo/newTryAtUI/src/inputManagement/Input.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/inputManagement/Input.cpp.o -c /home/hekapoo/newTryAtUI/src/inputManagement/Input.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/inputManagement/Input.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/mesh/QuadMesh.cpp.o -c /home/hekapoo/newTryAtUI/src/mesh/QuadMesh.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/mesh/QuadMesh.cpp.o -c /home/hekapoo/newTryAtUI/src/mesh/QuadMesh.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/mesh/QuadMesh.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/renderer/Renderer.cpp.o -c /home/hekapoo/newTryAtUI/src/renderer/Renderer.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/renderer/Renderer.cpp.o -c /home/hekapoo/newTryAtUI/src/renderer/Renderer.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/renderer/Renderer.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o -c /home/hekapoo/newTryAtUI/src/shaderManagement/ShaderLoader.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/shaderManagement/ShaderLoader.cpp.o -c /home/hekapoo/newTryAtUI/src/shaderManagement/ShaderLoader.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/shaderManagement/ShaderLoader.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
-  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -DTRACY_ENABLE -std=gnu++23 -o CMakeFiles/test.dir/home/hekapoo/Downloads/tracy/public/TracyClient.cpp.o -c /home/hekapoo/Downloads/tracy/public/TracyClient.cpp",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/home/hekapoo/Downloads/tracy/public/TracyClient.cpp.o -c /home/hekapoo/Downloads/tracy/public/TracyClient.cpp",
   "file": "/home/hekapoo/Downloads/tracy/public/TracyClient.cpp"
 }
 ]

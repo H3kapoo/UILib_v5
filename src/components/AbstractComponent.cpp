@@ -131,6 +131,9 @@ void AbstractComponent::details()
         case CompType::Button:
             stringType = "Button";
             break;
+        case CompType::ScrollBar:
+            stringType = "ScrollBar";
+            break;
         default:
             stringType = "Unknown";
     }
@@ -330,6 +333,12 @@ void AbstractComponent::updateNodeStructure()
 void AbstractComponent::setState(UIState* newState)
 {
     state = newState;
+}
+
+void AbstractComponent::manuallyAdjustDepthTo(const int newDepth)
+{
+    depth = newDepth;
+    getTransformRW().layer = getDepth();
 }
 
 void AbstractComponent::onClickEvent() {}

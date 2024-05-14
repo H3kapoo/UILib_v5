@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AbstractComponent.hpp"
-#include "compUtils/ScrollBar.hpp"
+#include "ScrollBar.hpp"
 #include "layoutCalc/LayoutCalculator.hpp"
 
 #include "../assetLoaders/TextureLoader.hpp"
@@ -59,17 +59,12 @@ private:
 
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this}; // TODO: Singleton
-    int overflow{0};
-    glm::i16vec2 deducedOverflow{0, 0};
 
-    computils::ScrollBar hsb{getTransformRead(), std::bind(&layoutcalc::LayoutCalculator::scrollView,
-                                                     &layoutCalc,
-                                                     std::placeholders::_1,
-                                                     std::placeholders::_2)};
-    computils::ScrollBar vsb{getTransformRead(), std::bind(&layoutcalc::LayoutCalculator::scrollView,
-                                                     &layoutCalc,
-                                                     std::placeholders::_1,
-                                                     std::placeholders::_2)};
+    computils::ScrollBar hsb{std::bind(
+        &layoutcalc::LayoutCalculator::scrollView, &layoutCalc, std::placeholders::_1, std::placeholders::_2)};
+    computils::ScrollBar vsb{std::bind(
+        &layoutcalc::LayoutCalculator::scrollView, &layoutCalc, std::placeholders::_1, std::placeholders::_2)};
+
     /* Callbacks related*/
     std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
     std::function<void(const HIDAction*)> keyEventCb{nullptr};

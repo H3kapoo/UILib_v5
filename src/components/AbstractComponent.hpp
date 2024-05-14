@@ -22,6 +22,7 @@ public:
         Unknown,
         Button,
         Div,
+        ScrollBar,
     };
 
     struct Options
@@ -148,6 +149,7 @@ public:
 
     /* Trivial setters */
     void setRenderable(const bool canBeRendered);
+    void manuallyAdjustDepthTo(const int newDepth);
 
     /* Direct getters */
     layoutcalc::LayoutData layout;

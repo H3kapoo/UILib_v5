@@ -5,6 +5,8 @@
 
 namespace components::layoutcalc
 {
+#define SKIP_SCROLLBAR(x)                                                                                              \
+    if (x->getType() == AbstractComponent::CompType::ScrollBar) { continue; }
 
 LayoutCalculator::LayoutCalculator(AbstractComponent* comp)
     : root{comp}
@@ -43,23 +45,29 @@ glm::i16vec2 LayoutCalculator::calculate()
 
     totalOverflowY += topOverflow > 0 ? topOverflow : 0;
     totalOverflowY += bottomOverflow > 0 ? bottomOverflow : 0;
-    utils::printlnw("VO {}", totalOverflowY);
-
-    for (const auto& childNode : root->getNodes())
-    {
-        auto& childPos = childNode->getTransformRW().pos;
-        childPos.x += leftOverflow > 0 ? leftOverflow : 0;
-        childPos.y += topOverflow > 0 ? topOverflow : 0;
-    }
 
     return {totalOverflowX, totalOverflowY};
 }
 
 void LayoutCalculator::scrollView(const int scrollOffsetX, const int scrollOffsetY)
 {
+    float diffX = 0;
+    float diffY = 0;
     for (const auto& childNode : root->getNodes())
     {
+        SKIP_SCROLLBAR(childNode)
+        auto& childPos = childNode->getTransformRead().pos;
+        diffX = root->getTransformRead().pos.x - childPos.x;
+        diffY = root->getTransformRead().pos.y - childPos.y;
+        break;
+    }
+
+    for (const auto& childNode : root->getNodes())
+    {
+        SKIP_SCROLLBAR(childNode)
         auto& childPos = childNode->getTransformRW().pos;
+        childPos.x += diffX;
+        childPos.y += diffY;
         childPos.x -= scrollOffsetX;
         childPos.y -= scrollOffsetY;
     }
@@ -79,6 +87,7 @@ void LayoutCalculator::calculateAndApplyAlignOffset()
 
     for (const auto& childNode : root->getNodes())
     {
+        SKIP_SCROLLBAR(childNode)
         switch (root->layout.align.horizontal)
         {
             case LdAlign::Left: {
@@ -132,6 +141,8 @@ void LayoutCalculator::calculateAndApplyPosition()
     auto remainingSpace = getRemainingSpaceAfterScale();
     for (const auto& childNode : root->getNodes())
     {
+        SKIP_SCROLLBAR(childNode)
+
         auto& childPos = childNode->getTransformRW().pos;
         auto& childScale = childNode->getTransformRW().scale;
         if (root->layout.orientation == LayoutData::Orientation::Horizontal)
@@ -179,6 +190,8 @@ void LayoutCalculator::calculateAndApplyScale()
 {
     for (const auto& comp : root->getNodes())
     {
+        SKIP_SCROLLBAR(comp)
+
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
         {
             comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value;
@@ -211,6 +224,8 @@ void LayoutCalculator::resetPositions()
 {
     for (const auto& childNode : root->getNodes())
     {
+        SKIP_SCROLLBAR(childNode)
+
         childNode->getTransformRW().pos = {0, 0};
     }
 }
@@ -227,6 +242,8 @@ glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale()
     glm::vec2 accumulatedSize = {0, 0};
     for (const auto& childNode : root->getNodes())
     {
+        SKIP_SCROLLBAR(childNode)
+
         const auto& chScale = childNode->getTransformRead().scale;
         if (root->layout.orientation == LdOrientation::Horizontal)
         {
@@ -254,6 +271,8 @@ LayoutCalculator::Bounds LayoutCalculator::getChildrenBound(const std::vector<Ab
     Bounds result;
     for (const auto& comp : childComps)
     {
+        SKIP_SCROLLBAR(comp)
+
         /* X related */
         const auto& childTransform = comp->getTransformRead();
         if (childTransform.pos.x <= result.start.x) { result.start.x = childTransform.pos.x; }

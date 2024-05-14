@@ -6,6 +6,7 @@
 #include "../Utility.hpp"
 #include "layoutCalc/LayoutData.hpp"
 #include <algorithm>
+#include <glm/fwd.hpp>
 
 namespace components
 {
@@ -27,7 +28,6 @@ Div::~Div()
 
 void Div::onPrepareToRender()
 {
-
     auto border = glm::vec4(layout.borderSize.top, layout.borderSize.bottom, layout.borderSize.left,
         layout.borderSize.right);
 
@@ -39,11 +39,7 @@ void Div::onPrepareToRender()
     // getShader().set2DTextureUnit("uTexture", textureData->id, GL_TEXTURE0);
 }
 
-void Div::onRenderDone()
-{
-    hsb.show(getState()->projectionMatrix);
-    vsb.show(getState()->projectionMatrix);
-}
+void Div::onRenderDone() {}
 
 void Div::addClickListener(std::function<void(int, int, MouseButton)>&& func)
 {
@@ -68,18 +64,6 @@ void Div::addOnKeyListener(std::function<void(const HIDAction*)>&& func)
 void Div::onClickEvent()
 {
     const auto& s = getState();
-    if (s->mouseAction == HIDAction::Pressed && s->clickedButton == MouseButton::Left)
-    {
-        if (hsb.onMouseClick(s->mouseX, s->mouseY)) { return; }
-        if (vsb.onMouseClick(s->mouseX, s->mouseY)) { return; }
-    }
-
-    if (s->mouseAction == HIDAction::Released && s->clickedButton == MouseButton::Left)
-    {
-        hsb.onMouseRelease();
-        vsb.onMouseRelease();
-    }
-
     if (mouseClickCb && s->mouseAction == HIDAction::Pressed) { mouseClickCb(s->mouseX, s->mouseY, s->clickedButton); }
 }
 
@@ -114,12 +98,7 @@ void Div::onMouseExitEvent()
     if (mouseExitCb) { mouseExitCb(); }
 }
 
-void Div::onMoveEvent()
-{
-    const auto& s = getState();
-    if (hsb.onMouseMove(s->mouseX, s->mouseY)) { return; }
-    if (vsb.onMouseMove(s->mouseX, s->mouseY)) { return; }
-}
+void Div::onMoveEvent() {}
 
 void Div::onStart()
 {
@@ -129,9 +108,34 @@ void Div::onStart()
 
 void Div::onLayoutUpdate()
 {
-    deducedOverflow = layoutCalc.calculate();
-    hsb.updateOverflow(deducedOverflow.x);
-    vsb.updateOverflow(deducedOverflow.y);
+    const glm::i16vec2 deducedOverflow = layoutCalc.calculate();
+
+    // utils::printlne("OF {} {} COND {}", deducedOverflow.x, hsb.isBarActive(),
+    //     deducedOverflow.x > 0 && !hsb.isBarActive());
+    if (hsb.isComponentParented()) { hsb.updateOverflow(deducedOverflow.x); }
+    if (vsb.isComponentParented()) { vsb.updateOverflow(deducedOverflow.y); }
+    if (deducedOverflow.x > 0 && !hsb.isComponentParented())
+    {
+        hsb.setActive();
+        append(&hsb);
+    }
+    else if (deducedOverflow.x <= 0 && hsb.isComponentParented())
+    {
+        hsb.setInactive();
+        remove(&hsb);
+    }
+
+    if (deducedOverflow.y > 0 && !vsb.isComponentParented())
+    {
+        vsb.setActive();
+        append(&vsb);
+    }
+    else if (deducedOverflow.y <= 0 && vsb.isComponentParented())
+    {
+        vsb.setInactive();
+        remove(&vsb);
+    }
+    // vsb.updateOverflow(deducedOverflow.y);
 }
 
 } // namespace components

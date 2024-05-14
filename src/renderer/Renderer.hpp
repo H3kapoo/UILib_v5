@@ -19,7 +19,7 @@ namespace renderer
 class Renderer
 {
 public:
-    static constexpr float MAX_LAYERS{-100};
+    static constexpr float MAX_LAYERS{-1000};
 
     /**
      * @brief Sets the projection matrix that will be used on next draw call

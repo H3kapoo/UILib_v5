@@ -31,7 +31,7 @@ void App::start(int initialWidth, int initialHeight)
     // div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 700}, {LdScalePolicy::Absolute, 250}};
 
     div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 200}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 100}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 100}};
     div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
 
     div2.style.color = utils::hexToVec4("#6de025ff");
@@ -57,13 +57,14 @@ void App::start(int initialWidth, int initialHeight)
     // div5.addOnEnterListener([this]() { div5.style.color = utils::hexToVec4("#336b55ff"); });
     // div5.addOnExitListener([this]() { div5.style.color = utils::hexToVec4("#3b1526ff"); });
     rootDiv.addClickListener(
-        [this](auto, auto, MouseButton)
+        [this](auto, auto, MouseButton btn)
         {
-            // if (btn == MouseButton::Left)
-            // {
-            //     uint8_t x = (uint8_t)rootDiv.layout.orientation + 1;
-            //     rootDiv.layout.orientation = LdOrientation(x % (uint8_t)LdOrientation::COUNT);
-            // }
+            if (btn == MouseButton::Left)
+            {
+                rootDiv.showTree();
+                // uint8_t x = (uint8_t)rootDiv.layout.orientation + 1;
+                // rootDiv.layout.orientation = LdOrientation(x % (uint8_t)LdOrientation::COUNT);
+            }
             // if (btn == MouseButton::Right)
             // {
             //     uint8_t x = (uint8_t)rootDiv.layout.fillPolicy + 1;
