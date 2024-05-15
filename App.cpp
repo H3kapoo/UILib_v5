@@ -33,7 +33,7 @@ void App::start(int initialWidth, int initialHeight)
     div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Absolute, 600}};
     div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 210}, {LdScalePolicy::Absolute, 100}};
     div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
-    div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 250}};
+    div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 100}, {LdScalePolicy::Absolute, 250}};
 
     div2.style.color = utils::hexToVec4("#6de025ff");
     div3.style.color = utils::hexToVec4("#bc115bff");

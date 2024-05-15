@@ -54,12 +54,28 @@ void ScrollBar::onClickEvent()
         if (!xConstraint || !yConstraint) { return; }
         isDragging = true;
 
+        bool insideKnobX = s->mouseX >= knob.transform.pos.x &&
+                           s->mouseX <= knob.transform.pos.x + knob.transform.scale.x;
+        bool insideKnobY = s->mouseY >= knob.transform.pos.y &&
+                           s->mouseY <= knob.transform.pos.y + knob.transform.scale.y;
+        if (options.orientation == layoutcalc::LdOrientation::Horizontal)
+        {
+            if (insideKnobX && insideKnobY) { mouseOffset = s->mouseX - knob.transform.pos.x; }
+            else { mouseOffset = knob.transform.scale.x / 2.0f; }
+        }
+        else if (options.orientation == layoutcalc::LdOrientation::Vertical)
+        {
+            if (insideKnobX && insideKnobY) { mouseOffset = s->mouseY - knob.transform.pos.y; }
+            else { mouseOffset = knob.transform.scale.y / 2.0f; }
+        }
+
         adjustKnob(s->mouseX, s->mouseY);
     }
     else
     {
         if (!isActive) { return; }
         isDragging = false;
+        mouseOffset = 0;
     }
 }
 
@@ -75,9 +91,9 @@ int ScrollBar::adjustKnob(const int x, const int y)
     if (options.orientation == layoutcalc::LdOrientation::Horizontal)
     {
         const auto sPos = thisTransform.pos.x;
-        const auto ePos = sPos + thisTransform.scale.x - options.barSize;
+        const auto ePos = sPos + thisTransform.scale.x - knob.transform.scale.x;
 
-        knob.transform.pos.x = x - options.barSize / 2.0f;
+        knob.transform.pos.x = x - mouseOffset;
         knob.transform.pos.x = std::clamp(knob.transform.pos.x, sPos, ePos);
 
         scrollValue = utils::remap(knob.transform.pos.x, sPos, ePos, 0.0f, overflow);
@@ -85,9 +101,9 @@ int ScrollBar::adjustKnob(const int x, const int y)
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
     {
         const auto sPos = thisTransform.pos.y;
-        const auto ePos = sPos + thisTransform.scale.y - options.barSize;
+        const auto ePos = sPos + thisTransform.scale.y - knob.transform.scale.y;
 
-        knob.transform.pos.y = y - options.barSize / 2.0f;
+        knob.transform.pos.y = y - mouseOffset;
         knob.transform.pos.y = std::clamp(knob.transform.pos.y, sPos, ePos);
 
         scrollValue = utils::remap(knob.transform.pos.y, sPos, ePos, 0.0f, overflow);
@@ -104,8 +120,6 @@ int ScrollBar::adjustKnob(const int x, const int y)
 void ScrollBar::notifyLayoutHasChanged()
 {
     if (!isActive) { return; }
-
-    // // Really should be done just once, but eh. We never know how root will change it's layer
 
     const auto& parentTransform = getParent()->getTransformRead();
     const int oppositeBarSubtract = isOppositeActive ? options.barSize : 0;
@@ -129,11 +143,17 @@ void ScrollBar::notifyLayoutHasChanged()
             knobPercentageAlongBg = knobPos / bgLen;
         }
 
+        /*
+            Bigger overflow -> smaller knob size
+            Smaller overflow -> bigger knob size
+        */
+        const auto knobSizeX = std::max(options.barSize, (int)getTransformRW().scale.x - overflow);
+
         /* Calculate position and scale for knob to be in bounds */
         const auto sPos = getTransformRW().pos.x;
-        const auto ePos = sPos + getTransformRW().scale.x - options.barSize;
+        const auto ePos = sPos + getTransformRW().scale.x - knobSizeX;
         knob.transform.pos = {std::clamp(knob.transform.pos.x, sPos, ePos), getTransformRW().pos.y};
-        knob.transform.scale = {options.barSize, getTransformRW().scale.y};
+        knob.transform.scale = {knobSizeX, getTransformRW().scale.y};
 
         /* Value needs to be recalculated here based on new overflow value and knob position. It kinda scrolls by
         itself when container is resized. */
@@ -159,11 +179,17 @@ void ScrollBar::notifyLayoutHasChanged()
             knobPercentageAlongBg = knobPos / bgLen;
         }
 
+        /*
+            Bigger overflow -> smaller knob size
+            Smaller overflow -> bigger knob size
+        */
+        const auto knobSizeY = std::max(options.barSize, (int)getTransformRW().scale.y - overflow);
+
         /* Calculate position and scale for knob to be in bounds */
         const auto sPos = getTransformRW().pos.y;
-        const auto ePos = sPos + getTransformRW().scale.y - options.barSize;
+        const auto ePos = sPos + getTransformRW().scale.y - knobSizeY;
         knob.transform.pos = {getTransformRW().pos.x, std::clamp(knob.transform.pos.y, sPos, ePos)};
-        knob.transform.scale = {getTransformRW().scale.x, options.barSize};
+        knob.transform.scale = {getTransformRW().scale.x, knobSizeY};
 
         /* Value needs to be recalculated here based on new overflow value and knob position. It kinda scrolls by
         itself when container is resized. */

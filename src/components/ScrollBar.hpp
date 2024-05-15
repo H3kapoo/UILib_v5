@@ -56,6 +56,7 @@ private:
     bool isFillerIfNeeded{false};
     bool updateDueToResize{true};
     float knobPercentageAlongBg{0};
+    float mouseOffset{0};
 
     renderer::LightWeightRenderer lwr;
     computils::LightWeightDummy knob;

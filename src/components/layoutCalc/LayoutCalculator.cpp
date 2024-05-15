@@ -52,12 +52,7 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX, const int scro
         auto& childPos = childNode->getTransformRW().pos;
         childPos.x += leftOverflow > 0 ? leftOverflow : 0;
         childPos.y += topOverflow > 0 ? topOverflow : 0;
-    }
 
-    for (const auto& childNode : root->getNodes())
-    {
-        SKIP_SCROLLBAR(childNode)
-        auto& childPos = childNode->getTransformRW().pos;
         childPos.x -= scrollOffsetX;
         childPos.y -= scrollOffsetY;
     }
