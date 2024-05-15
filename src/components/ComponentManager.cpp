@@ -58,7 +58,9 @@ void ComponentManager::updateLayout()
 void ComponentManager::render()
 {
     renderer.clearScreen();
-    for (const auto& childNode : flattenedNodes)
+    /* Note: For alpha blending to work, we unfortunatelly have to render objects back to front and disable depth
+       testing. This introduces a bit of overdraw sadly. */
+    for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
         if (!childNode->isComponentRenderable()) { continue; }
 
@@ -73,9 +75,6 @@ void ComponentManager::mouseClickEvent(MouseButton button, HIDAction action, Act
     state.clickedButton = button;
     state.mouseAction = action;
     state.activeMods |= mods;
-
-    // TODO: In case we click on X and move the mouse away from X to Y, for example, X will not get the release event,
-    // but Y will, because it is now the hovered element
 
     /* Will trigger the event top to bottom */
     for (const auto& childNode : flattenedNodes)
@@ -99,13 +98,20 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
     // TODO: Notify only the hovered comp
     for (const auto& childNode : flattenedNodes)
     {
-        childNode->onMoveEvent();
+        if (state.hoveredId == childNode->getId())
+        {
+            childNode->onMoveEvent();
+            break;
+        }
     }
 
     /* Bellow two passes should in very worst case be O(2N) but in 95% of cases is much less than that */
     bool shouldNotify = false;
     for (const auto& childNode : flattenedNodes)
     {
+        /* If mouse is still pressed, we cannot switch who's the hovered element just yet. */
+        if (state.mouseAction == HIDAction::Pressed) { return; }
+
         const auto& childBox = childNode->getTransformRead();
         bool xConstraint = state.mouseX >= childBox.pos.x && state.mouseX <= childBox.pos.x + childBox.scale.x;
         bool yConstraint = state.mouseY >= childBox.pos.y && state.mouseY <= childBox.pos.y + childBox.scale.y;
@@ -178,6 +184,7 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
 
     /* Keeps root the same size as the window */
     root->getTransformRW().scale = {newWidth, newHeight};
+    root->getTransformRW().pos = {0, 0};
 
     /* Layout also needs to be recalculated */
     updateLayout();
@@ -190,6 +197,10 @@ void ComponentManager::updateInternalTreeStructure(const std::string& action)
 
     /* Tree can be dirty due to additions or removals */
     flattenRoot();
+
+    /* Keeps root the same size as the window */
+    root->getTransformRW().scale = {state.windowWidth, state.windowHeight};
+    root->getTransformRW().pos = {0, 0};
 
     /* Layout also needs to be recalculated due to possible addition/removal */
     updateLayout();

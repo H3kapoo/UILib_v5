@@ -60,10 +60,8 @@ private:
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this}; // TODO: Singleton
 
-    computils::ScrollBar hsb{std::bind(
-        &layoutcalc::LayoutCalculator::scrollView, &layoutCalc, std::placeholders::_1, std::placeholders::_2)};
-    computils::ScrollBar vsb{std::bind(
-        &layoutcalc::LayoutCalculator::scrollView, &layoutCalc, std::placeholders::_1, std::placeholders::_2)};
+    computils::ScrollBar hsb{false};
+    computils::ScrollBar vsb{true};
 
     /* Callbacks related*/
     std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};

@@ -261,6 +261,7 @@ bool AbstractComponent::removeAux(AbstractComponent* node)
     {
         /* Reset values */
         (*it)->isParented = false;
+        (*it)->isRuntimeInitialized = false;
         (*it)->parent = nullptr;
         (*it)->depth = 0;
         (*it)->state = nullptr;

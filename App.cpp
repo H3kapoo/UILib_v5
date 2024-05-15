@@ -16,9 +16,9 @@ void App::start(int initialWidth, int initialHeight)
     rootDiv.style.borderColor = utils::hexToVec4("#c85c0fff");
     // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
-    rootDiv.layout.orientation = LdOrientation::Vertical;
+    rootDiv.layout.orientation = LdOrientation::Horizontal;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
-    rootDiv.layout.align = LdAlignment{LdAlign::Left, LdAlign::Top};
+    rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
     rootDiv.layout.internalAlign = LdAlign::Top;
     rootDiv.layout.wrap = LdWrapMode::NoWrap;
 
@@ -30,26 +30,34 @@ void App::start(int initialWidth, int initialHeight)
     // div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 550}, {LdScalePolicy::Absolute, 100}};
     // div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 700}, {LdScalePolicy::Absolute, 250}};
 
-    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 200}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 100}};
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Absolute, 600}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 210}, {LdScalePolicy::Absolute, 100}};
     div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
+    div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 250}};
 
     div2.style.color = utils::hexToVec4("#6de025ff");
     div3.style.color = utils::hexToVec4("#bc115bff");
     // div4.style.color = glm::vec4(0.4f, 0.2f, 0.9f, 1.0f); // utils::hexToVec4("#932758ff");
     div4.style.color = utils::hexToVec4("#932758ff");
     div5.style.color = utils::hexToVec4("#d5317bff");
+    div6.style.color = utils::hexToVec4("#0608a5ff");
 
     componentManager.setRoot(&rootDiv);
+    componentManager.resizeEvent(initialWidth, initialHeight);
+
+    div3.layout.orientation = LdOrientation::Horizontal;
+    div3.layout.fillPolicy = LdFillPolicy::Tightly;
+    div3.layout.internalAlign = LdAlign::Top;
+    div3.layout.wrap = LdWrapMode::NoWrap;
+    div3.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
 
     // div3.append(&div2);
-    rootDiv.append({&div3, &div4, &div5});
-    // div3.append({&div4, &div5});
+    rootDiv.append({&div3, &div4});
+    div3.append({&div5, &div6});
 
     rootDiv.showTree();
 
     /* Trigger initial resize event to "stabilize" the scene */
-    componentManager.resizeEvent(initialWidth, initialHeight);
 
     utils::printlni("size of {}B", sizeof(Div));
     utils::printlni("size of {}Kb", sizeof(Div) / 1024.0f);
@@ -61,7 +69,7 @@ void App::start(int initialWidth, int initialHeight)
         {
             if (btn == MouseButton::Left)
             {
-                rootDiv.showTree();
+                // rootDiv.showTree();
                 // uint8_t x = (uint8_t)rootDiv.layout.orientation + 1;
                 // rootDiv.layout.orientation = LdOrientation(x % (uint8_t)LdOrientation::COUNT);
             }

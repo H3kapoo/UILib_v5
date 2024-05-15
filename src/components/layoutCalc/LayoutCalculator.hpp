@@ -14,7 +14,7 @@ class LayoutCalculator
 {
 public:
     LayoutCalculator(AbstractComponent* comp);
-    glm::i16vec2 calculate();
+    glm::i16vec2 calculate(const int scrollOffsetX = 0, const int scrollOffsetY = 0);
     void scrollView(const int scrollOffsetX, const int scrollOffsetY);
 
 private:
@@ -24,6 +24,8 @@ private:
         glm::vec2 end{-9999};
     };
 
+    void scrollViewSubchildren(
+        AbstractComponent* comp, const int scrollOffsetX, const int scrollOffsetY, const int diffX, const int diffY);
     float getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace);
     void calculateAndApplyAlignOffset();
     void calculateAndApplyPosition();

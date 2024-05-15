@@ -12,7 +12,7 @@ LayoutCalculator::LayoutCalculator(AbstractComponent* comp)
     : root{comp}
 {}
 
-glm::i16vec2 LayoutCalculator::calculate()
+glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX, const int scrollOffsetY)
 {
     /* Reset positions */
     resetPositions();
@@ -28,8 +28,8 @@ glm::i16vec2 LayoutCalculator::calculate()
 
     const auto bounds = getChildrenBound(root->getNodes());
 
-    const auto& rts = root->getTransformRead().scale;
-    const auto& rtp = root->getTransformRead().pos;
+    const auto& rts = root->getTransformRW().scale;
+    const auto& rtp = root->getTransformRW().pos;
     const auto rte = rtp + rts;
 
     const auto rightOverflow = bounds.end.x - rte.x;  // x pos if overflow
@@ -45,32 +45,24 @@ glm::i16vec2 LayoutCalculator::calculate()
 
     totalOverflowY += topOverflow > 0 ? topOverflow : 0;
     totalOverflowY += bottomOverflow > 0 ? bottomOverflow : 0;
+    // utils::printlnw("HO {} VO {}", totalOverflowX, totalOverflowY);
 
-    return {totalOverflowX, totalOverflowY};
-}
-
-void LayoutCalculator::scrollView(const int scrollOffsetX, const int scrollOffsetY)
-{
-    float diffX = 0;
-    float diffY = 0;
     for (const auto& childNode : root->getNodes())
     {
-        SKIP_SCROLLBAR(childNode)
-        auto& childPos = childNode->getTransformRead().pos;
-        diffX = root->getTransformRead().pos.x - childPos.x;
-        diffY = root->getTransformRead().pos.y - childPos.y;
-        break;
+        auto& childPos = childNode->getTransformRW().pos;
+        childPos.x += leftOverflow > 0 ? leftOverflow : 0;
+        childPos.y += topOverflow > 0 ? topOverflow : 0;
     }
 
     for (const auto& childNode : root->getNodes())
     {
         SKIP_SCROLLBAR(childNode)
         auto& childPos = childNode->getTransformRW().pos;
-        childPos.x += diffX;
-        childPos.y += diffY;
         childPos.x -= scrollOffsetX;
         childPos.y -= scrollOffsetY;
     }
+
+    return {totalOverflowX, totalOverflowY};
 }
 
 void LayoutCalculator::calculateAndApplyAlignOffset()
@@ -85,49 +77,50 @@ void LayoutCalculator::calculateAndApplyAlignOffset()
     const auto boundsDiff = bound.end - bound.start;
     glm::vec2 offset = {0, 0};
 
+    switch (root->layout.align.horizontal)
+    {
+        case LdAlign::Left: {
+            offset.x = rootLeftBorder;
+            break;
+        }
+        case LdAlign::Center: {
+            int halfDiffX = boundsDiff.x / 2;
+            int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
+            offset.x = spaceLeft / 2.0f - halfDiffX;
+            break;
+        }
+        case LdAlign::Right: {
+            offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
+            break;
+        }
+        case LdAlign::COUNT:
+            break;
+    }
+
+    switch (root->layout.align.vertical)
+    {
+        case LdAlign::Top: {
+            offset.y = rootTopBorder;
+            break;
+        }
+        case LdAlign::Center: {
+            int halfDiffY = boundsDiff.y / 2;
+            int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
+            offset.y = spaceLeft / 2.0f - halfDiffY;
+            break;
+        }
+        case LdAlign::Bot: {
+            offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
+            break;
+        }
+        case LdAlign::COUNT:
+            break;
+    }
+
+    offset += rootBox.pos;
     for (const auto& childNode : root->getNodes())
     {
         SKIP_SCROLLBAR(childNode)
-        switch (root->layout.align.horizontal)
-        {
-            case LdAlign::Left: {
-                offset.x = rootLeftBorder;
-                break;
-            }
-            case LdAlign::Center: {
-                int halfDiffX = boundsDiff.x / 2;
-                int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
-                offset.x = spaceLeft / 2.0f - halfDiffX;
-                break;
-            }
-            case LdAlign::Right: {
-                offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
-                break;
-            }
-            case LdAlign::COUNT:
-                break;
-        }
-
-        switch (root->layout.align.vertical)
-        {
-            case LdAlign::Top: {
-                offset.y = rootTopBorder;
-                break;
-            }
-            case LdAlign::Center: {
-                int halfDiffY = boundsDiff.y / 2;
-                int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
-                offset.y = spaceLeft / 2.0f - halfDiffY;
-                break;
-            }
-            case LdAlign::Bot: {
-                offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
-
-                break;
-            }
-            case LdAlign::COUNT:
-                break;
-        }
 
         childNode->getTransformRW().pos += offset;
     }
@@ -135,8 +128,9 @@ void LayoutCalculator::calculateAndApplyAlignOffset()
 
 void LayoutCalculator::calculateAndApplyPosition()
 {
-    const auto& rootBox = root->getTransformRead();
-    glm::vec2 startXY = rootBox.pos;
+    const auto& rootBox = root->getTransformRW();
+    // glm::vec2 startXY = rootBox.pos;
+    glm::vec2 startXY = {0, 0};
 
     auto remainingSpace = getRemainingSpaceAfterScale();
     for (const auto& childNode : root->getNodes())

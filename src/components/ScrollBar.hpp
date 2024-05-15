@@ -22,12 +22,13 @@ public:
         int barSize{20};
     };
 
-    ScrollBar(const std::function<void(const int x, const int y)> scrollCb);
+    ScrollBar(const bool fillerIfNeeded = false);
 
     void onPrepareToRender() override;
     void onRenderDone() override;
     void onMoveEvent() override;
     void onClickEvent() override;
+    void onStart() override;
 
     int adjustKnob(const int x, const int y);
     void notifyLayoutHasChanged();
@@ -35,6 +36,9 @@ public:
     void show(const glm::mat4& projMatrix);
 
     void updateOverflow(int newOverflow);
+
+    void setOppositeScrollBarActive();
+    void setOppositeScrollBarInactive();
 
     void setInactive();
     void setActive();
@@ -48,10 +52,13 @@ private:
     int scrollValue{0};
     bool isDragging{false};
     bool isActive{false};
+    bool isOppositeActive{false};
+    bool isFillerIfNeeded{false};
+    bool updateDueToResize{true};
+    float knobPercentageAlongBg{0};
 
-    std::function<void(const int x, const int y)> scrollViewCb{nullptr};
     renderer::LightWeightRenderer lwr;
-    // computils::LightWeightDummy bgd;
-    computils::LightWeightDummy knobd;
+    computils::LightWeightDummy knob;
+    computils::LightWeightDummy cornerFiller;
 };
 } // namespace components::computils

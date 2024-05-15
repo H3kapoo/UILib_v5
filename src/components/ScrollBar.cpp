@@ -3,18 +3,21 @@
 namespace components::computils
 {
 
-ScrollBar::ScrollBar(const std::function<void(const int x, const int y)> scrollCb)
+ScrollBar::ScrollBar(const bool fillerIfNeeded)
     : AbstractComponent({.type = CompType::ScrollBar,
           .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl"})
-    , scrollViewCb{scrollCb}
-    , knobd("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl")
+    , isFillerIfNeeded{fillerIfNeeded}
+    , knob("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl")
+    , cornerFiller("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl")
 {
-    knobd.options.color = utils::hexToVec4("#1eb635ff");
+    knob.options.color = utils::hexToVec4("#1eb635ff");
+    cornerFiller.options.color = utils::hexToVec4("#d4d4d4ff");
 }
 
 void ScrollBar::onPrepareToRender()
 {
-    glm::vec4 color = utils::hexToVec4("#970f97ff");
+    // glm::vec4 color = utils::hexToVec4("#970f9739");
+    glm::vec4 color = glm::vec4(1.0f, 1.0f, 0.3f, .3f);
     getShader().setActiveShaderId(getShaderId());
     getShader().setVec4f("uColor", color);
 }
@@ -22,7 +25,10 @@ void ScrollBar::onPrepareToRender()
 void ScrollBar::onRenderDone()
 {
     if (!isActive) { return; }
-    lwr.render(getState()->projectionMatrix, knobd);
+    lwr.render(getState()->projectionMatrix, knob);
+
+    if (!isOppositeActive || !isFillerIfNeeded) { return; }
+    lwr.render(getState()->projectionMatrix, cornerFiller);
 }
 
 void ScrollBar::onMoveEvent()
@@ -57,6 +63,12 @@ void ScrollBar::onClickEvent()
     }
 }
 
+void ScrollBar::onStart()
+{
+    manuallyAdjustDepthTo(getParent()->getDepth() + 128);
+    knob.transform.layer = getDepth() + 1;
+}
+
 int ScrollBar::adjustKnob(const int x, const int y)
 {
     const auto& thisTransform = getTransformRead();
@@ -65,24 +77,26 @@ int ScrollBar::adjustKnob(const int x, const int y)
         const auto sPos = thisTransform.pos.x;
         const auto ePos = sPos + thisTransform.scale.x - options.barSize;
 
-        knobd.transform.pos.x = x - options.barSize / 2.0f;
-        knobd.transform.pos.x = std::clamp(knobd.transform.pos.x, sPos, ePos);
+        knob.transform.pos.x = x - options.barSize / 2.0f;
+        knob.transform.pos.x = std::clamp(knob.transform.pos.x, sPos, ePos);
 
-        scrollValue = utils::remap(knobd.transform.pos.x, sPos, ePos, 0.0f, overflow);
-        scrollViewCb(scrollValue, 0);
+        scrollValue = utils::remap(knob.transform.pos.x, sPos, ePos, 0.0f, overflow);
     }
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
     {
         const auto sPos = thisTransform.pos.y;
         const auto ePos = sPos + thisTransform.scale.y - options.barSize;
 
-        knobd.transform.pos.y = y - options.barSize / 2.0f;
-        knobd.transform.pos.y = std::clamp(knobd.transform.pos.y, sPos, ePos);
+        knob.transform.pos.y = y - options.barSize / 2.0f;
+        knob.transform.pos.y = std::clamp(knob.transform.pos.y, sPos, ePos);
 
-        scrollValue = utils::remap(knobd.transform.pos.y, sPos, ePos, 0.0f, overflow);
-        scrollViewCb(0, scrollValue);
+        scrollValue = utils::remap(knob.transform.pos.y, sPos, ePos, 0.0f, overflow);
     }
-    knobd.transform.markDirty();
+
+    updateDueToResize = false;
+    updateLayout();
+
+    knob.transform.markDirty();
 
     return 0;
 }
@@ -91,74 +105,97 @@ void ScrollBar::notifyLayoutHasChanged()
 {
     if (!isActive) { return; }
 
-    // Really should be done just once, but eh. We never know how root will change it's layer
-    manuallyAdjustDepthTo(getParent()->getDepth() + 128);
-    knobd.transform.layer = getDepth() + 1;
+    // // Really should be done just once, but eh. We never know how root will change it's layer
 
     const auto& parentTransform = getParent()->getTransformRead();
+    const int oppositeBarSubtract = isOppositeActive ? options.barSize : 0;
     if (options.orientation == layoutcalc::LdOrientation::Horizontal)
     {
         /* Place background bar */
         getTransformRW().pos = {
             parentTransform.pos.x, parentTransform.pos.y + parentTransform.scale.y - options.barSize};
-        getTransformRW().scale = {parentTransform.scale.x, options.barSize};
+        getTransformRW().scale = {parentTransform.scale.x - oppositeBarSubtract, options.barSize};
+
+        /* On component resize, knob position along the background scrollbar should be preserved */
+        if (updateDueToResize)
+        {
+            knob.transform.pos = {
+                getTransformRead().pos.x + getTransformRead().scale.x * knobPercentageAlongBg, getTransformRW().pos.y};
+        }
+        else
+        {
+            const auto bgLen = getTransformRW().scale.x;
+            const auto knobPos = (float)knob.transform.pos.x - getTransformRW().pos.x;
+            knobPercentageAlongBg = knobPos / bgLen;
+        }
 
         /* Calculate position and scale for knob to be in bounds */
         const auto sPos = getTransformRW().pos.x;
         const auto ePos = sPos + getTransformRW().scale.x - options.barSize;
-        knobd.transform.pos = {std::clamp(knobd.transform.pos.x, sPos, ePos), getTransformRW().pos.y};
-        knobd.transform.scale = {options.barSize, getTransformRW().scale.y};
+        knob.transform.pos = {std::clamp(knob.transform.pos.x, sPos, ePos), getTransformRW().pos.y};
+        knob.transform.scale = {options.barSize, getTransformRW().scale.y};
 
         /* Value needs to be recalculated here based on new overflow value and knob position. It kinda scrolls by
         itself when container is resized. */
-        scrollValue = utils::remap(knobd.transform.pos.x, sPos, ePos, 0.0f, overflow);
+        scrollValue = utils::remap(knob.transform.pos.x, sPos, ePos, 0.0f, overflow);
     }
     else
     {
         /* Place background bar */
         getTransformRW().pos = {
             parentTransform.pos.x + parentTransform.scale.x - options.barSize, parentTransform.pos.y};
-        getTransformRW().scale = {options.barSize, parentTransform.scale.y};
+        getTransformRW().scale = {options.barSize, parentTransform.scale.y - oppositeBarSubtract};
+
+        /* On component resize, knob position along the background scrollbar should be preserved */
+        if (updateDueToResize)
+        {
+            knob.transform.pos = {
+                getTransformRW().pos.x, getTransformRead().pos.y + getTransformRead().scale.y * knobPercentageAlongBg};
+        }
+        else
+        {
+            const auto bgLen = getTransformRW().scale.y;
+            const auto knobPos = (float)knob.transform.pos.y - getTransformRW().pos.y;
+            knobPercentageAlongBg = knobPos / bgLen;
+        }
 
         /* Calculate position and scale for knob to be in bounds */
         const auto sPos = getTransformRW().pos.y;
         const auto ePos = sPos + getTransformRW().scale.y - options.barSize;
-        knobd.transform.pos = {getTransformRW().pos.x, std::clamp(knobd.transform.pos.y, sPos, ePos)};
-        knobd.transform.scale = {getTransformRW().scale.x, options.barSize};
+        knob.transform.pos = {getTransformRW().pos.x, std::clamp(knob.transform.pos.y, sPos, ePos)};
+        knob.transform.scale = {getTransformRW().scale.x, options.barSize};
 
         /* Value needs to be recalculated here based on new overflow value and knob position. It kinda scrolls by
         itself when container is resized. */
-        scrollValue = utils::remap(knobd.transform.pos.y, sPos, ePos, 0.0f, overflow);
+        scrollValue = utils::remap(knob.transform.pos.y, sPos, ePos, 0.0f, overflow);
     }
 
-    knobd.transform.markDirty();
+    if (isOppositeActive && isFillerIfNeeded)
+    {
+        const auto sPos = getTransformRW().pos.x + getTransformRW().scale.x;
+        cornerFiller.transform.pos = {sPos, getTransformRW().pos.y};
+        cornerFiller.transform.scale = {options.barSize, options.barSize};
+    }
+
+    updateDueToResize = true;
+
+    cornerFiller.transform.markDirty();
+    knob.transform.markDirty();
 }
 
 void ScrollBar::updateOverflow(int newOverflow)
 {
-    // return;
-    if (newOverflow > 0)
-    {
-        setActive();
-        notifyLayoutHasChanged();
-        // if (newOverflow != overflow)
-        {
-            if (options.orientation == layoutcalc::LdOrientation::Horizontal) { scrollViewCb(scrollValue, 0); }
-            else if (options.orientation == layoutcalc::LdOrientation::Vertical) { scrollViewCb(0, scrollValue); }
-        }
-    }
-    else
-    {
-        setInactive();
-        knobd.transform.pos = getTransformRW().pos;
-        scrollValue = 0;
-    }
+    notifyLayoutHasChanged();
     overflow = newOverflow;
 }
 
 void ScrollBar::setInactive()
 {
     isActive = false;
+    scrollValue = 0;
+    knobPercentageAlongBg = 0;
+    knob.transform.pos = getTransformRW().pos;
+    knob.transform.markDirty();
 }
 
 void ScrollBar::setActive()
@@ -169,5 +206,20 @@ void ScrollBar::setActive()
 bool ScrollBar::isBarActive()
 {
     return isActive;
+}
+
+void ScrollBar::setOppositeScrollBarActive()
+{
+    isOppositeActive = true;
+}
+
+void ScrollBar::setOppositeScrollBarInactive()
+{
+    isOppositeActive = false;
+}
+
+int ScrollBar::getScrollValue()
+{
+    return scrollValue;
 }
 } // namespace components::computils

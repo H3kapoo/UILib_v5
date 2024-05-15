@@ -127,8 +127,13 @@ int main()
         });
     app.start(startWindowWidth, startWindowHeight);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    // glEnable(GL_ALPHA_TEST);
+    // glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glBlendFunc(GL_SRC_ALPHA, GL_);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     while (!glfwWindowShouldClose(window))
     {

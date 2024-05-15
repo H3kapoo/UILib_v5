@@ -108,34 +108,40 @@ void Div::onStart()
 
 void Div::onLayoutUpdate()
 {
-    const glm::i16vec2 deducedOverflow = layoutCalc.calculate();
+    // TODO: Do not parent anything at first. Make it that somehow the next call to update is the valid one to do so
+    // Otherwise we will have to append a SB to each Div for nothing
+    const int scrollValueH = hsb.getScrollValue();
+    const int scrollValueV = vsb.getScrollValue();
+    const auto deducedOverflow = layoutCalc.calculate(scrollValueH, scrollValueV);
 
-    // utils::printlne("OF {} {} COND {}", deducedOverflow.x, hsb.isBarActive(),
-    //     deducedOverflow.x > 0 && !hsb.isBarActive());
-    if (hsb.isComponentParented()) { hsb.updateOverflow(deducedOverflow.x); }
-    if (vsb.isComponentParented()) { vsb.updateOverflow(deducedOverflow.y); }
     if (deducedOverflow.x > 0 && !hsb.isComponentParented())
     {
         hsb.setActive();
+        vsb.setOppositeScrollBarActive();
         append(&hsb);
     }
     else if (deducedOverflow.x <= 0 && hsb.isComponentParented())
     {
         hsb.setInactive();
+        vsb.setOppositeScrollBarInactive();
         remove(&hsb);
     }
 
     if (deducedOverflow.y > 0 && !vsb.isComponentParented())
     {
         vsb.setActive();
+        hsb.setOppositeScrollBarActive();
         append(&vsb);
     }
     else if (deducedOverflow.y <= 0 && vsb.isComponentParented())
     {
         vsb.setInactive();
+        hsb.setOppositeScrollBarInactive();
         remove(&vsb);
     }
-    // vsb.updateOverflow(deducedOverflow.y);
+
+    if (hsb.isComponentParented()) { hsb.updateOverflow(deducedOverflow.x); }
+    if (vsb.isComponentParented()) { vsb.updateOverflow(deducedOverflow.y); }
 }
 
 } // namespace components
