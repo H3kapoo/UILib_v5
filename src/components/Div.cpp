@@ -112,7 +112,9 @@ void Div::onLayoutUpdate()
     // Otherwise we will have to append a SB to each Div for nothing
     const int scrollValueH = hsb.getScrollValue();
     const int scrollValueV = vsb.getScrollValue();
-    const auto deducedOverflow = layoutCalc.calculate(scrollValueH, scrollValueV);
+    const int scrollBarSize = hsb.options.barSize;
+    const auto deducedOverflow = layoutCalc.calculate(scrollValueH, scrollValueV, hsb.isBarActive(), vsb.isBarActive(),
+        scrollBarSize);
 
     if (deducedOverflow.x > 0 && !hsb.isComponentParented())
     {

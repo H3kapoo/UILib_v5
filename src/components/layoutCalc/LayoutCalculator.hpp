@@ -2,6 +2,7 @@
 
 #include "../AbstractComponent.hpp"
 #include "LayoutUtils.hpp"
+#include <cstdint>
 
 namespace components::layoutcalc
 {
@@ -14,7 +15,11 @@ class LayoutCalculator
 {
 public:
     LayoutCalculator(AbstractComponent* comp);
-    glm::i16vec2 calculate(const int scrollOffsetX = 0, const int scrollOffsetY = 0);
+    glm::i16vec2 calculate(const int scrollOffsetX = 0,
+        const int scrollOffsetY = 0,
+        const bool isHScrollActive = false,
+        const bool isVScrollActive = false,
+        const int16_t scrollBarSize = 0);
     void scrollView(const int scrollOffsetX, const int scrollOffsetY);
 
 private:
@@ -38,5 +43,10 @@ private:
 
     /* TODO: Maybe in the future this root can be removed and class can be made static so we are fully stateless */
     AbstractComponent* root;
+
+    // Just for now, remove later
+    bool isHScrollActive{0};
+    bool isVScrollActive{false};
+    int16_t scrollBarSize{0};
 };
 } // namespace components::layoutcalc

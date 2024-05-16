@@ -12,8 +12,18 @@ LayoutCalculator::LayoutCalculator(AbstractComponent* comp)
     : root{comp}
 {}
 
-glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX, const int scrollOffsetY)
+glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
+    const int scrollOffsetY,
+    const bool isHScrollActive_,
+    const bool isVScrollActive_,
+    const int16_t scrollBarSize_)
 {
+
+    isHScrollActive = isHScrollActive_;
+    isVScrollActive = isVScrollActive_;
+    scrollBarSize = scrollBarSize_;
+    // utils::printlnw("HA {} VA {} SS {}", isHScrollActive, isVScrollActive, scrollBarSize);
+
     /* Reset positions */
     resetPositions();
 
@@ -26,6 +36,7 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX, const int scro
     /* Calculate and add offset to the position based on Align & internalAlign */
     calculateAndApplyAlignOffset();
 
+    /* Overflow calculation */
     const auto bounds = getChildrenBound(root->getNodes());
 
     const auto& rts = root->getTransformRW().scale;
@@ -47,6 +58,7 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX, const int scro
     totalOverflowY += bottomOverflow > 0 ? bottomOverflow : 0;
     // utils::printlnw("HO {} VO {}", totalOverflowX, totalOverflowY);
 
+    /* Overflow application */
     for (const auto& childNode : root->getNodes())
     {
         auto& childPos = childNode->getTransformRW().pos;
@@ -58,121 +70,6 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX, const int scro
     }
 
     return {totalOverflowX, totalOverflowY};
-}
-
-void LayoutCalculator::calculateAndApplyAlignOffset()
-{
-    const auto rootLeftBorder = root->layout.borderSize.left;
-    const auto rootRightBorder = root->layout.borderSize.right;
-    const auto rootTopBorder = root->layout.borderSize.top;
-    const auto rootBotBorder = root->layout.borderSize.bottom;
-
-    const auto& rootBox = root->getTransformRead();
-    const auto bound = getChildrenBound(root->getNodes());
-    const auto boundsDiff = bound.end - bound.start;
-    glm::vec2 offset = {0, 0};
-
-    switch (root->layout.align.horizontal)
-    {
-        case LdAlign::Left: {
-            offset.x = rootLeftBorder;
-            break;
-        }
-        case LdAlign::Center: {
-            int halfDiffX = boundsDiff.x / 2;
-            int spaceLeft = rootBox.scale.x + rootLeftBorder - rootRightBorder;
-            offset.x = spaceLeft / 2.0f - halfDiffX;
-            break;
-        }
-        case LdAlign::Right: {
-            offset.x = rootBox.scale.x - (boundsDiff.x + rootRightBorder);
-            break;
-        }
-        case LdAlign::COUNT:
-            break;
-    }
-
-    switch (root->layout.align.vertical)
-    {
-        case LdAlign::Top: {
-            offset.y = rootTopBorder;
-            break;
-        }
-        case LdAlign::Center: {
-            int halfDiffY = boundsDiff.y / 2;
-            int spaceLeft = rootBox.scale.y + rootTopBorder - rootBotBorder;
-            offset.y = spaceLeft / 2.0f - halfDiffY;
-            break;
-        }
-        case LdAlign::Bot: {
-            offset.y = rootBox.scale.y - (boundsDiff.y + rootBotBorder);
-            break;
-        }
-        case LdAlign::COUNT:
-            break;
-    }
-
-    offset += rootBox.pos;
-    for (const auto& childNode : root->getNodes())
-    {
-        SKIP_SCROLLBAR(childNode)
-
-        childNode->getTransformRW().pos += offset;
-    }
-}
-
-void LayoutCalculator::calculateAndApplyPosition()
-{
-    const auto& rootBox = root->getTransformRW();
-    // glm::vec2 startXY = rootBox.pos;
-    glm::vec2 startXY = {0, 0};
-
-    auto remainingSpace = getRemainingSpaceAfterScale();
-    for (const auto& childNode : root->getNodes())
-    {
-        SKIP_SCROLLBAR(childNode)
-
-        auto& childPos = childNode->getTransformRW().pos;
-        auto& childScale = childNode->getTransformRW().scale;
-        if (root->layout.orientation == LayoutData::Orientation::Horizontal)
-        {
-            childPos.x = getNextFillPolicyPosition(startXY.x, childScale.x, remainingSpace.x);
-        }
-        else if (root->layout.orientation == LayoutData::Orientation::Vertical)
-        {
-            childPos.y = getNextFillPolicyPosition(startXY.y, childScale.y, remainingSpace.y);
-        }
-    }
-}
-
-float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace)
-{
-    float nextPos = 0;
-    switch (root->layout.fillPolicy)
-    {
-        case LayoutData::FillPolicy::Tightly: {
-            nextPos = bufferPos;
-            bufferPos += compScale;
-            break;
-        }
-        case LayoutData::FillPolicy::EvenlySpaced: {
-            const auto offset = remainingSpace / (root->getNodes().size() + 1);
-            bufferPos += offset;
-            nextPos = bufferPos;
-            bufferPos += compScale;
-            break;
-        }
-        case LayoutData::FillPolicy::SpaceBetween: {
-            // TODO: Treat division by zero. Currently this is ok due to .size() being size_t
-            nextPos = bufferPos;
-            const auto offset = remainingSpace / (root->getNodes().size() - 1);
-            bufferPos += offset + compScale;
-            break;
-        }
-        case LayoutData::FillPolicy::COUNT:
-            break;
-    }
-    return nextPos;
 }
 
 void LayoutCalculator::calculateAndApplyScale()
@@ -207,6 +104,128 @@ void LayoutCalculator::calculateAndApplyScale()
                                              (root->getTransformRead().scale.y - (rootTopBorder + rootBotBorder));
         }
     }
+}
+
+void LayoutCalculator::calculateAndApplyPosition()
+{
+    // const auto& rootBox = root->getTransformRW();
+    // glm::vec2 startXY = rootBox.pos;
+    glm::vec2 startXY = {0, 0};
+
+    auto remainingSpace = getRemainingSpaceAfterScale();
+    for (const auto& childNode : root->getNodes())
+    {
+        SKIP_SCROLLBAR(childNode)
+
+        auto& childPos = childNode->getTransformRW().pos;
+        auto& childScale = childNode->getTransformRW().scale;
+        if (root->layout.orientation == LayoutData::Orientation::Horizontal)
+        {
+            childPos.x = getNextFillPolicyPosition(startXY.x, childScale.x, remainingSpace.x);
+        }
+        else if (root->layout.orientation == LayoutData::Orientation::Vertical)
+        {
+            childPos.y = getNextFillPolicyPosition(startXY.y, childScale.y, remainingSpace.y);
+        }
+    }
+}
+
+void LayoutCalculator::calculateAndApplyAlignOffset()
+{
+    const auto rootLeftBorder = root->layout.borderSize.left;
+    const auto rootRightBorder = root->layout.borderSize.right;
+    const auto rootTopBorder = root->layout.borderSize.top;
+    const auto rootBotBorder = root->layout.borderSize.bottom;
+
+    const auto& rootBox = root->getTransformRead();
+    const auto bound = getChildrenBound(root->getNodes());
+    const auto boundsDiff = bound.end - bound.start;
+
+    auto adjustedRootScale = rootBox.scale;
+
+    /* They are reversed, it's justified */
+    adjustedRootScale.y -= isHScrollActive ? scrollBarSize : 0;
+    adjustedRootScale.x -= isVScrollActive ? scrollBarSize : 0;
+
+    glm::vec2 offset = {0, 0};
+
+    switch (root->layout.align.horizontal)
+    {
+        case LdAlign::Left: {
+            offset.x = rootLeftBorder;
+            break;
+        }
+        case LdAlign::Center: {
+            int halfDiffX = boundsDiff.x / 2;
+            int spaceLeft = adjustedRootScale.x + rootLeftBorder - rootRightBorder;
+            offset.x = spaceLeft / 2.0f - halfDiffX;
+            break;
+        }
+        case LdAlign::Right: {
+            offset.x = adjustedRootScale.x - (boundsDiff.x + rootRightBorder);
+            break;
+        }
+        case LdAlign::COUNT:
+            break;
+    }
+
+    switch (root->layout.align.vertical)
+    {
+        case LdAlign::Top: {
+            offset.y = rootTopBorder;
+            break;
+        }
+        case LdAlign::Center: {
+            int halfDiffY = boundsDiff.y / 2;
+            int spaceLeft = adjustedRootScale.y + rootTopBorder - rootBotBorder;
+            offset.y = spaceLeft / 2.0f - halfDiffY;
+            break;
+        }
+        case LdAlign::Bot: {
+            offset.y = adjustedRootScale.y - (boundsDiff.y + rootBotBorder);
+            break;
+        }
+        case LdAlign::COUNT:
+            break;
+    }
+
+    offset += rootBox.pos;
+    for (const auto& childNode : root->getNodes())
+    {
+        SKIP_SCROLLBAR(childNode)
+
+        childNode->getTransformRW().pos += offset;
+    }
+}
+
+float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace)
+{
+    float nextPos = 0;
+    switch (root->layout.fillPolicy)
+    {
+        case LayoutData::FillPolicy::Tightly: {
+            nextPos = bufferPos;
+            bufferPos += compScale;
+            break;
+        }
+        case LayoutData::FillPolicy::EvenlySpaced: {
+            const auto offset = remainingSpace / (root->getNodes().size() + 1);
+            bufferPos += offset;
+            nextPos = bufferPos;
+            bufferPos += compScale;
+            break;
+        }
+        case LayoutData::FillPolicy::SpaceBetween: {
+            // TODO: Treat division by zero. Currently this is ok due to .size() being size_t
+            nextPos = bufferPos;
+            const auto offset = remainingSpace / (root->getNodes().size() - 1);
+            bufferPos += offset + compScale;
+            break;
+        }
+        case LayoutData::FillPolicy::COUNT:
+            break;
+    }
+    return nextPos;
 }
 
 void LayoutCalculator::resetPositions()
@@ -250,6 +269,10 @@ glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale()
     auto remainingSpace = root->getTransformRead().scale - accumulatedSize;
     remainingSpace.x -= (rootLeftBorder + rootRightBorder);
     remainingSpace.y -= (rootTopBorder + rootBotBorder);
+
+    /* They are reversed, it's justified */
+    remainingSpace.x -= isVScrollActive ? scrollBarSize : 0;
+    remainingSpace.y -= isHScrollActive ? scrollBarSize : 0;
 
     return remainingSpace;
 }

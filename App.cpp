@@ -25,13 +25,8 @@ void App::start(int initialWidth, int initialHeight)
     div3.style.borderColor = utils::hexToVec4("#13b613ff");
     // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
 
-    // div3.layout.marginSize = glm::vec4(6.0f);
-    // div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 200}};
-    // div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 550}, {LdScalePolicy::Absolute, 100}};
-    // div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 700}, {LdScalePolicy::Absolute, 250}};
-
-    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Absolute, 600}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 210}, {LdScalePolicy::Absolute, 100}};
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Relative, 0.6f}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 100}};
     div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
     div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 100}, {LdScalePolicy::Absolute, 250}};
 
