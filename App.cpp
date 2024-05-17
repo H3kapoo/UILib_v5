@@ -18,14 +18,14 @@ void App::start(int initialWidth, int initialHeight)
     // rootDiv.layout.borderSize = glm::vec4(6);
     rootDiv.layout.orientation = LdOrientation::Horizontal;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
-    rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
+    rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Bot};
     rootDiv.layout.internalAlign = LdAlign::Top;
     rootDiv.layout.wrap = LdWrapMode::NoWrap;
 
     div3.style.borderColor = utils::hexToVec4("#13b613ff");
     // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
 
-    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Relative, 0.6f}};
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Absolute, 600}};
     div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 100}};
     div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
     div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 100}, {LdScalePolicy::Absolute, 250}};

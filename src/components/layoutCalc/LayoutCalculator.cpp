@@ -14,15 +14,11 @@ LayoutCalculator::LayoutCalculator(AbstractComponent* comp)
 
 glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
     const int scrollOffsetY,
-    const bool isHScrollActive_,
-    const bool isVScrollActive_,
-    const int16_t scrollBarSize_)
+    const bool isHScrollActive,
+    const bool isVScrollActive,
+    const int16_t scrollBarSize)
 {
-
-    isHScrollActive = isHScrollActive_;
-    isVScrollActive = isVScrollActive_;
-    scrollBarSize = scrollBarSize_;
-    // utils::printlnw("HA {} VA {} SS {}", isHScrollActive, isVScrollActive, scrollBarSize);
+    const ScrollBarDetails sbDetails{isHScrollActive, isVScrollActive, scrollBarSize};
 
     /* Reset positions */
     resetPositions();
@@ -31,16 +27,30 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
     calculateAndApplyScale();
 
     /* Calculate position based on FillPolicy & Orientation */
-    calculateAndApplyPosition();
+    calculateAndApplyPosition(sbDetails);
 
     /* Calculate and add offset to the position based on Align & internalAlign */
-    calculateAndApplyAlignOffset();
+    calculateAndApplyAlignOffset(sbDetails);
 
     /* Overflow calculation */
+    const auto overflow = calculateAndApplyOverflow(scrollOffsetX, scrollOffsetY);
+
+    return {overflow.overflowX, overflow.overflowY};
+}
+
+LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(const int16_t scrollOffsetX,
+    const int16_t scrollOffsetY)
+{
     const auto bounds = getChildrenBound(root->getNodes());
 
-    const auto& rts = root->getTransformRW().scale;
-    const auto& rtp = root->getTransformRW().pos;
+    const auto rootLeftBorder = root->layout.borderSize.left;
+    const auto rootRightBorder = root->layout.borderSize.right;
+    const auto rootTopBorder = root->layout.borderSize.top;
+    const auto rootBotBorder = root->layout.borderSize.bottom;
+
+    const auto& rts = root->getTransformRW().scale -
+                      glm::vec2{rootLeftBorder + rootRightBorder, rootBotBorder + rootTopBorder};
+    const auto& rtp = root->getTransformRW().pos + glm::vec2{rootLeftBorder, rootTopBorder};
     const auto rte = rtp + rts;
 
     const auto rightOverflow = bounds.end.x - rte.x;  // x pos if overflow
@@ -62,14 +72,18 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
     for (const auto& childNode : root->getNodes())
     {
         auto& childPos = childNode->getTransformRW().pos;
+
+        /* This will push the content in such a way that it doesn't overflow to the left or to the top. Scrollbars will
+           be shown instead for scrolling */
         childPos.x += leftOverflow > 0 ? leftOverflow : 0;
         childPos.y += topOverflow > 0 ? topOverflow : 0;
 
+        /* Apply user chosen overflow */
         childPos.x -= scrollOffsetX;
         childPos.y -= scrollOffsetY;
     }
 
-    return {totalOverflowX, totalOverflowY};
+    return OverflowResult{totalOverflowX, totalOverflowY};
 }
 
 void LayoutCalculator::calculateAndApplyScale()
@@ -106,13 +120,13 @@ void LayoutCalculator::calculateAndApplyScale()
     }
 }
 
-void LayoutCalculator::calculateAndApplyPosition()
+void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetails)
 {
     // const auto& rootBox = root->getTransformRW();
     // glm::vec2 startXY = rootBox.pos;
     glm::vec2 startXY = {0, 0};
 
-    auto remainingSpace = getRemainingSpaceAfterScale();
+    auto remainingSpace = getRemainingSpaceAfterScale(sbDetails);
     for (const auto& childNode : root->getNodes())
     {
         SKIP_SCROLLBAR(childNode)
@@ -130,7 +144,7 @@ void LayoutCalculator::calculateAndApplyPosition()
     }
 }
 
-void LayoutCalculator::calculateAndApplyAlignOffset()
+void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDetails)
 {
     const auto rootLeftBorder = root->layout.borderSize.left;
     const auto rootRightBorder = root->layout.borderSize.right;
@@ -144,8 +158,8 @@ void LayoutCalculator::calculateAndApplyAlignOffset()
     auto adjustedRootScale = rootBox.scale;
 
     /* They are reversed, it's justified */
-    adjustedRootScale.y -= isHScrollActive ? scrollBarSize : 0;
-    adjustedRootScale.x -= isVScrollActive ? scrollBarSize : 0;
+    adjustedRootScale.y -= sbDetails.isHBarActive ? sbDetails.barSize : 0;
+    adjustedRootScale.x -= sbDetails.isVBarActive ? sbDetails.barSize : 0;
 
     glm::vec2 offset = {0, 0};
 
@@ -238,7 +252,7 @@ void LayoutCalculator::resetPositions()
     }
 }
 
-glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale()
+glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale(const ScrollBarDetails& sbDetails)
 {
     // TODO: Wrongly calculates remaning usable space. Doesnt take into account
     //  current orientation
@@ -271,8 +285,8 @@ glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale()
     remainingSpace.y -= (rootTopBorder + rootBotBorder);
 
     /* They are reversed, it's justified */
-    remainingSpace.x -= isVScrollActive ? scrollBarSize : 0;
-    remainingSpace.y -= isHScrollActive ? scrollBarSize : 0;
+    remainingSpace.x -= sbDetails.isVBarActive ? sbDetails.barSize : 0;
+    remainingSpace.y -= sbDetails.isHBarActive ? sbDetails.barSize : 0;
 
     return remainingSpace;
 }

@@ -20,7 +20,6 @@ public:
         const bool isHScrollActive = false,
         const bool isVScrollActive = false,
         const int16_t scrollBarSize = 0);
-    void scrollView(const int scrollOffsetX, const int scrollOffsetY);
 
 private:
     struct Bounds
@@ -29,24 +28,31 @@ private:
         glm::vec2 end{-9999};
     };
 
-    void scrollViewSubchildren(
-        AbstractComponent* comp, const int scrollOffsetX, const int scrollOffsetY, const int diffX, const int diffY);
+    struct ScrollBarDetails
+    {
+        bool isHBarActive{false};
+        bool isVBarActive{false};
+        int16_t barSize{0};
+    };
+
+    struct OverflowResult
+    {
+        float overflowX{0};
+        float overflowY{0};
+    };
+
+    OverflowResult calculateAndApplyOverflow(const int16_t scrollOffsetX, const int16_t scrollOffsetY);
     float getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace);
-    void calculateAndApplyAlignOffset();
-    void calculateAndApplyPosition();
+    void calculateAndApplyAlignOffset(const ScrollBarDetails& sbDetails);
+    void calculateAndApplyPosition(const ScrollBarDetails& sbDetails);
     void calculateAndApplyScale();
     void calculateNextBasePosition(glm::vec2& currentXY, AbstractComponent* comp);
 
     void resetPositions();
-    glm::vec2 getRemainingSpaceAfterScale();
+    glm::vec2 getRemainingSpaceAfterScale(const ScrollBarDetails& sbDetails);
     Bounds getChildrenBound(const std::vector<AbstractComponent*>& childComps);
 
     /* TODO: Maybe in the future this root can be removed and class can be made static so we are fully stateless */
     AbstractComponent* root;
-
-    // Just for now, remove later
-    bool isHScrollActive{0};
-    bool isVScrollActive{false};
-    int16_t scrollBarSize{0};
 };
 } // namespace components::layoutcalc

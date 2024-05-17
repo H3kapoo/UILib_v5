@@ -122,13 +122,20 @@ void ScrollBar::notifyLayoutHasChanged()
     if (!isActive) { return; }
 
     const auto& parentTransform = getParent()->getTransformRead();
+    const auto& parentLayout = getParent()->layout;
+    const auto rootLeftBorder = parentLayout.borderSize.left;
+    const auto rootRightBorder = parentLayout.borderSize.right;
+    const auto rootTopBorder = parentLayout.borderSize.top;
+    const auto rootBotBorder = parentLayout.borderSize.bottom;
+
     const int oppositeBarSubtract = isOppositeActive ? options.barSize : 0;
     if (options.orientation == layoutcalc::LdOrientation::Horizontal)
     {
         /* Place background bar */
-        getTransformRW().pos = {
-            parentTransform.pos.x, parentTransform.pos.y + parentTransform.scale.y - options.barSize};
-        getTransformRW().scale = {parentTransform.scale.x - oppositeBarSubtract, options.barSize};
+        getTransformRW().pos = {parentTransform.pos.x + rootLeftBorder,
+            parentTransform.pos.y + parentTransform.scale.y - options.barSize - rootBotBorder};
+        getTransformRW().scale = {
+            parentTransform.scale.x - (oppositeBarSubtract + rootRightBorder + rootLeftBorder), options.barSize};
 
         /* On component resize, knob position along the background scrollbar should be preserved */
         if (updateDueToResize)
@@ -162,9 +169,10 @@ void ScrollBar::notifyLayoutHasChanged()
     else
     {
         /* Place background bar */
-        getTransformRW().pos = {
-            parentTransform.pos.x + parentTransform.scale.x - options.barSize, parentTransform.pos.y};
-        getTransformRW().scale = {options.barSize, parentTransform.scale.y - oppositeBarSubtract};
+        getTransformRW().pos = {parentTransform.pos.x + parentTransform.scale.x - (options.barSize + rootRightBorder),
+            parentTransform.pos.y + rootTopBorder};
+        getTransformRW().scale = {
+            options.barSize, parentTransform.scale.y - (oppositeBarSubtract + rootTopBorder + rootBotBorder)};
 
         /* On component resize, knob position along the background scrollbar should be preserved */
         if (updateDueToResize)
