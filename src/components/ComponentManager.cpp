@@ -148,6 +148,19 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
     }
 }
 
+void ComponentManager::mouseScrollEvent(double offsetX, double offsetY)
+{
+    (void)offsetX;
+
+    state.scrollDirection = offsetY;
+
+    for (const auto& childNode : flattenedNodes)
+    {
+        if (childNode->getId() == state.hoveredId) { childNode->onScroll(); }
+    }
+    // utils::printlne("Mouse scrolled {} {}", offsetX, offsetY);
+}
+
 void ComponentManager::keyEvent(int key, HIDAction action, int mods)
 {
     // TODO: Logic for clearing MODs bits needs to be introduced

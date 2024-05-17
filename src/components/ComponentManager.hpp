@@ -61,6 +61,14 @@ public:
     void mouseMoveEvent(double mouseX, double mouseY);
 
     /**
+     * @brief Function to be called by Input management when mouse is scrolled.
+     *
+     * @param offsetX - trivial
+     * @param offsetY - trivial
+     */
+    void mouseScrollEvent(double offsetX, double offsetY);
+
+    /**
      * @brief Function to be called by Input management when a key event happens.
      *
      * @param key - Key that triggered the event.

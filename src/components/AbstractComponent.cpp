@@ -344,6 +344,7 @@ void AbstractComponent::manuallyAdjustDepthTo(const int newDepth)
 
 void AbstractComponent::onClickEvent() {}
 void AbstractComponent::onMoveEvent() {}
+void AbstractComponent::onScroll() {}
 void AbstractComponent::onKeyEvent() {}
 void AbstractComponent::onMouseEnterEvent() {}
 void AbstractComponent::onMouseExitEvent() {}

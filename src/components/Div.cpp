@@ -63,6 +63,8 @@ void Div::addOnKeyListener(std::function<void(const HIDAction*)>&& func)
 
 void Div::onClickEvent()
 {
+    utils::printlni("[INF] I am node {} and onStart() called", getId());
+
     const auto& s = getState();
     if (mouseClickCb && s->mouseAction == HIDAction::Pressed) { mouseClickCb(s->mouseX, s->mouseY, s->clickedButton); }
 }
@@ -112,9 +114,8 @@ void Div::onLayoutUpdate()
     // Otherwise we will have to append a SB to each Div for nothing
     const int scrollValueH = hsb.getScrollValue();
     const int scrollValueV = vsb.getScrollValue();
-    const int scrollBarSize = hsb.options.barSize;
     const auto deducedOverflow = layoutCalc.calculate(scrollValueH, scrollValueV, hsb.isBarActive(), vsb.isBarActive(),
-        scrollBarSize);
+        hsb.options.barSize);
 
     if (deducedOverflow.x > 0 && !hsb.isComponentParented())
     {

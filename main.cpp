@@ -125,6 +125,9 @@ int main()
             }
             app.keyEvent(key, a, mods);
         });
+
+    inputManagement::InputHelper::get().registerOnMouseScrollAction(std::bind(&App::mouseScrollEvent, &app,
+        std::placeholders::_1, std::placeholders::_2));
     app.start(startWindowWidth, startWindowHeight);
 
     // glEnable(GL_DEPTH_TEST);

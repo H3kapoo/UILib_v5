@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <glm/glm.hpp>
 #include <string>
@@ -39,6 +40,8 @@ struct UIState
     MouseButton clickedButton{MouseButton::None};
     int mouseX{0};
     int mouseY{0};
+    int8_t scrollDirection{0};
+
     int selectedId{0};
     int prevHoveredId{0}, hoveredId{0};
 

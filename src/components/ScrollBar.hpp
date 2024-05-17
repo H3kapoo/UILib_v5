@@ -1,14 +1,12 @@
 #pragma once
 
-#include <algorithm>
-#include <functional>
+#include <cstdint>
 
 #include "AbstractComponent.hpp"
 
 #include "../Utility.hpp"
 #include "../renderer/LightWeightRenderer.hpp"
 #include "compUtils/LightWeightDummy.hpp"
-#include "compUtils/Transform.hpp"
 #include "layoutCalc/LayoutData.hpp"
 
 namespace components::computils
@@ -19,18 +17,19 @@ public:
     struct Options
     {
         layoutcalc::LdOrientation orientation{layoutcalc::LdOrientation::Horizontal};
-        int barSize{20};
+        int barSize{11};
     };
 
-    ScrollBar(const bool fillerIfNeeded = false);
+    ScrollBar();
 
     void onPrepareToRender() override;
     void onRenderDone() override;
     void onMoveEvent() override;
     void onClickEvent() override;
     void onStart() override;
+    void onScroll() override;
 
-    int adjustKnob(const int x, const int y);
+    int adjustKnobOnMouseEvent(const int x, const int y);
     void notifyLayoutHasChanged();
 
     void show(const glm::mat4& projMatrix);
@@ -53,13 +52,13 @@ private:
     bool isDragging{false};
     bool isActive{false};
     bool isOppositeActive{false};
-    bool isFillerIfNeeded{false};
     bool updateDueToResize{true};
     float knobPercentageAlongBg{0};
     float mouseOffset{0};
+    float scrollSensitivity{10.0f};
+    int8_t knobInset{2};
 
     renderer::LightWeightRenderer lwr;
     computils::LightWeightDummy knob;
-    computils::LightWeightDummy cornerFiller;
 };
 } // namespace components::computils

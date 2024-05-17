@@ -38,6 +38,9 @@ void InputHelper::observe(GLFWwindow* window)
 
     /* Mouse dropped items callback */
     glfwSetDropCallback(window, dropCallback);
+
+    /* Mouse scroll callback */
+    glfwSetScrollCallback(window, scrollCallback);
 }
 
 // ------ STATIC CALLBACKS ------
@@ -79,6 +82,14 @@ void InputHelper::mouseMoveCallback(GLFWwindow*, double xPos, double yPos)
 void InputHelper::dropCallback(GLFWwindow*, int dropCount, const char** paths)
 {
     get().invokeOnMouseDropAction(dropCount, paths);
+}
+
+/**
+ * @brief Static gateway needed to access window mouse scroll data the OS.
+ */
+void InputHelper::scrollCallback(GLFWwindow*, double xOffset, double yOffset)
+{
+    get().invokeOnScrollAction(xOffset, yOffset);
 }
 
 // ------ INVOKE ----------
@@ -141,6 +152,17 @@ void InputHelper::invokeOnMouseDropAction(int dropCount, const char** paths)
     if (gOnMouseDropActionCallback) gOnMouseDropActionCallback(dropCount, paths);
 }
 
+/**
+ * @brief Invoke the mouse drop action event.
+ *
+ * @param dropCount  Number of paths dropped.
+ * @param paths      Vector of string paths.
+ */
+void InputHelper::invokeOnScrollAction(double xOffset, double yOffset)
+{
+    if (gOnMouseScrollActionCallback) gOnMouseScrollActionCallback(xOffset, yOffset);
+}
+
 // ------ REGISTER ----------
 /**
  * @brief Register callback to be called on window key action.
@@ -190,6 +212,16 @@ void InputHelper::registerOnMouseMoveAction(const std::function<void(double xPos
 void InputHelper::registerOnMouseDropAction(const std::function<void(double dropCount, const char** paths)> callback)
 {
     gOnMouseDropActionCallback = callback;
+}
+
+/**
+ * @brief Register callback to be called on mouse scroll action.
+ *
+ * @param callback Callback to be called.
+ */
+void InputHelper::registerOnMouseScrollAction(const std::function<void(double xOffset, double yOffset)> callback)
+{
+    gOnMouseScrollActionCallback = callback;
 }
 
 } // namespace inputManagement

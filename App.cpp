@@ -124,3 +124,8 @@ void App::resizeEvent(int newWidth, int newHeight)
 {
     componentManager.resizeEvent(newWidth, newHeight);
 }
+
+void App::mouseScrollEvent(double offsetX, double offsetY)
+{
+    componentManager.mouseScrollEvent(offsetX, offsetY);
+}

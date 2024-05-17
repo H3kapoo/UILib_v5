@@ -23,6 +23,7 @@ public:
     /* Events handlers */
     void mouseClickEvent(MouseButton button, HIDAction action, ActiveModifiersBits mods);
     void mouseMoveEvent(double mouseX, double mouseY);
+    void mouseScrollEvent(double offsetX, double offsetY);
     void keyEvent(int key, HIDAction action, int mods);
     void resizeEvent(int newWidth, int newHeight);
 
