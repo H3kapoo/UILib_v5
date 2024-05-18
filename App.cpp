@@ -46,10 +46,10 @@ void App::start(int initialWidth, int initialHeight)
     div3.layout.wrap = LdWrapMode::NoWrap;
     div3.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
 
-    div3.append({&div6});
-    rootDiv.append({&div3});
-    // rootDiv.append({&div3, &div4});
-    // div3.append({&div5, &div6});
+    // div3.append({&div6});
+    // rootDiv.append({&div3});
+    rootDiv.append({&div3, &div4});
+    div3.append({&div5, &div6});
 
     rootDiv.showTree();
 

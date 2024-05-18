@@ -90,18 +90,8 @@ void ComponentManager::render()
         else
         {
             const auto& pViewableArea = childNode->viewArea;
-            glScissor(pViewableArea.start.x, state.windowHeight - pViewableArea.scale.y, pViewableArea.scale.x,
-                pViewableArea.scale.y - pViewableArea.start.y);
-            // const auto& pViewableArea = childNode->getParent()->viewArea;
-            // glScissor(pViewableArea.start.x, state.windowHeight - (pViewableArea.start.y + pViewableArea.scale.y),
-            //     pViewableArea.scale.x, pViewableArea.scale.y);
-
-            if (childNode->getId() == 16)
-            {
-                // utils::printlnw("Child minY {} maxY {}", childNode->viewArea.start.y, childNode->viewArea.scale.y);
-                // utils::printlnw("Child startY {} endY {}",
-                //     state.windowHeight - (pViewableArea.start.y + pViewableArea.scale.y), pViewableArea.scale.y);
-            }
+            glScissor(pViewableArea.start.x, state.windowHeight - pViewableArea.end.y, pViewableArea.end.x,
+                pViewableArea.end.y - pViewableArea.start.y);
         }
 
         childNode->onPrepareToRender();
@@ -268,7 +258,7 @@ void ComponentManager::computeViewableArea()
         if (childNode->getId() == root->getId())
         {
             childNode->viewArea.start = childNode->getTransformRead().pos;
-            childNode->viewArea.scale = childNode->getTransformRead().scale + childNode->getTransformRead().pos;
+            childNode->viewArea.end = childNode->getTransformRead().scale + childNode->getTransformRead().pos;
         }
         /* Else we are a child, our viewable area depends on the viewable area of the parent */
         else
@@ -279,36 +269,17 @@ void ComponentManager::computeViewableArea()
             const auto& childPos = childNode->getTransformRead().pos;
             const auto& childScale = childNode->getTransformRead().scale;
 
-            const auto pViewAreaEndX = (int16_t)(0 + pViewableArea.scale.x);
-            const auto pViewAreaEndY = (int16_t)(0 + pViewableArea.scale.y);
+            const auto pViewAreaEndX = (int16_t)(0 + pViewableArea.end.x);
+            const auto pViewAreaEndY = (int16_t)(0 + pViewableArea.end.y);
 
             const auto childEndX = (int16_t)(childPos.x + childScale.x);
             const auto childEndY = (int16_t)(childPos.y + childScale.y);
 
-            // const glm::i16vec2 vaX = {std::max(pViewableArea.start.x, (int16_t)childPos.x),
-            //     std::min((int16_t)(pViewableArea.start.x + pViewableArea.scale.x),
-            //         (int16_t)(childPos.x + childScale.x))};
-
-            // const glm::i16vec2 vaY = {std::max(pViewableArea.start.y, (int16_t)childPos.y),
-            //     std::min((int16_t)(pViewableArea.start.y + pViewableArea.scale.y),
-            //         (int16_t)(childPos.y + childScale.y))};
-
             // Logic: maxStart(parentXY,childXY) , minEnd(parentXY,childXY);
             childNode->viewArea.start.x = std::max(pViewableArea.start.x, (int16_t)childPos.x);
-            childNode->viewArea.scale.y = std::min(pViewAreaEndY, childEndY);
+            childNode->viewArea.end.y = std::min(pViewAreaEndY, childEndY);
             childNode->viewArea.start.y = std::max(pViewableArea.start.y, (int16_t)childPos.y);
-            childNode->viewArea.scale.x = std::min(pViewAreaEndX, childEndX);
-            if (childNode->getId() == 16)
-            {
-                utils::printlnw("16 Child minY {} maxY {}", childNode->viewArea.start.y, childNode->viewArea.scale.y);
-                utils::printlnw("16 Child pViewAreaEndY {} childEndY {}", pViewAreaEndY, childEndY);
-            }
-
-            if (childNode->getId() == 7)
-            {
-                utils::printlnw("7 Child minY {} maxY {}", childNode->viewArea.start.y, childNode->viewArea.scale.y);
-                utils::printlnw("7 Child pViewAreaEndY {} childEndY {}", pViewAreaEndY, childEndY);
-            }
+            childNode->viewArea.end.x = std::min(pViewAreaEndX, childEndX);
         }
     }
 }
