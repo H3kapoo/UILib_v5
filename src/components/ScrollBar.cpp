@@ -104,7 +104,7 @@ void ScrollBar::onStart()
     knob.transform.layer = getDepth() + 1;
 }
 
-int ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
+int16_t ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
 {
     /* Note/TODO: Normally 'knobInset' should be taken into account here as well to perfectly determine the knob
        position and scrollValue, however the value is so small we can get away without accounting for it for now.*/
@@ -173,7 +173,7 @@ void ScrollBar::notifyLayoutHasChanged()
             Bigger overflow -> smaller knob size
             Smaller overflow -> bigger knob size
         */
-        const auto knobSizeX = std::max(options.barSize, (int)getTransformRW().scale.x - overflow);
+        const auto knobSizeX = std::max(options.barSize, (int16_t)(getTransformRW().scale.x - overflow));
 
         /* Calculate position and scale for knob to be in bounds */
         const auto sPos = getTransformRW().pos.x + knobInset;
@@ -212,7 +212,7 @@ void ScrollBar::notifyLayoutHasChanged()
             Bigger overflow -> smaller knob size
             Smaller overflow -> bigger knob size
         */
-        const auto knobSizeY = std::max(options.barSize, (int)getTransformRW().scale.y - overflow);
+        const auto knobSizeY = std::max(options.barSize, (int16_t)(getTransformRW().scale.y - overflow));
 
         /* Calculate position and scale for knob to be in bounds */
         const int niceifyCornerOffset = isOppositeActive ? 0 : knobInset;
@@ -267,7 +267,7 @@ void ScrollBar::setOppositeScrollBarInactive()
     isOppositeActive = false;
 }
 
-int ScrollBar::getScrollValue()
+int16_t ScrollBar::getScrollValue()
 {
     return scrollValue;
 }

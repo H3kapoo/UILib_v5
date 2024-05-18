@@ -45,7 +45,7 @@ private:
     float getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace);
     void calculateAndApplyAlignOffset(const ScrollBarDetails& sbDetails);
     void calculateAndApplyPosition(const ScrollBarDetails& sbDetails);
-    void calculateAndApplyScale();
+    void calculateAndApplyScale(const ScrollBarDetails& sbDetails);
     void calculateNextBasePosition(glm::vec2& currentXY, AbstractComponent* comp);
 
     void resetPositions();

@@ -1,6 +1,8 @@
 #include "ComponentManager.hpp"
 
 #include <algorithm>
+#include <cstdint>
+#include <glm/fwd.hpp>
 #include <ranges>
 
 #include "../Utility.hpp"
@@ -39,8 +41,8 @@ void ComponentManager::removeRoot()
 void ComponentManager::updateLayout()
 {
     /* Note: due to the fact that child.onLayoutUpdate can add/remove new nodes while this function is running, it can
-    invalidate "flattenedNodes | std::views::reverse" statement pointers. Basically addition/removal while iterating.
-    Solution for now is to cache "flattenedNodes" into a temp vector and iterate over the temp vector. */
+       invalidate "flattenedNodes | std::views::reverse" statement pointers. Basically addition/removal while iterating.
+       Solution for now is to cache "flattenedNodes" into a temp vector and iterate over the temp vector. */
     std::vector<AbstractComponent*> tmpFlattenedNodes;
     tmpFlattenedNodes.reserve(flattenedNodes.size());
     for (const auto& childNode : flattenedNodes | std::views::reverse)
@@ -54,20 +56,60 @@ void ComponentManager::updateLayout()
 
         childNode->onLayoutUpdate();
     }
+
+    /* Compute viewableArea for each element */
+    computeViewableArea();
 }
+
 void ComponentManager::render()
 {
+    // TODO: take into account viewable area. GL_SCISSORS. No rounded corners cutting is supported (might need to
+    // experiment with stencil buffer in the future)
+
     renderer.clearScreen();
+
+    /* Note: glScissor normally has start coords in lower left corner. This UI has start coords in top left corner,
+     * so calculations on where Scissors start on Y axis are reversed.*/
+    glEnable(GL_SCISSOR_TEST);
+
     /* Note: For alpha blending to work, we unfortunatelly have to render objects back to front and disable depth
-       testing. This introduces a bit of overdraw sadly. */
+       testing. This introduces a bit of overdraw sadly. If it's know there will be no alpha blending, 'reverse' can be
+       removed. */
     for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
+        // TODO: Render only if: comp is renderable and viewable area is not zero (basically scale on X or Y should be
+        // greater than zero
         if (!childNode->isComponentRenderable()) { continue; }
+
+        if (childNode->getId() == root->getId())
+        {
+            const auto pTransform = childNode->getTransformRead();
+            glScissor(pTransform.pos.x, state.windowHeight - (pTransform.pos.y + pTransform.scale.y),
+                pTransform.scale.x, pTransform.scale.y);
+        }
+        else
+        {
+            const auto& pViewableArea = childNode->viewArea;
+            glScissor(pViewableArea.start.x, state.windowHeight - pViewableArea.scale.y, pViewableArea.scale.x,
+                pViewableArea.scale.y - pViewableArea.start.y);
+            // const auto& pViewableArea = childNode->getParent()->viewArea;
+            // glScissor(pViewableArea.start.x, state.windowHeight - (pViewableArea.start.y + pViewableArea.scale.y),
+            //     pViewableArea.scale.x, pViewableArea.scale.y);
+
+            if (childNode->getId() == 16)
+            {
+                // utils::printlnw("Child minY {} maxY {}", childNode->viewArea.start.y, childNode->viewArea.scale.y);
+                // utils::printlnw("Child startY {} endY {}",
+                //     state.windowHeight - (pViewableArea.start.y + pViewableArea.scale.y), pViewableArea.scale.y);
+            }
+        }
 
         childNode->onPrepareToRender();
         renderer.renderComponent(*childNode);
         childNode->onRenderDone();
     }
+
+    glDisable(GL_SCISSOR_TEST);
 }
 
 void ComponentManager::mouseClickEvent(MouseButton button, HIDAction action, ActiveModifiersBits mods)
@@ -158,7 +200,6 @@ void ComponentManager::mouseScrollEvent(double offsetX, double offsetY)
     {
         if (childNode->getId() == state.hoveredId) { childNode->onScroll(); }
     }
-    // utils::printlne("Mouse scrolled {} {}", offsetX, offsetY);
 }
 
 void ComponentManager::keyEvent(int key, HIDAction action, int mods)
@@ -218,6 +259,59 @@ void ComponentManager::updateInternalTreeStructure(const std::string& action)
     /* Layout also needs to be recalculated due to possible addition/removal */
     updateLayout();
 };
+
+void ComponentManager::computeViewableArea()
+{
+    for (const auto& childNode : flattenedNodes | std::views::reverse)
+    {
+        /* If we are root, viewable area is ourself */
+        if (childNode->getId() == root->getId())
+        {
+            childNode->viewArea.start = childNode->getTransformRead().pos;
+            childNode->viewArea.scale = childNode->getTransformRead().scale + childNode->getTransformRead().pos;
+        }
+        /* Else we are a child, our viewable area depends on the viewable area of the parent */
+        else
+        {
+            // TODO: This is too simple, it depends on which side the 2 elements are on.
+
+            const auto& pViewableArea = childNode->getParent()->viewArea;
+            const auto& childPos = childNode->getTransformRead().pos;
+            const auto& childScale = childNode->getTransformRead().scale;
+
+            const auto pViewAreaEndX = (int16_t)(0 + pViewableArea.scale.x);
+            const auto pViewAreaEndY = (int16_t)(0 + pViewableArea.scale.y);
+
+            const auto childEndX = (int16_t)(childPos.x + childScale.x);
+            const auto childEndY = (int16_t)(childPos.y + childScale.y);
+
+            // const glm::i16vec2 vaX = {std::max(pViewableArea.start.x, (int16_t)childPos.x),
+            //     std::min((int16_t)(pViewableArea.start.x + pViewableArea.scale.x),
+            //         (int16_t)(childPos.x + childScale.x))};
+
+            // const glm::i16vec2 vaY = {std::max(pViewableArea.start.y, (int16_t)childPos.y),
+            //     std::min((int16_t)(pViewableArea.start.y + pViewableArea.scale.y),
+            //         (int16_t)(childPos.y + childScale.y))};
+
+            // Logic: maxStart(parentXY,childXY) , minEnd(parentXY,childXY);
+            childNode->viewArea.start.x = std::max(pViewableArea.start.x, (int16_t)childPos.x);
+            childNode->viewArea.scale.y = std::min(pViewAreaEndY, childEndY);
+            childNode->viewArea.start.y = std::max(pViewableArea.start.y, (int16_t)childPos.y);
+            childNode->viewArea.scale.x = std::min(pViewAreaEndX, childEndX);
+            if (childNode->getId() == 16)
+            {
+                utils::printlnw("16 Child minY {} maxY {}", childNode->viewArea.start.y, childNode->viewArea.scale.y);
+                utils::printlnw("16 Child pViewAreaEndY {} childEndY {}", pViewAreaEndY, childEndY);
+            }
+
+            if (childNode->getId() == 7)
+            {
+                utils::printlnw("7 Child minY {} maxY {}", childNode->viewArea.start.y, childNode->viewArea.scale.y);
+                utils::printlnw("7 Child pViewAreaEndY {} childEndY {}", pViewAreaEndY, childEndY);
+            }
+        }
+    }
+}
 
 void ComponentManager::flattenRoot()
 {

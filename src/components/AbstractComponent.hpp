@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/fwd.hpp>
 #include <string>
 #include <vector>
 
@@ -29,6 +30,12 @@ public:
     {
         CompType type{CompType::Unknown};
         std::string shaderPath{"SHADER_PATH_NON_EXISTENT"};
+    };
+
+    struct ViewableArea
+    {
+        glm::i16vec2 start;
+        glm::i16vec2 scale;
     };
 
     /* Constructors */
@@ -175,6 +182,7 @@ private:
     Options options;
 
     /* Rendering related */
+    ViewableArea viewArea;
     bool isRenderable{true};
     unsigned int meshVao{0};
     computils::Transform transform;

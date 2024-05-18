@@ -24,7 +24,7 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
     resetPositions();
 
     /* Calculate scale */
-    calculateAndApplyScale();
+    calculateAndApplyScale(sbDetails);
 
     /* Calculate position based on FillPolicy & Orientation */
     calculateAndApplyPosition(sbDetails);
@@ -86,8 +86,13 @@ LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(con
     return OverflowResult{totalOverflowX, totalOverflowY};
 }
 
-void LayoutCalculator::calculateAndApplyScale()
+void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
 {
+    auto rootScale = root->getTransformRead().scale;
+
+    /* They are reversed, it's justified */
+    rootScale.x -= sbDetails.isVBarActive ? sbDetails.barSize : 0;
+    rootScale.y -= sbDetails.isHBarActive ? sbDetails.barSize : 0;
     for (const auto& comp : root->getNodes())
     {
         SKIP_SCROLLBAR(comp)
@@ -107,7 +112,7 @@ void LayoutCalculator::calculateAndApplyScale()
             const auto rootLeftBorder = root->layout.borderSize.left;
             const auto rootRightBorder = root->layout.borderSize.right;
             comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
-                                             (root->getTransformRead().scale.x - (rootLeftBorder + rootRightBorder));
+                                             (rootScale.x - (rootLeftBorder + rootRightBorder));
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
@@ -115,15 +120,13 @@ void LayoutCalculator::calculateAndApplyScale()
             const auto rootTopBorder = root->layout.borderSize.top;
             const auto rootBotBorder = root->layout.borderSize.bottom;
             comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
-                                             (root->getTransformRead().scale.y - (rootTopBorder + rootBotBorder));
+                                             (rootScale.y - (rootTopBorder + rootBotBorder));
         }
     }
 }
 
 void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetails)
 {
-    // const auto& rootBox = root->getTransformRW();
-    // glm::vec2 startXY = rootBox.pos;
     glm::vec2 startXY = {0, 0};
 
     auto remainingSpace = getRemainingSpaceAfterScale(sbDetails);

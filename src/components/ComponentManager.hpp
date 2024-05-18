@@ -103,6 +103,14 @@ private:
     void updateInternalTreeStructure(const std::string& action);
 
     /**
+     * @brief Function responsible for calculating, based on parent viewable area, what the viewable area of the
+     * children is. This is useful in conjunction with scrollbars and with eliminating from the rendering process
+     * elements that are fully not visible.
+     *
+     */
+    void computeViewableArea();
+
+    /**
      * @brief Flattens the nodes in a depth descending way suited for fast click detection.
      * No reason to traverse all the tree nodes from root to leaf nodes and checking if click/hover happened. 99% of the
      * time it's a leaf node we click on and in this project leafs have increasing depth values. By sorting nodes in a
@@ -118,6 +126,6 @@ private:
 
     /* These will be deallocated trivially*/
     AbstractComponent* root{nullptr};
-    std::vector<AbstractComponent*> flattenedNodes;
+    std::vector<AbstractComponent*> flattenedNodes; /* Nodes sorted in depth descending order */
 };
 } // namespace components

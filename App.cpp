@@ -18,17 +18,17 @@ void App::start(int initialWidth, int initialHeight)
     // rootDiv.layout.borderSize = glm::vec4(6);
     rootDiv.layout.orientation = LdOrientation::Horizontal;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
-    rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Bot};
+    rootDiv.layout.align = LdAlignment{LdAlign::Top, LdAlign::Center};
     rootDiv.layout.internalAlign = LdAlign::Top;
     rootDiv.layout.wrap = LdWrapMode::NoWrap;
 
     div3.style.borderColor = utils::hexToVec4("#13b613ff");
     // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
 
-    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Absolute, 600}};
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Absolute, 400}};
     div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 100}};
     div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
-    div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 100}, {LdScalePolicy::Absolute, 250}};
+    div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 550}};
 
     div2.style.color = utils::hexToVec4("#6de025ff");
     div3.style.color = utils::hexToVec4("#bc115bff");
@@ -46,9 +46,10 @@ void App::start(int initialWidth, int initialHeight)
     div3.layout.wrap = LdWrapMode::NoWrap;
     div3.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
 
-    // div3.append(&div2);
-    rootDiv.append({&div3, &div4});
-    div3.append({&div5, &div6});
+    div3.append({&div6});
+    rootDiv.append({&div3});
+    // rootDiv.append({&div3, &div4});
+    // div3.append({&div5, &div6});
 
     rootDiv.showTree();
 

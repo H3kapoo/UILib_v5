@@ -4,14 +4,14 @@
 #include "ScrollBar.hpp"
 #include "layoutCalc/LayoutCalculator.hpp"
 
-#include "../assetLoaders/TextureLoader.hpp"
-#include "../renderer/LightWeightRenderer.hpp"
+// #include "../assetLoaders/TextureLoader.hpp"
+// #include "../renderer/LightWeightRenderer.hpp"
 #include <functional>
 
 namespace components
 {
 
-using namespace assetloaders;
+// using namespace assetloaders;
 
 class Div : public AbstractComponent
 {
@@ -60,6 +60,7 @@ private:
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this}; // TODO: Singleton
 
+    // TODO: Should be pointers and allocated on demand so as to not memory bloat
     computils::ScrollBar hsb;
     computils::ScrollBar vsb;
 

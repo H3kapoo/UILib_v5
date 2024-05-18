@@ -17,7 +17,7 @@ public:
     struct Options
     {
         layoutcalc::LdOrientation orientation{layoutcalc::LdOrientation::Horizontal};
-        int barSize{11};
+        int16_t barSize{11};
     };
 
     ScrollBar();
@@ -29,7 +29,7 @@ public:
     void onStart() override;
     void onScroll() override;
 
-    int adjustKnobOnMouseEvent(const int x, const int y);
+    int16_t adjustKnobOnMouseEvent(const int x, const int y);
     void notifyLayoutHasChanged();
 
     void show(const glm::mat4& projMatrix);
@@ -41,14 +41,15 @@ public:
 
     void setInactive();
     void setActive();
-    int getScrollValue();
+    int16_t getScrollValue();
     bool isBarActive();
 
     Options options;
 
 private:
-    int overflow{0};
-    int scrollValue{0};
+    int16_t overflow{0};
+    int16_t scrollValue{0};
+    int8_t knobInset{2};
     bool isDragging{false};
     bool isActive{false};
     bool isOppositeActive{false};
@@ -56,7 +57,6 @@ private:
     float knobPercentageAlongBg{0};
     float mouseOffset{0};
     float scrollSensitivity{10.0f};
-    int8_t knobInset{2};
 
     renderer::LightWeightRenderer lwr;
     computils::LightWeightDummy knob;
