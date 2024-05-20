@@ -161,11 +161,12 @@ public:
     /* Direct getters */
     layoutcalc::LayoutData layout;
 
+    /* TODO: If we remove this node, remove the data of all children nodes as well */
+    bool appendAux(AbstractComponent* node);
+    bool removeAux(AbstractComponent* node);
+
 private:
     /* Internal helpers */
-    bool appendAux(AbstractComponent* node);
-    /* TODO: If we remove this node, remove the data of all children nodes as well */
-    bool removeAux(AbstractComponent* node);
     int generateNextId();
     void showTree(int currentDepth);
 
@@ -210,6 +211,6 @@ protected:
     virtual void onPrepareToRender();
     virtual void onRenderDone();
     virtual void onStart();
-    virtual void onLayoutUpdate();
+    virtual bool onLayoutUpdate();
 };
 } // namespace components

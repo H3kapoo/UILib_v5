@@ -124,7 +124,7 @@ void ScrollBar::onStart()
     knob.transform.layer = getDepth() + 1;
 }
 
-int16_t ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
+void ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
 {
     const auto& thisTransform = getTransformRead();
     if (options.orientation == layoutcalc::LdOrientation::Horizontal)
@@ -155,8 +155,6 @@ int16_t ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
     updateLayout();
 
     knob.transform.markDirty();
-
-    return 0;
 }
 
 void ScrollBar::notifyLayoutHasChanged()

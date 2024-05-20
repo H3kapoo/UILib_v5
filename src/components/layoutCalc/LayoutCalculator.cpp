@@ -15,10 +15,9 @@ LayoutCalculator::LayoutCalculator(AbstractComponent* comp)
 glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
     const int scrollOffsetY,
     const bool isHScrollActive,
-    const bool isVScrollActive,
-    const int16_t scrollBarSize)
+    const bool isVScrollActive)
 {
-    const ScrollBarDetails sbDetails{isHScrollActive, isVScrollActive, scrollBarSize};
+    const ScrollBarDetails sbDetails{isHScrollActive, isVScrollActive};
 
     /* Reset positions */
     resetPositions();
@@ -91,8 +90,8 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
     auto rootScale = root->getTransformRead().scale;
 
     /* They are reversed, it's justified */
-    rootScale.x -= sbDetails.isVBarActive ? sbDetails.barSize : 0;
-    rootScale.y -= sbDetails.isHBarActive ? sbDetails.barSize : 0;
+    rootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
+    rootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
     for (const auto& comp : root->getNodes())
     {
         SKIP_SCROLLBAR(comp)
@@ -161,8 +160,8 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
     auto adjustedRootScale = rootBox.scale;
 
     /* They are reversed, it's justified */
-    adjustedRootScale.y -= sbDetails.isHBarActive ? sbDetails.barSize : 0;
-    adjustedRootScale.x -= sbDetails.isVBarActive ? sbDetails.barSize : 0;
+    adjustedRootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
+    adjustedRootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
 
     glm::vec2 offset = {0, 0};
 
@@ -288,8 +287,8 @@ glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale(const ScrollBarDetails& 
     remainingSpace.y -= (rootTopBorder + rootBotBorder);
 
     /* They are reversed, it's justified */
-    remainingSpace.x -= sbDetails.isVBarActive ? sbDetails.barSize : 0;
-    remainingSpace.y -= sbDetails.isHBarActive ? sbDetails.barSize : 0;
+    remainingSpace.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
+    remainingSpace.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
 
     return remainingSpace;
 }

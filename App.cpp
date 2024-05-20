@@ -14,6 +14,8 @@ void App::start(int initialWidth, int initialHeight)
 {
     rootDiv.style.color = utils::hexToVec4("#125ea9ff");
     rootDiv.style.borderColor = utils::hexToVec4("#c85c0fff");
+    rootDiv.style.enableVScroll = true;
+
     // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
     rootDiv.layout.orientation = LdOrientation::Horizontal;
@@ -21,6 +23,7 @@ void App::start(int initialWidth, int initialHeight)
     rootDiv.layout.align = LdAlignment{LdAlign::Top, LdAlign::Center};
     rootDiv.layout.internalAlign = LdAlign::Top;
     rootDiv.layout.wrap = LdWrapMode::NoWrap;
+    // rootDiv.layout.scrollBarSize = 11;
 
     div3.style.borderColor = utils::hexToVec4("#13b613ff");
     // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};

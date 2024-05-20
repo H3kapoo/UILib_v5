@@ -18,8 +18,7 @@ public:
     glm::i16vec2 calculate(const int scrollOffsetX = 0,
         const int scrollOffsetY = 0,
         const bool isHScrollActive = false,
-        const bool isVScrollActive = false,
-        const int16_t scrollBarSize = 0);
+        const bool isVScrollActive = false);
 
 private:
     struct Bounds
@@ -32,7 +31,6 @@ private:
     {
         bool isHBarActive{false};
         bool isVBarActive{false};
-        int16_t barSize{0};
     };
 
     struct OverflowResult

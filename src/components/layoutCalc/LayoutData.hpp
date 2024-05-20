@@ -85,6 +85,8 @@ struct LayoutData
     Scaling scaling{ScalePair{ScalePolicy::Absolute, 10}, ScalePair{ScalePolicy::Absolute, 10}};
     WrapMode wrap{WrapMode::NoWrap};
 
+    int16_t scrollBarSize{21};
+
     BorderSize borderSize{0};
     // glm::u16vec4 borderSize{0};
     // glm::u16vec4 marginSize{0};

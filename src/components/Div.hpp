@@ -30,6 +30,8 @@ public:
         glm::vec4 borderColor{0.0f};
         glm::vec4 color{0.0f};
         glm::vec4 hOut{0.0f};
+        bool enableHScroll{false};
+        bool enableVScroll{false};
     };
 
     Div();
@@ -51,7 +53,7 @@ private:
     void onMouseExitEvent() override;
     void onMoveEvent() override;
     void onStart() override;
-    void onLayoutUpdate() override;
+    bool onLayoutUpdate() override;
 
     // TextureLoader::TextureDataPtr textureData{nullptr};
     // TextureLoader::TextureDataPtr textureData2{nullptr};
@@ -60,9 +62,9 @@ private:
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this}; // TODO: Singleton
 
-    // TODO: Should be pointers and allocated on demand so as to not memory bloat
-    computils::ScrollBar hsb;
-    computils::ScrollBar vsb;
+    /*Note: Pointers to due memory consumption reasons. Create/delete on demand. */
+    computils::ScrollBar* hsb{nullptr};
+    computils::ScrollBar* vsb{nullptr};
 
     /* Callbacks related*/
     std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};

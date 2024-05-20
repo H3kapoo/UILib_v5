@@ -4,6 +4,7 @@
 #include "GLFW/glfw3.h"
 
 #include "../Utility.hpp"
+#include "ScrollBar.hpp"
 #include "layoutCalc/LayoutData.hpp"
 #include <algorithm>
 #include <glm/fwd.hpp>
@@ -16,13 +17,14 @@ Div::Div()
           .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
 // , textureLoader(assetloaders::TextureLoader::get())
 {
-
-    hsb.options.orientation = layoutcalc::LdOrientation::Horizontal;
-    vsb.options.orientation = layoutcalc::LdOrientation::Vertical;
+    // hsb = new computils::ScrollBar();
+    // vsb = new computils::ScrollBar();
 }
 
 Div::~Div()
 {
+    // delete hsb;
+    // delete vsb;
     // printlni("Deleting {} id {} ..", getType(), getId());
 }
 
@@ -63,8 +65,6 @@ void Div::addOnKeyListener(std::function<void(const HIDAction*)>&& func)
 
 void Div::onClickEvent()
 {
-    utils::printlni("[INF] I am node {} and onStart() called", getId());
-
     const auto& s = getState();
     if (mouseClickCb && s->mouseAction == HIDAction::Pressed) { mouseClickCb(s->mouseX, s->mouseY, s->clickedButton); }
 }
@@ -108,43 +108,58 @@ void Div::onStart()
     utils::printlni("[INF] I am node {} and onStart() called", getId());
 }
 
-void Div::onLayoutUpdate()
+bool Div::onLayoutUpdate()
 {
-    // TODO: Do not parent anything at first. Make it that somehow the next call to update is the valid one to do so
-    // Otherwise we will have to append a SB to each Div for nothing
-    const int scrollValueH = hsb.getScrollValue();
-    const int scrollValueV = vsb.getScrollValue();
-    const auto deducedOverflow = layoutCalc.calculate(scrollValueH, scrollValueV, hsb.isBarActive(), vsb.isBarActive(),
-        hsb.options.barSize);
+    const int scrollValueH = hsb ? hsb->getScrollValue() : 0;
+    const int scrollValueV = vsb ? vsb->getScrollValue() : 0;
+    const bool isHBarActive = hsb ? true : false;
+    const bool isVBarActive = vsb ? true : false;
+    const auto deducedOverflow = layoutCalc.calculate(scrollValueH, scrollValueV, isHBarActive, isVBarActive);
 
-    if (deducedOverflow.x > 0 && !hsb.isComponentParented())
+    bool needsUpdate = false;
+    if (deducedOverflow.x > 0 && hsb == nullptr)
     {
-        hsb.setActive();
-        vsb.setOppositeScrollBarActive();
-        append(&hsb);
+        hsb = new computils::ScrollBar();
+        hsb->setActive();
+        hsb->options.barSize = layout.scrollBarSize;
+        hsb->options.orientation = layoutcalc::LdOrientation::Horizontal;
+        if (vsb) { vsb->setOppositeScrollBarActive(); }
+        appendAux(hsb);
+        needsUpdate = true;
     }
-    else if (deducedOverflow.x <= 0 && hsb.isComponentParented())
+    else if (deducedOverflow.x <= 0 && hsb != nullptr)
     {
-        hsb.setInactive();
-        vsb.setOppositeScrollBarInactive();
-        remove(&hsb);
-    }
-
-    if (deducedOverflow.y > 0 && !vsb.isComponentParented())
-    {
-        vsb.setActive();
-        hsb.setOppositeScrollBarActive();
-        append(&vsb);
-    }
-    else if (deducedOverflow.y <= 0 && vsb.isComponentParented())
-    {
-        vsb.setInactive();
-        hsb.setOppositeScrollBarInactive();
-        remove(&vsb);
+        hsb->setInactive();
+        if (vsb) { vsb->setOppositeScrollBarInactive(); }
+        removeAux(hsb);
+        delete hsb;
+        hsb = nullptr;
+        needsUpdate = true;
     }
 
-    if (hsb.isComponentParented()) { hsb.updateOverflow(deducedOverflow.x); }
-    if (vsb.isComponentParented()) { vsb.updateOverflow(deducedOverflow.y); }
+    if (deducedOverflow.y > 0 && vsb == nullptr)
+    {
+        vsb = new computils::ScrollBar();
+        vsb->setActive();
+        vsb->options.barSize = layout.scrollBarSize;
+        vsb->options.orientation = layoutcalc::LdOrientation::Vertical;
+        if (hsb) { hsb->setOppositeScrollBarActive(); }
+        appendAux(vsb);
+        needsUpdate = true;
+    }
+    else if (deducedOverflow.y <= 0 && vsb != nullptr)
+    {
+        vsb->setInactive();
+        if (hsb) { hsb->setOppositeScrollBarInactive(); }
+        removeAux(vsb);
+        delete vsb;
+        vsb = nullptr;
+        needsUpdate = true;
+    }
+
+    if (hsb) { hsb->updateOverflow(deducedOverflow.x); }
+    if (vsb) { vsb->updateOverflow(deducedOverflow.y); }
+    return needsUpdate;
 }
 
 } // namespace components

@@ -27,7 +27,7 @@ private:
     void onClickEvent() override;
     void onMoveEvent() override;
     void onStart() override;
-    void onLayoutUpdate() override;
+    bool onLayoutUpdate() override;
 
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this};

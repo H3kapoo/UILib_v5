@@ -40,22 +40,23 @@ void ComponentManager::removeRoot()
 
 void ComponentManager::updateLayout()
 {
-    /* Note: due to the fact that child.onLayoutUpdate can add/remove new nodes while this function is running, it can
-       invalidate "flattenedNodes | std::views::reverse" statement pointers. Basically addition/removal while iterating.
-       Solution for now is to cache "flattenedNodes" into a temp vector and iterate over the temp vector. */
-    std::vector<AbstractComponent*> tmpFlattenedNodes;
-    tmpFlattenedNodes.reserve(flattenedNodes.size());
+    /* Note: 'onLayoutUpdate' can add/remove nodes while iterating 'flattenedNodes', fact designated by 'onLayoutUpdate'
+       returning TRUE. In such cases, we need to retrigger a layout update again to make sure that new node or the now
+       removed node action is correctly performed. We also need to stop each time we detect an update is needed as to
+       not go further an access now invalid iterators. */
+    bool needsUpdate = false;
     for (const auto& childNode : flattenedNodes | std::views::reverse)
-    {
-        tmpFlattenedNodes.push_back(childNode);
-    }
-
-    for (const auto& childNode : tmpFlattenedNodes)
     {
         if (childNode->getNodes().empty()) { continue; }
 
-        childNode->onLayoutUpdate();
+        if (childNode->onLayoutUpdate())
+        {
+            needsUpdate = true;
+            break;
+        }
     }
+
+    if (needsUpdate) { updateInternalTreeStructure("AdditionOrRemovalInLayoutUpdate"); }
 
     /* Compute viewableArea for each element */
     computeViewableArea();

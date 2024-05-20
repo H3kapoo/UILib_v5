@@ -29,7 +29,7 @@ public:
     void onStart() override;
     void onScroll() override;
 
-    int16_t adjustKnobOnMouseEvent(const int x, const int y);
+    void adjustKnobOnMouseEvent(const int x, const int y);
     void notifyLayoutHasChanged();
 
     void show(const glm::mat4& projMatrix);
@@ -49,7 +49,6 @@ public:
 private:
     int16_t overflow{0};
     int16_t scrollValue{0};
-    // int8_t knobInset{0};
     int8_t knobInset{2};
     bool isDragging{false};
     bool isActive{false};

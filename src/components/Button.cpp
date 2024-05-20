@@ -46,9 +46,10 @@ void Button::onStart()
     // printlni("[INF] I am node {} and onStart() called", getId());
 }
 
-void Button::onLayoutUpdate()
+bool Button::onLayoutUpdate()
 {
     layoutCalc.calculate();
+    return false;
 }
 
 } // namespace components

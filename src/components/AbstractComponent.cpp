@@ -351,6 +351,8 @@ void AbstractComponent::onMouseExitEvent() {}
 void AbstractComponent::onPrepareToRender() {}
 void AbstractComponent::onRenderDone() {}
 void AbstractComponent::onStart() {}
-void AbstractComponent::onLayoutUpdate() {}
-
+bool AbstractComponent::onLayoutUpdate()
+{
+    return false;
+}
 } // namespace components
