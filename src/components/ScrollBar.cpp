@@ -80,21 +80,31 @@ void ScrollBar::onClickEvent()
 
 void ScrollBar::onScroll()
 {
-    return;
     if (!isActive) { return; }
-    // utils::printlne("{} On scroll called for {}", glfwGetTime(), getId());
 
+    const auto& thisTransform = getTransformRead();
     if (options.orientation == layoutcalc::LdOrientation::Horizontal)
     {
+        const auto knobSizeX = std::max(options.barSize, (int16_t)(getTransformRW().scale.x - overflow));
+        const auto sPos = thisTransform.pos.x + knobInset;
+        const auto ePos = sPos + thisTransform.scale.x - (knobSizeX + knobInset);
+
         knob.transform.pos.x -= getState()->scrollDirection * scrollSensitivity;
-        knob.transform.pos.x = std::clamp(knob.transform.pos.x, getTransformRead().pos.x,
-            getTransformRead().pos.x + getTransformRead().scale.x);
+        knob.transform.pos.x = std::clamp(knob.transform.pos.x, sPos, ePos);
+
+        scrollValue = utils::remap(knob.transform.pos.x, sPos, ePos, 0.0f, overflow);
     }
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
     {
+        const auto knobSizeY = std::max(options.barSize, (int16_t)(getTransformRW().scale.y - overflow));
+        const int niceifyCornerOffset = isOppositeActive ? 0 : knobInset;
+        const auto sPos = thisTransform.pos.y + knobInset;
+        const auto ePos = sPos + thisTransform.scale.y - (knobSizeY + niceifyCornerOffset);
+
         knob.transform.pos.y -= getState()->scrollDirection * scrollSensitivity;
-        knob.transform.pos.y = std::clamp(knob.transform.pos.y, getTransformRead().pos.y,
-            getTransformRead().pos.y + getTransformRead().scale.y);
+        knob.transform.pos.y = std::clamp(knob.transform.pos.y, sPos, ePos);
+
+        scrollValue = utils::remap(knob.transform.pos.y, sPos, ePos, 0.0f, overflow);
     }
 
     knob.transform.markDirty();
