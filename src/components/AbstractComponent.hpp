@@ -35,7 +35,7 @@ public:
     struct ViewableArea
     {
         glm::i16vec2 start;
-        glm::i16vec2 end;
+        glm::i16vec2 scale;
     };
 
     /* Constructors */

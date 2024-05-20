@@ -74,11 +74,9 @@ void ComponentManager::render()
 
     /* Note: For alpha blending to work, we unfortunatelly have to render objects back to front and disable depth
        testing. This introduces a bit of overdraw sadly. If it's know there will be no alpha blending, 'reverse' can be
-       removed. */
+       removed and depth testing SHALL be enabled. */
     for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
-        // TODO: Render only if: comp is renderable and viewable area is not zero (basically scale on X or Y should be
-        // greater than zero
         if (!childNode->isComponentRenderable()) { continue; }
 
         if (childNode->getId() == root->getId())
@@ -90,8 +88,8 @@ void ComponentManager::render()
         else
         {
             const auto& pViewableArea = childNode->viewArea;
-            glScissor(pViewableArea.start.x, state.windowHeight - pViewableArea.end.y, pViewableArea.end.x,
-                pViewableArea.end.y - pViewableArea.start.y);
+            glScissor(pViewableArea.start.x, state.windowHeight - (pViewableArea.start.y + pViewableArea.scale.y),
+                pViewableArea.scale.x, pViewableArea.scale.y);
         }
 
         childNode->onPrepareToRender();
@@ -252,34 +250,33 @@ void ComponentManager::updateInternalTreeStructure(const std::string& action)
 
 void ComponentManager::computeViewableArea()
 {
+    /* Compute viewable area from backmost element to frontmost element. Back to front. */
     for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
         /* If we are root, viewable area is ourself */
         if (childNode->getId() == root->getId())
         {
             childNode->viewArea.start = childNode->getTransformRead().pos;
-            childNode->viewArea.end = childNode->getTransformRead().scale + childNode->getTransformRead().pos;
+            childNode->viewArea.scale = childNode->getTransformRead().scale;
         }
         /* Else we are a child, our viewable area depends on the viewable area of the parent */
         else
         {
-            // TODO: This is too simple, it depends on which side the 2 elements are on.
-
             const auto& pViewableArea = childNode->getParent()->viewArea;
             const auto& childPos = childNode->getTransformRead().pos;
             const auto& childScale = childNode->getTransformRead().scale;
 
-            const auto pViewAreaEndX = (int16_t)(0 + pViewableArea.end.x);
-            const auto pViewAreaEndY = (int16_t)(0 + pViewableArea.end.y);
+            const auto pViewAreaEndX = (int16_t)(pViewableArea.start.x + pViewableArea.scale.x);
+            const auto pViewAreaEndY = (int16_t)(pViewableArea.start.y + pViewableArea.scale.y);
 
             const auto childEndX = (int16_t)(childPos.x + childScale.x);
             const auto childEndY = (int16_t)(childPos.y + childScale.y);
 
             // Logic: maxStart(parentXY,childXY) , minEnd(parentXY,childXY);
             childNode->viewArea.start.x = std::max(pViewableArea.start.x, (int16_t)childPos.x);
-            childNode->viewArea.end.y = std::min(pViewAreaEndY, childEndY);
             childNode->viewArea.start.y = std::max(pViewableArea.start.y, (int16_t)childPos.y);
-            childNode->viewArea.end.x = std::min(pViewAreaEndX, childEndX);
+            childNode->viewArea.scale.x = std::min(pViewAreaEndX, childEndX) - childNode->viewArea.start.x;
+            childNode->viewArea.scale.y = std::min(pViewAreaEndY, childEndY) - childNode->viewArea.start.y;
         }
     }
 }

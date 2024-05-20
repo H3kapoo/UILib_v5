@@ -1,5 +1,8 @@
 #include "ScrollBar.hpp"
+#include "GLFW/glfw3.h"
 #include "layoutCalc/LayoutData.hpp"
+#include <climits>
+#include <cstdint>
 
 namespace components::computils
 {
@@ -77,7 +80,9 @@ void ScrollBar::onClickEvent()
 
 void ScrollBar::onScroll()
 {
+    return;
     if (!isActive) { return; }
+    // utils::printlne("{} On scroll called for {}", glfwGetTime(), getId());
 
     if (options.orientation == layoutcalc::LdOrientation::Horizontal)
     {
@@ -100,19 +105,23 @@ void ScrollBar::onScroll()
 
 void ScrollBar::onStart()
 {
-    manuallyAdjustDepthTo(getParent()->getDepth() + 128);
+    /* Note: In order for the scrollbars to render correctly, they need to be rendered in a "above playground" depth
+     setting. SB_DEPTH_COUNTUP value was arbitrarly choosen. Otherwise if we don't do this trick, it may happen that
+     scrollbars are rendered on top of another one or that an element will render above another scrollbar. This
+     eliminates those problems with minimal overhead. */
+    static int16_t SB_DEPTH_COUNTUP = 512;
+    manuallyAdjustDepthTo(++SB_DEPTH_COUNTUP);
     knob.transform.layer = getDepth() + 1;
 }
 
 int16_t ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
 {
-    /* Note/TODO: Normally 'knobInset' should be taken into account here as well to perfectly determine the knob
-       position and scrollValue, however the value is so small we can get away without accounting for it for now.*/
     const auto& thisTransform = getTransformRead();
     if (options.orientation == layoutcalc::LdOrientation::Horizontal)
     {
-        const auto sPos = thisTransform.pos.x;
-        const auto ePos = sPos + thisTransform.scale.x - knob.transform.scale.x;
+        const auto knobSizeX = std::max(options.barSize, (int16_t)(getTransformRW().scale.x - overflow));
+        const auto sPos = thisTransform.pos.x + knobInset;
+        const auto ePos = sPos + thisTransform.scale.x - (knobSizeX + knobInset);
 
         knob.transform.pos.x = x - mouseOffset;
         knob.transform.pos.x = std::clamp(knob.transform.pos.x, sPos, ePos);
@@ -121,8 +130,10 @@ int16_t ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
     }
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
     {
-        const auto sPos = thisTransform.pos.y;
-        const auto ePos = sPos + thisTransform.scale.y - knob.transform.scale.y;
+        const auto knobSizeY = std::max(options.barSize, (int16_t)(getTransformRW().scale.y - overflow));
+        const int niceifyCornerOffset = isOppositeActive ? 0 : knobInset;
+        const auto sPos = thisTransform.pos.y + knobInset;
+        const auto ePos = sPos + thisTransform.scale.y - (knobSizeY + niceifyCornerOffset);
 
         knob.transform.pos.y = y - mouseOffset;
         knob.transform.pos.y = std::clamp(knob.transform.pos.y, sPos, ePos);
@@ -151,6 +162,8 @@ void ScrollBar::notifyLayoutHasChanged()
 
     if (options.orientation == layoutcalc::LdOrientation::Horizontal)
     {
+        const auto knobSizeX = std::max(options.barSize, (int16_t)(getTransformRW().scale.x - overflow));
+
         /* Place background bar */
         getTransformRW().pos = {parentTransform.pos.x + rootLeftBorder,
             parentTransform.pos.y + parentTransform.scale.y - options.barSize - rootBotBorder};
@@ -160,26 +173,21 @@ void ScrollBar::notifyLayoutHasChanged()
         if (updateDueToResize)
         {
             knob.transform.pos = {
-                getTransformRead().pos.x + getTransformRead().scale.x * knobPercentageAlongBg, getTransformRW().pos.y};
+                getTransformRead().pos.x + (getTransformRead().scale.x - knobSizeX) * knobPercentageAlongBg,
+                getTransformRW().pos.y};
         }
         else
         {
-            const auto bgLen = getTransformRW().scale.x;
+            const auto bgLen = getTransformRW().scale.x - knobSizeX;
             const auto knobPos = (float)knob.transform.pos.x - getTransformRW().pos.x;
             knobPercentageAlongBg = knobPos / bgLen;
         }
-
-        /*
-            Bigger overflow -> smaller knob size
-            Smaller overflow -> bigger knob size
-        */
-        const auto knobSizeX = std::max(options.barSize, (int16_t)(getTransformRW().scale.x - overflow));
 
         /* Calculate position and scale for knob to be in bounds */
         const auto sPos = getTransformRW().pos.x + knobInset;
         const auto ePos = sPos + getTransformRW().scale.x - (knobSizeX + knobInset);
         knob.transform.pos = {
-            std::clamp(knob.transform.pos.x + knobInset, sPos, ePos), getTransformRW().pos.y + knobInset};
+            std::clamp(knob.transform.pos.x + 0 * knobInset, sPos, ePos), getTransformRW().pos.y + knobInset};
         knob.transform.scale = {knobSizeX - knobInset, getTransformRW().scale.y - knobInset * 2};
 
         /* Value needs to be recalculated here based on new overflow value and knob position. It kinda scrolls by
@@ -188,6 +196,8 @@ void ScrollBar::notifyLayoutHasChanged()
     }
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
     {
+        const auto knobSizeY = std::max(options.barSize, (int16_t)(getTransformRW().scale.y - overflow));
+
         /* Place background bar */
         const int oppositeBarSubtract = isOppositeActive ? options.barSize : 0;
         getTransformRW().pos = {parentTransform.pos.x + parentTransform.scale.x - (options.barSize + rootRightBorder),
@@ -198,28 +208,21 @@ void ScrollBar::notifyLayoutHasChanged()
         /* On component resize, knob position along the background scrollbar should be preserved */
         if (updateDueToResize)
         {
-            knob.transform.pos = {
-                getTransformRW().pos.x, getTransformRead().pos.y + getTransformRead().scale.y * knobPercentageAlongBg};
+            knob.transform.pos = {getTransformRW().pos.x,
+                getTransformRead().pos.y + (getTransformRead().scale.y - knobSizeY) * knobPercentageAlongBg};
         }
         else
         {
-            const auto bgLen = getTransformRW().scale.y;
+            const auto bgLen = getTransformRW().scale.y - knobSizeY;
             const auto knobPos = (float)knob.transform.pos.y - getTransformRW().pos.y;
             knobPercentageAlongBg = knobPos / bgLen;
         }
-
-        /*
-            Bigger overflow -> smaller knob size
-            Smaller overflow -> bigger knob size
-        */
-        const auto knobSizeY = std::max(options.barSize, (int16_t)(getTransformRW().scale.y - overflow));
 
         /* Calculate position and scale for knob to be in bounds */
         const int niceifyCornerOffset = isOppositeActive ? 0 : knobInset;
         const auto sPos = getTransformRW().pos.y + knobInset;
         const auto ePos = sPos + getTransformRW().scale.y - (knobSizeY + niceifyCornerOffset);
-        knob.transform.pos = {
-            getTransformRW().pos.x + knobInset, std::clamp(knob.transform.pos.y + knobInset, sPos, ePos)};
+        knob.transform.pos = {getTransformRW().pos.x + knobInset, std::clamp(knob.transform.pos.y, sPos, ePos)};
         knob.transform.scale = {getTransformRW().scale.x - knobInset * 2, knobSizeY - knobInset};
 
         /* Value needs to be recalculated here based on new overflow value and knob position. It kinda scrolls by
@@ -228,7 +231,6 @@ void ScrollBar::notifyLayoutHasChanged()
     }
 
     updateDueToResize = true;
-
     knob.transform.markDirty();
 }
 

@@ -49,6 +49,7 @@ public:
 private:
     int16_t overflow{0};
     int16_t scrollValue{0};
+    // int8_t knobInset{0};
     int8_t knobInset{2};
     bool isDragging{false};
     bool isActive{false};
