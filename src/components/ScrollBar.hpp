@@ -18,6 +18,8 @@ public:
     {
         layoutcalc::LdOrientation orientation{layoutcalc::LdOrientation::Horizontal};
         int16_t barSize{11};
+        int16_t knobInset{2};
+        float scrollSensitivity{10.0f};
     };
 
     ScrollBar();
@@ -38,25 +40,26 @@ public:
 
     void setOppositeScrollBarActive();
     void setOppositeScrollBarInactive();
-
     void setInactive();
     void setActive();
-    int16_t getScrollValue();
+
     bool isBarActive();
+
+    int16_t getScrollValue();
 
     Options options;
 
 private:
     int16_t overflow{0};
     int16_t scrollValue{0};
-    int8_t knobInset{2};
+
     bool isDragging{false};
     bool isActive{false};
     bool isOppositeActive{false};
     bool updateDueToResize{true};
+
     float knobPercentageAlongBg{0};
     float mouseOffset{0};
-    float scrollSensitivity{10.0f};
 
     renderer::LightWeightRenderer lwr;
     computils::LightWeightDummy knob;

@@ -41,6 +41,9 @@ void InputHelper::observe(GLFWwindow* window)
 
     /* Mouse scroll callback */
     glfwSetScrollCallback(window, scrollCallback);
+
+    /* Window maximized/minimized callback */
+    glfwSetWindowMaximizeCallback(window, windowMaximizedCallback);
 }
 
 // ------ STATIC CALLBACKS ------
@@ -85,11 +88,19 @@ void InputHelper::dropCallback(GLFWwindow*, int dropCount, const char** paths)
 }
 
 /**
- * @brief Static gateway needed to access window mouse scroll data the OS.
+ * @brief Static gateway needed to access window mouse scroll data from the OS.
  */
 void InputHelper::scrollCallback(GLFWwindow*, double xOffset, double yOffset)
 {
     get().invokeOnScrollAction(xOffset, yOffset);
+}
+
+/**
+ * @brief Static gateway needed to access window maximized/minimized data from the OS.
+ */
+void InputHelper::windowMaximizedCallback(GLFWwindow*, int maximized)
+{
+    get().invokeOnWindowMaximizedAction(maximized);
 }
 
 // ------ INVOKE ----------
@@ -153,14 +164,24 @@ void InputHelper::invokeOnMouseDropAction(int dropCount, const char** paths)
 }
 
 /**
- * @brief Invoke the mouse drop action event.
+ * @brief Invoke the mouse scroll action event.
  *
- * @param dropCount  Number of paths dropped.
- * @param paths      Vector of string paths.
+ * @param xOffset  -1 or 1 offset of scroll wheel X.
+ * @param yOffset  -1 or 1 offset of scroll wheel Y.
  */
 void InputHelper::invokeOnScrollAction(double xOffset, double yOffset)
 {
     if (gOnMouseScrollActionCallback) gOnMouseScrollActionCallback(xOffset, yOffset);
+}
+
+/**
+ * @brief Invoke the window minimized/maximized action event.
+ *
+ * @param maximized  Int bool denoting if window is now maximized or not.
+ */
+void InputHelper::invokeOnWindowMaximizedAction(int maximized)
+{
+    if (gOnWindowMaximizedActionCallback) gOnWindowMaximizedActionCallback(maximized);
 }
 
 // ------ REGISTER ----------
@@ -222,6 +243,16 @@ void InputHelper::registerOnMouseDropAction(const std::function<void(double drop
 void InputHelper::registerOnMouseScrollAction(const std::function<void(double xOffset, double yOffset)> callback)
 {
     gOnMouseScrollActionCallback = callback;
+}
+
+/**
+ * @brief Register callback to be called on window minimized/maximized action.
+ *
+ * @param callback Callback to be called.
+ */
+void InputHelper::registerOnWindowMaximizedAction(const std::function<void(int maximized)> callback)
+{
+    gOnWindowMaximizedActionCallback = callback;
 }
 
 } // namespace inputManagement

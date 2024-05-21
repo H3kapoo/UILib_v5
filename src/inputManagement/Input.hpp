@@ -22,6 +22,7 @@ public:
     void registerOnMouseMoveAction(const std::function<void(double xPos, double yPos)> callback);
     void registerOnMouseDropAction(const std::function<void(double dropCount, const char** paths)> callback);
     void registerOnMouseScrollAction(const std::function<void(double xOffset, double yOffset)> callback);
+    void registerOnWindowMaximizedAction(const std::function<void(int maximized)> callback);
 
 private:
     InputHelper() = default;
@@ -34,6 +35,7 @@ private:
     static void mouseMoveCallback(GLFWwindow* window, double xPos, double yPos);
     static void dropCallback(GLFWwindow* window, int dropCount, const char** paths);
     static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+    static void windowMaximizedCallback(GLFWwindow* window, int maximied);
 
     void invokeOnKeyAction(int key, int scanCode, int action, int mods);
     void invokeOnWindowResizeAction(int width, int height);
@@ -41,6 +43,7 @@ private:
     void invokeOnMouseMoveAction(double xPos, double yPos);
     void invokeOnMouseDropAction(int dropCount, const char** paths);
     void invokeOnScrollAction(double xOffset, double yOffset);
+    void invokeOnWindowMaximizedAction(int maximized);
 
     /* Only one window can be observed at the time for now */
     GLFWwindow* gObservedWindow{nullptr};
@@ -51,5 +54,6 @@ private:
     std::function<void(double xPos, double yPos)> gOnMouseMoveActionCallback;
     std::function<void(int dropCount, const char** paths)> gOnMouseDropActionCallback;
     std::function<void(double xOffset, double yOffset)> gOnMouseScrollActionCallback;
+    std::function<void(int maximized)> gOnWindowMaximizedActionCallback;
 };
 } // namespace inputManagement

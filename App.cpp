@@ -29,7 +29,7 @@ void App::start(int initialWidth, int initialHeight)
     // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
 
     div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Absolute, 400}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 100}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 3410}, {LdScalePolicy::Absolute, 100}};
     div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
     div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 590}};
 
@@ -68,7 +68,8 @@ void App::start(int initialWidth, int initialHeight)
         {
             if (btn == MouseButton::Left)
             {
-                // rootDiv.showTree();
+                // div3.style.knobInset = div3.style.knobInset == 2 ? 0 : 2;
+                rootDiv.showTree();
                 // uint8_t x = (uint8_t)rootDiv.layout.orientation + 1;
                 // rootDiv.layout.orientation = LdOrientation(x % (uint8_t)LdOrientation::COUNT);
             }
@@ -132,4 +133,9 @@ void App::resizeEvent(int newWidth, int newHeight)
 void App::mouseScrollEvent(double offsetX, double offsetY)
 {
     componentManager.mouseScrollEvent(offsetX, offsetY);
+}
+
+void App::windowMaximizedEvent(int maximized)
+{
+    componentManager.windowMaximizedEvent(maximized);
 }

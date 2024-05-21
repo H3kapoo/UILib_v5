@@ -128,6 +128,10 @@ int main()
 
     inputManagement::InputHelper::get().registerOnMouseScrollAction(std::bind(&App::mouseScrollEvent, &app,
         std::placeholders::_1, std::placeholders::_2));
+
+    inputManagement::InputHelper::get().registerOnWindowMaximizedAction(std::bind(&App::windowMaximizedEvent, &app,
+        std::placeholders::_1));
+
     app.start(startWindowWidth, startWindowHeight);
 
     // glEnable(GL_DEPTH_TEST);

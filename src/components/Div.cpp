@@ -1,13 +1,10 @@
 #include "Div.hpp"
 
 #include "AbstractComponent.hpp"
-#include "GLFW/glfw3.h"
 
 #include "../Utility.hpp"
 #include "ScrollBar.hpp"
 #include "layoutCalc/LayoutData.hpp"
-#include <algorithm>
-#include <glm/fwd.hpp>
 
 namespace components
 {
@@ -16,17 +13,9 @@ Div::Div()
     : AbstractComponent({.type = CompType::Div,
           .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
 // , textureLoader(assetloaders::TextureLoader::get())
-{
-    // hsb = new computils::ScrollBar();
-    // vsb = new computils::ScrollBar();
-}
+{}
 
-Div::~Div()
-{
-    // delete hsb;
-    // delete vsb;
-    // printlni("Deleting {} id {} ..", getType(), getId());
-}
+Div::~Div() {}
 
 void Div::onPrepareToRender()
 {
@@ -116,14 +105,13 @@ bool Div::onLayoutUpdate()
     const bool isVBarActive = vsb ? true : false;
     const auto deducedOverflow = layoutCalc.calculate(scrollValueH, scrollValueV, isHBarActive, isVBarActive);
 
+    /* Following IFs add or remove scrollbars on demand */
     bool needsUpdate = false;
-    if (deducedOverflow.x > 0 && hsb == nullptr)
+    if (style.enableHScroll && deducedOverflow.x > 0 && hsb == nullptr)
     {
         hsb = new computils::ScrollBar();
         hsb->setActive();
-        hsb->options.barSize = layout.scrollBarSize;
-        hsb->options.orientation = layoutcalc::LdOrientation::Horizontal;
-        if (vsb) { vsb->setOppositeScrollBarActive(); }
+
         appendAux(hsb);
         needsUpdate = true;
     }
@@ -137,12 +125,11 @@ bool Div::onLayoutUpdate()
         needsUpdate = true;
     }
 
-    if (deducedOverflow.y > 0 && vsb == nullptr)
+    if (style.enableVScroll && deducedOverflow.y > 0 && vsb == nullptr)
     {
         vsb = new computils::ScrollBar();
         vsb->setActive();
-        vsb->options.barSize = layout.scrollBarSize;
-        vsb->options.orientation = layoutcalc::LdOrientation::Vertical;
+
         if (hsb) { hsb->setOppositeScrollBarActive(); }
         appendAux(vsb);
         needsUpdate = true;
@@ -150,15 +137,34 @@ bool Div::onLayoutUpdate()
     else if (deducedOverflow.y <= 0 && vsb != nullptr)
     {
         vsb->setInactive();
-        if (hsb) { hsb->setOppositeScrollBarInactive(); }
         removeAux(vsb);
         delete vsb;
         vsb = nullptr;
         needsUpdate = true;
     }
 
-    if (hsb) { hsb->updateOverflow(deducedOverflow.x); }
-    if (vsb) { vsb->updateOverflow(deducedOverflow.y); }
+    /* Options can change at runtime. This updates those and the scrollbars overflow calculations. */
+    if (hsb)
+    {
+        hsb->options.knobInset = style.knobInset;
+        hsb->options.scrollSensitivity = style.scrollSensitivity;
+        hsb->options.barSize = layout.scrollBarSize;
+        hsb->options.orientation = layoutcalc::LdOrientation::Horizontal;
+
+        if (vsb) { vsb->setOppositeScrollBarActive(); }
+        hsb->updateOverflow(deducedOverflow.x);
+    }
+
+    if (vsb)
+    {
+        vsb->options.knobInset = style.knobInset;
+        vsb->options.scrollSensitivity = style.scrollSensitivity;
+        vsb->options.barSize = layout.scrollBarSize;
+        vsb->options.orientation = layoutcalc::LdOrientation::Vertical;
+
+        if (hsb) { hsb->setOppositeScrollBarInactive(); }
+        vsb->updateOverflow(deducedOverflow.y);
+    }
     return needsUpdate;
 }
 

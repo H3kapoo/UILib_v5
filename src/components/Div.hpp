@@ -19,19 +19,15 @@ class Div : public AbstractComponent
 public:
     struct Style
     {
-        // struct BorderColor
-        // {
-        //     glm::vec4 left{0};
-        //     glm::vec4 right{0};
-        //     glm::vec4 top{0};
-        //     glm::vec4 bottom{0};
-        // };
-
         glm::vec4 borderColor{0.0f};
         glm::vec4 color{0.0f};
         glm::vec4 hOut{0.0f};
-        bool enableHScroll{false};
-        bool enableVScroll{false};
+
+        /* Scrollbar related */
+        bool enableHScroll{true};
+        bool enableVScroll{true};
+        int16_t knobInset{2};
+        float scrollSensitivity{10.0f};
     };
 
     Div();

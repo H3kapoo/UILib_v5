@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cstdlib>
 #include <glm/fwd.hpp>
 #include <ranges>
 
@@ -206,13 +207,15 @@ void ComponentManager::keyEvent(int key, HIDAction action, int mods)
             break;
         }
     }
-
-    // utils::printlne("key: {} act: {} mods: {}", key, (uint8_t)action, mods);
 }
 
 void ComponentManager::resizeEvent(int newWidth, int newHeight)
 {
-    // utils::printlni("Resizing...");
+    // utils::printlni("Resizing to {} {}...", newWidth, newHeight);
+
+    const int16_t WINDOW_FULLSCREEN_SENSE_VALUE = 200;
+    bool sensedWindowFullscreen = std::abs(newWidth - state.windowWidth) > WINDOW_FULLSCREEN_SENSE_VALUE;
+
     state.windowWidth = newWidth;
     state.windowHeight = newHeight;
     glm::mat4 projMatrix = glm::ortho(0.0f, (float)newWidth, (float)newHeight, 0.0f, renderer::Renderer::MAX_LAYERS,
@@ -231,6 +234,23 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
 
     /* Layout also needs to be recalculated */
     updateLayout();
+
+    /* Note: Due to (1) 'windowMaximizedEvent' being called before 'resizeEvent', update layout from (1) is useless due
+       to it having to deal with previous window size values. Due to previous values, scrollbars knob size will not be
+       displayed correctly. A trick to solving this is to somehow "sense" that the window might of been resized to
+       fullscreen or restored to previous size, in which case, trigger a layout updated again. This is not related only
+       to scrollbars, but this is where the bug was found.*/
+    if (sensedWindowFullscreen)
+    {
+        utils::printlni("Sensed window going fullscreen or reverse.");
+        updateLayout();
+    }
+}
+
+void ComponentManager::windowMaximizedEvent(int maximized)
+{
+    (void)maximized;
+    /* Note: On linux, this is called before 'resizeEvent' */
 }
 
 void ComponentManager::updateInternalTreeStructure(const std::string& action)

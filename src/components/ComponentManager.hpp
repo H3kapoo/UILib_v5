@@ -85,6 +85,13 @@ public:
      */
     void resizeEvent(int newWidth, int newHeight);
 
+    /**
+     * @brief Function to be called by Input management when window is minimized/maximized.
+     *
+     * @param maximized - Is window maximized now or not
+     */
+    void windowMaximizedEvent(int maximized);
+
 private:
     /* Internal helpers */
 

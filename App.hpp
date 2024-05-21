@@ -26,6 +26,7 @@ public:
     void mouseScrollEvent(double offsetX, double offsetY);
     void keyEvent(int key, HIDAction action, int mods);
     void resizeEvent(int newWidth, int newHeight);
+    void windowMaximizedEvent(int maximized);
 
 private:
     ComponentManager componentManager;
