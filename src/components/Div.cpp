@@ -41,9 +41,10 @@ void Div::refreshOptions()
         style.enableHScroll.isNew = false;
 
         /* Don't do anything really as scrollbars will pop up when needed */
-        if (style.enableHScroll.value)
+        if (style.enableHScroll.value && hsb == nullptr)
         {
             // Empty
+            updateLayout();
         }
         /* Else if horizontal scrollbar is present, remove it.*/
         else if (!style.enableHScroll.value && hsb)
@@ -52,12 +53,17 @@ void Div::refreshOptions()
             removeAux(hsb);
             delete hsb;
             hsb = nullptr;
+            layoutNeedsUpdate = true;
             utils::printlnw("Scrollbar removed by user");
         }
         utils::printlnw("Got here from user");
     }
 
-    if (layoutNeedsUpdate) { updateLayout(); }
+    if (layoutNeedsUpdate)
+    {
+        getState()->triggerTreeUpdate("FromRuntime");
+        updateLayout();
+    }
 }
 
 void Div::onPrepareToRender()
