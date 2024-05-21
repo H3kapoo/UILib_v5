@@ -114,6 +114,7 @@ void ScrollBar::onScroll()
 
 void ScrollBar::onStart()
 {
+    // Later note: doesnt really work. Needs fixing. BUG.
     /* Note: In order for the scrollbars to render correctly, they need to be rendered in a "above playground" depth
      setting. SB_DEPTH_COUNTUP value was arbitrarly choosen. Otherwise if we don't do this trick, it may happen that
      scrollbars are rendered on top of another one or that an element will render above another scrollbar. This

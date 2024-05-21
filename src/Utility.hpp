@@ -11,6 +11,14 @@ namespace utils
 {
 
 #define ENABLE_ALL_LOGGING 1
+
+/**
+ * @brief Get the GLFW time since application start. For obvious reasons, we first need to have a valid glfw context.
+ *
+ * @return double - time in seconds
+ */
+double getTime();
+
 /**
    @brief Simple functions for outputting to stdout. Later this can be used to output to a specific file for debugging
 */
@@ -31,21 +39,21 @@ template <typename... Args> void println(std::format_string<Args...> s, Args&&..
 template <typename... Args> void printlni(std::format_string<Args...> s, Args&&... args)
 {
 #if ENABLE_ALL_LOGGING == 1
-    printf("\033[38;5;15m[INF] %s\033[0m\n", std::format(s, std::forward<Args>(args)...).c_str());
+    printf("\033[38;5;15m[%f][INF] %s\033[0m\n", getTime(), std::format(s, std::forward<Args>(args)...).c_str());
 #endif
 }
 
 template <typename... Args> void printlnw(std::format_string<Args...> s, Args&&... args)
 {
 #if ENABLE_ALL_LOGGING == 1
-    printf("\033[38;5;159m[WRN] %s\033[0m\n", std::format(s, std::forward<Args>(args)...).c_str());
+    printf("\033[38;5;159m[%f][WRN] %s\033[0m\n", getTime(), std::format(s, std::forward<Args>(args)...).c_str());
 #endif
 }
 
 template <typename... Args> void printlne(std::format_string<Args...> s, Args&&... args)
 {
 #if ENABLE_ALL_LOGGING == 1
-    printf("\033[38;5;196m[ERR] %s\033[0m\n", std::format(s, std::forward<Args>(args)...).c_str());
+    printf("\033[38;5;196m[%f][ERR] %s\033[0m\n", getTime(), std::format(s, std::forward<Args>(args)...).c_str());
 #endif
 }
 
@@ -88,3 +96,20 @@ inline float remap(float value, const float startA, const float endA, const floa
 }
 
 } // namespace utils
+
+// Not really an utility but we need it outside of a scope for clean access
+/* Utility needed so that we know when we refresh components options what options really need reloading and actions to
+   be taken. */
+template <typename T> struct NewValue
+{
+    NewValue(const T& _value)
+        : value{_value}
+    {}
+
+    T value;
+    bool isNew{true};
+};
+
+// Deduction guide
+NewValue(const char*) -> NewValue<const char*>;
+template <typename T> NewValue(const T&) -> NewValue<T>;

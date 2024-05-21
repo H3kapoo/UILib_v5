@@ -114,6 +114,8 @@ void AbstractComponent::updateLayout()
     state ? state->triggerLayoutUpdate() : void();
 }
 
+void AbstractComponent::refreshOptions() {}
+
 void AbstractComponent::details()
 {
     const auto pid = parent ? std::to_string(parent->getId()) : "N/A";

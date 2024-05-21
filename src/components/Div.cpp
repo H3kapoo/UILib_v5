@@ -5,6 +5,7 @@
 #include "../Utility.hpp"
 #include "ScrollBar.hpp"
 #include "layoutCalc/LayoutData.hpp"
+#include <string_view>
 
 namespace components
 {
@@ -12,10 +13,52 @@ Div::Div()
     // : AbstractComponent({.type = "Div", .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl"})
     : AbstractComponent({.type = CompType::Div,
           .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
-// , textureLoader(assetloaders::TextureLoader::get())
+    //   .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl"})
+
+    , textureLoader(assetloaders::TextureLoader::get())
 {}
 
 Div::~Div() {}
+
+void Div::refreshOptions()
+{
+    /* Maybe layout needs to be recalculated for changes to take effect */
+    bool layoutNeedsUpdate = false;
+
+    /* Note: User shall ensure valid path. */
+    if (style.imagePath.isNew)
+    {
+        style.imagePath.isNew = false;
+        if (!std::string_view(style.imagePath.value).empty())
+        {
+            textureData = textureLoader.loadTexture(style.imagePath.value);
+            utils::printlni("Div {} reloaded image to {}", getId(), style.imagePath.value);
+        }
+    }
+
+    if (style.enableHScroll.isNew)
+    {
+        style.enableHScroll.isNew = false;
+
+        /* Don't do anything really as scrollbars will pop up when needed */
+        if (style.enableHScroll.value)
+        {
+            // Empty
+        }
+        /* Else if horizontal scrollbar is present, remove it.*/
+        else if (!style.enableHScroll.value && hsb)
+        {
+            if (vsb) { vsb->setOppositeScrollBarInactive(); }
+            removeAux(hsb);
+            delete hsb;
+            hsb = nullptr;
+            utils::printlnw("Scrollbar removed by user");
+        }
+        utils::printlnw("Got here from user");
+    }
+
+    if (layoutNeedsUpdate) { updateLayout(); }
+}
 
 void Div::onPrepareToRender()
 {
@@ -107,7 +150,7 @@ bool Div::onLayoutUpdate()
 
     /* Following IFs add or remove scrollbars on demand */
     bool needsUpdate = false;
-    if (style.enableHScroll && deducedOverflow.x > 0 && hsb == nullptr)
+    if (style.enableHScroll.value && deducedOverflow.x > 0 && hsb == nullptr)
     {
         hsb = new computils::ScrollBar();
         hsb->setActive();
@@ -115,7 +158,7 @@ bool Div::onLayoutUpdate()
         appendAux(hsb);
         needsUpdate = true;
     }
-    else if (deducedOverflow.x <= 0 && hsb != nullptr)
+    else if ((deducedOverflow.x <= 0 || !style.enableHScroll.value) && hsb != nullptr)
     {
         hsb->setInactive();
         if (vsb) { vsb->setOppositeScrollBarInactive(); }
@@ -125,7 +168,7 @@ bool Div::onLayoutUpdate()
         needsUpdate = true;
     }
 
-    if (style.enableVScroll && deducedOverflow.y > 0 && vsb == nullptr)
+    if (style.enableVScroll.value && deducedOverflow.y > 0 && vsb == nullptr)
     {
         vsb = new computils::ScrollBar();
         vsb->setActive();
@@ -134,7 +177,7 @@ bool Div::onLayoutUpdate()
         appendAux(vsb);
         needsUpdate = true;
     }
-    else if (deducedOverflow.y <= 0 && vsb != nullptr)
+    else if ((deducedOverflow.y <= 0 || !style.enableVScroll.value) && vsb != nullptr)
     {
         vsb->setInactive();
         removeAux(vsb);

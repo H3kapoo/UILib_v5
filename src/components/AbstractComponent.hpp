@@ -82,8 +82,6 @@ public:
     /**
      * @brief Remove single component from this component.
      *
-     * @note DO NOT APPEND if parent isnt part of the tree yet. This will set depth incorrectly.
-     *
      * @param comp - trivial
      *
      * @return True if comp exists and got removed. False otherwise.
@@ -118,6 +116,25 @@ public:
     bool removeDeep(AbstractComponent* node);
 
     /**
+     * @brief Append multiple components to this component. This doesn't call layout update. Use with care.
+     *
+     * @param comps - trivial
+     *
+     * @return True if at least one comp got appended successfully. False otherwise.
+     **/
+    bool appendAux(AbstractComponent* node);
+
+    /**
+     * @brief Remove single component from this component. This doesn't call layout update. Use with care.
+     *
+     * @param comp - trivial
+     *
+     * @return True if comp exists and got removed. False otherwise.
+     */
+    /* TODO: If we remove this node, remove the data of all children nodes as well */
+    bool removeAux(AbstractComponent* node);
+
+    /**
      * @brief Triggers instant recalculation of the layout starting from root.
      *
      * Function needs to be used in cases when user updates layout settings at runtime in order for those settings to
@@ -125,6 +142,12 @@ public:
      *
      */
     void updateLayout();
+
+    /**
+     * @brief Some options need direct user involvement to be refreshed (e.g. texture reloading) and this function
+     * provides a way to tell the component to refresh any dependencies it might have.
+     */
+    virtual void refreshOptions();
 
     /**
      * @brief Show details about this component.
@@ -160,10 +183,6 @@ public:
 
     /* Direct getters */
     layoutcalc::LayoutData layout;
-
-    /* TODO: If we remove this node, remove the data of all children nodes as well */
-    bool appendAux(AbstractComponent* node);
-    bool removeAux(AbstractComponent* node);
 
 private:
     /* Internal helpers */
