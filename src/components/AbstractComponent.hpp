@@ -134,18 +134,20 @@ public:
     /* TODO: If we remove this node, remove the data of all children nodes as well */
     bool removeAux(AbstractComponent* node);
 
-    /**
-     * @brief Triggers instant recalculation of the layout starting from root.
-     *
-     * Function needs to be used in cases when user updates layout settings at runtime in order for those settings to
-     * get applied right now.
-     *
-     */
-    void updateLayout();
+    // /**
+    //  * @brief Triggers instant recalculation of the layout starting from root.
+    //  *
+    //  * Function needs to be used in cases when user updates layout settings at runtime in order for those settings to
+    //  * get applied right now.
+    //  *
+    //  */
+    // void updateLayout();
 
     /**
      * @brief Some options need direct user involvement to be refreshed (e.g. texture reloading) and this function
      * provides a way to tell the component to refresh any dependencies it might have.
+     *
+     * @return True if some update was deduced and needed to be done.
      */
     virtual void refreshOptions();
 
@@ -164,8 +166,6 @@ public:
     /* Trivial getters */
     std::vector<AbstractComponent*>& getNodes();
     AbstractComponent* getParent();
-    /* Can be used to modify the global state */
-    UIState* getState();
     int getDepth() const;
     int getId() const;
     const CompType& getType() const;
@@ -179,7 +179,6 @@ public:
 
     /* Trivial setters */
     void setRenderable(const bool canBeRendered);
-    void manuallyAdjustDepthTo(const int newDepth);
 
     /* Direct getters */
     layoutcalc::LayoutData layout;
@@ -220,6 +219,18 @@ private:
     std::vector<AbstractComponent*> children;
 
 protected:
+    /* Can be used to modify the global state */
+    UIState* getState();
+
+    void manuallyAdjustDepthTo(const int newDepth);
+
+    /**
+     * @brief Change current component shader to another shader from path.
+     *
+     * @param newShaderPath - trivial
+     */
+    void changeShaderTo(const std::string& newShaderPath);
+
     /* Virtuals called by CM */
     virtual void onClickEvent();
     virtual void onMoveEvent();

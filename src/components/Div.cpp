@@ -16,13 +16,23 @@ Div::Div()
     //   .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl"})
 
     , textureLoader(assetloaders::TextureLoader::get())
-{}
+{
+    // To be removed
+    // textureData = textureLoader.loadTexture("/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg");
+}
 
 Div::~Div() {}
 
 void Div::refreshOptions()
 {
+    if (getState() == nullptr)
+    {
+        utils::printlne("State not found for refreshing options on node id {}", getId());
+        return;
+    }
+
     /* Maybe layout needs to be recalculated for changes to take effect */
+    AbstractComponent::refreshOptions();
     bool layoutNeedsUpdate = false;
 
     /* Note: User shall ensure valid path. */
@@ -32,7 +42,13 @@ void Div::refreshOptions()
         if (!std::string_view(style.imagePath.value).empty())
         {
             textureData = textureLoader.loadTexture(style.imagePath.value);
+            changeShaderTo("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl");
             utils::printlni("Div {} reloaded image to {}", getId(), style.imagePath.value);
+        }
+        else
+        {
+            changeShaderTo("/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl");
+            textureData = nullptr;
         }
     }
 
@@ -40,11 +56,11 @@ void Div::refreshOptions()
     {
         style.enableHScroll.isNew = false;
 
-        /* Don't do anything really as scrollbars will pop up when needed */
+        /* Do update layout as scrollbars will pop up if needed */
         if (style.enableHScroll.value && hsb == nullptr)
         {
-            // Empty
-            updateLayout();
+            // Update
+            layoutNeedsUpdate = true;
         }
         /* Else if horizontal scrollbar is present, remove it.*/
         else if (!style.enableHScroll.value && hsb)
@@ -54,16 +70,31 @@ void Div::refreshOptions()
             delete hsb;
             hsb = nullptr;
             layoutNeedsUpdate = true;
-            utils::printlnw("Scrollbar removed by user");
         }
-        utils::printlnw("Got here from user");
     }
 
-    if (layoutNeedsUpdate)
+    if (style.enableVScroll.isNew)
     {
-        getState()->triggerTreeUpdate("FromRuntime");
-        updateLayout();
+        style.enableVScroll.isNew = false;
+
+        /* Do update layout as scrollbars will pop up if needed */
+        if (style.enableVScroll.value && vsb == nullptr)
+        {
+            // Update
+            layoutNeedsUpdate = true;
+        }
+        /* Else if horizontal scrollbar is present, remove it.*/
+        else if (!style.enableVScroll.value && vsb)
+        {
+            if (hsb) { hsb->setOppositeScrollBarInactive(); }
+            removeAux(vsb);
+            delete vsb;
+            vsb = nullptr;
+            layoutNeedsUpdate = true;
+        }
     }
+
+    if (layoutNeedsUpdate) { getState()->isSomeLayoutDirty = true; }
 }
 
 void Div::onPrepareToRender()
@@ -72,11 +103,15 @@ void Div::onPrepareToRender()
         layout.borderSize.right);
 
     getShader().setActiveShaderId(getShaderId());
-    getShader().setVec4f("uInnerColor", style.color);
-    getShader().setVec4f("uBorderColor", style.borderColor);
-    getShader().setVec4f("uBorderSize", border);
-    getShader().setVec2f("uResolution", getTransformRead().scale);
-    // getShader().set2DTextureUnit("uTexture", textureData->id, GL_TEXTURE0);
+
+    if (textureData == nullptr)
+    {
+        getShader().setVec4f("uInnerColor", style.color);
+        getShader().setVec4f("uBorderColor", style.borderColor);
+        getShader().setVec4f("uBorderSize", border);
+        getShader().setVec2f("uResolution", getTransformRead().scale);
+    }
+    else { getShader().set2DTextureUnit("uTexture", textureData->id, GL_TEXTURE0); }
 }
 
 void Div::onRenderDone() {}

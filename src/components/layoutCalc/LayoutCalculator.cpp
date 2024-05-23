@@ -96,30 +96,26 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
     {
         SKIP_SCROLLBAR(comp)
 
-        if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
-        {
-            comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value;
-        }
+        const auto& compHPolicy = comp->layout.scaling.value.horizontal.policy;
+        const auto& compVPolicy = comp->layout.scaling.value.vertical.policy;
+        const auto& compHVal = comp->layout.scaling.value.horizontal.val;
+        const auto& compVVal = comp->layout.scaling.value.vertical.val;
+        if (compHPolicy == LdScalePolicy::Absolute) { comp->getTransformRW().scale.x = compHVal; }
 
-        if (comp->layout.scaling.vertical.policy == LdScalePolicy::Absolute)
-        {
-            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value;
-        }
+        if (compVPolicy == LdScalePolicy::Absolute) { comp->getTransformRW().scale.y = compVVal; }
 
-        if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
+        if (compHPolicy == LdScalePolicy::Relative)
         {
             const auto rootLeftBorder = root->layout.borderSize.left;
             const auto rootRightBorder = root->layout.borderSize.right;
-            comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
-                                             (rootScale.x - (rootLeftBorder + rootRightBorder));
+            comp->getTransformRW().scale.x = compHVal * (rootScale.x - (rootLeftBorder + rootRightBorder));
         }
 
-        if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
+        if (compVPolicy == LdScalePolicy::Relative)
         {
             const auto rootTopBorder = root->layout.borderSize.top;
             const auto rootBotBorder = root->layout.borderSize.bottom;
-            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
-                                             (rootScale.y - (rootTopBorder + rootBotBorder));
+            comp->getTransformRW().scale.y = compVVal * (rootScale.y - (rootTopBorder + rootBotBorder));
         }
     }
 }
@@ -135,11 +131,11 @@ void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetai
 
         auto& childPos = childNode->getTransformRW().pos;
         auto& childScale = childNode->getTransformRW().scale;
-        if (root->layout.orientation == LayoutData::Orientation::Horizontal)
+        if (root->layout.orientation.value == LayoutData::Orientation::Horizontal)
         {
             childPos.x = getNextFillPolicyPosition(startXY.x, childScale.x, remainingSpace.x);
         }
-        else if (root->layout.orientation == LayoutData::Orientation::Vertical)
+        else if (root->layout.orientation.value == LayoutData::Orientation::Vertical)
         {
             childPos.y = getNextFillPolicyPosition(startXY.y, childScale.y, remainingSpace.y);
         }
@@ -165,7 +161,7 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
 
     glm::vec2 offset = {0, 0};
 
-    switch (root->layout.align.horizontal)
+    switch (root->layout.align.value.horizontal)
     {
         case LdAlign::Left: {
             offset.x = rootLeftBorder;
@@ -185,7 +181,7 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
             break;
     }
 
-    switch (root->layout.align.vertical)
+    switch (root->layout.align.value.vertical)
     {
         case LdAlign::Top: {
             offset.y = rootTopBorder;
@@ -217,7 +213,7 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
 float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace)
 {
     float nextPos = 0;
-    switch (root->layout.fillPolicy)
+    switch (root->layout.fillPolicy.value)
     {
         case LayoutData::FillPolicy::Tightly: {
             nextPos = bufferPos;
@@ -269,12 +265,12 @@ glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale(const ScrollBarDetails& 
         SKIP_SCROLLBAR(childNode)
 
         const auto& chScale = childNode->getTransformRead().scale;
-        if (root->layout.orientation == LdOrientation::Horizontal)
+        if (root->layout.orientation.value == LdOrientation::Horizontal)
         {
             accumulatedSize.x += chScale.x;
             accumulatedSize.y = chScale.y > accumulatedSize.y ? chScale.y : accumulatedSize.y;
         }
-        else if (root->layout.orientation == LdOrientation::Vertical)
+        else if (root->layout.orientation.value == LdOrientation::Vertical)
         {
             accumulatedSize.x = chScale.x > accumulatedSize.x ? chScale.x : accumulatedSize.x;
             accumulatedSize.y += chScale.y;

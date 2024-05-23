@@ -2,6 +2,7 @@
 
 #include "../renderer/Renderer.hpp"
 #include "AbstractComponent.hpp"
+#include <vector>
 
 namespace components
 {
@@ -41,6 +42,13 @@ public:
      * PostRender pass can be used by the component to render additional assets on top of it, for example.
      */
     void render();
+
+    /**
+     * @brief Components can call 'refreshOptions' and that function deduces what actions are needed to be done for the
+     * options to apply correctly. This function applies those deduced actions.
+     *
+     */
+    void applyRefreshActions();
 
     /* Events handlers */
     /**

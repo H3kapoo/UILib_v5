@@ -59,6 +59,9 @@ void ComponentManager::updateLayout()
 
     if (needsUpdate) { updateInternalTreeStructure("AdditionOrRemovalInLayoutUpdate"); }
 
+    /* Should all be calculated by now. This is such that we don't recalculate if not needed. */
+    state.isSomeLayoutDirty = false;
+
     /* Compute viewableArea for each element */
     computeViewableArea();
 }
@@ -100,6 +103,15 @@ void ComponentManager::render()
     }
 
     glDisable(GL_SCISSOR_TEST);
+}
+
+void ComponentManager::applyRefreshActions()
+{
+    if (state.isSomeLayoutDirty)
+    {
+        state.isSomeLayoutDirty = false;
+        updateInternalTreeStructure("RefreshSome");
+    }
 }
 
 void ComponentManager::mouseClickEvent(MouseButton button, HIDAction action, ActiveModifiersBits mods)

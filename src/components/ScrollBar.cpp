@@ -109,7 +109,8 @@ void ScrollBar::onScroll()
     knob.transform.markDirty();
 
     updateDueToResize = false;
-    updateLayout();
+    // updateLayout();
+    getState() ? getState()->triggerLayoutUpdate() : void();
 }
 
 void ScrollBar::onStart()
@@ -152,7 +153,8 @@ void ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
     }
 
     updateDueToResize = false;
-    updateLayout();
+    // updateLayout();
+    getState() ? getState()->triggerLayoutUpdate() : void();
 
     knob.transform.markDirty();
 }

@@ -100,9 +100,9 @@ inline float remap(float value, const float startA, const float endA, const floa
 // Not really an utility but we need it outside of a scope for clean access
 /* Utility needed so that we know when we refresh components options what options really need reloading and actions to
    be taken. */
-template <typename T> struct NewValue
+template <typename T> struct ReloadableValue
 {
-    NewValue(const T& _value)
+    ReloadableValue(const T& _value)
         : value{_value}
     {}
 
@@ -111,5 +111,5 @@ template <typename T> struct NewValue
 };
 
 // Deduction guide
-NewValue(const char*) -> NewValue<const char*>;
-template <typename T> NewValue(const T&) -> NewValue<T>;
+ReloadableValue(const char*) -> ReloadableValue<const char*>;
+template <typename T> ReloadableValue(const T&) -> ReloadableValue<T>;

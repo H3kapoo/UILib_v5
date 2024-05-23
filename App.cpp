@@ -17,7 +17,7 @@ void App::start(int initialWidth, int initialHeight)
     rootDiv.style.enableVScroll = false;
     rootDiv.style.enableVScroll = false;
     // rootDiv.style.imagePath = NewValue("/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg");
-    // rootDiv.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+    // rootDiv.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/dummy.jpg";
 
     // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
@@ -63,6 +63,8 @@ void App::start(int initialWidth, int initialHeight)
 
     utils::printlni("size of {}B", sizeof(Div));
     utils::printlni("size of {}Kb", sizeof(Div) / 1024.0f);
+    // rootDiv.refreshOptions();
+
     // div5.addOnEnterListener([this]() { div5.style.color = utils::hexToVec4("#336b55ff"); });
     // div5.addOnExitListener([this]() { div5.style.color = utils::hexToVec4("#3b1526ff"); });
 
@@ -71,8 +73,15 @@ void App::start(int initialWidth, int initialHeight)
         {
             if (btn == MouseButton::Left)
             {
-                rootDiv.style.enableHScroll = !rootDiv.style.enableHScroll.value;
-                rootDiv.refreshOptions();
+                // rootDiv.layout.orientation = LdOrientation::Vertical;
+                div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 400}};
+                div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 600}};
+
+                // rootDiv.updateLayout();
+                div3.refreshOptions();
+                div4.refreshOptions();
+
+                componentManager.applyRefreshActions();
             }
         });
 

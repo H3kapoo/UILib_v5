@@ -24,11 +24,11 @@ public:
 
         /* Background texture path */
         // std::optional<const char*> imagePath{""};
-        NewValue<const char*> imagePath{""};
+        ReloadableValue<const char*> imagePath{""};
 
         /* Scrollbar related */
-        NewValue<bool> enableHScroll{true};
-        NewValue<bool> enableVScroll{true};
+        ReloadableValue<bool> enableHScroll{true};
+        ReloadableValue<bool> enableVScroll{true};
         int16_t knobInset{2};
         float scrollSensitivity{10.0f};
     };
