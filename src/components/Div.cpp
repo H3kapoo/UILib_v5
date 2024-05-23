@@ -41,48 +41,6 @@ void Div::imagePathChanged()
         changeShaderTo("/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl");
         textureData = nullptr;
     }
-
-    // if (style.enableHScroll.isNew)
-    // {
-    //     style.enableHScroll.isNew = false;
-
-    //     /* Do update layout as scrollbars will pop up if needed */
-    //     if (style.enableHScroll.value && hsb == nullptr)
-    //     {
-    //         // Update
-    //         layoutNeedsUpdate = true;
-    //     }
-    //     /* Else if horizontal scrollbar is present, remove it.*/
-    //     else if (!style.enableHScroll.value && hsb)
-    //     {
-    //         if (vsb) { vsb->setOppositeScrollBarInactive(); }
-    //         removeAux(hsb);
-    //         delete hsb;
-    //         hsb = nullptr;
-    //         layoutNeedsUpdate = true;
-    //     }
-    // }
-
-    // if (style.enableVScroll.isNew)
-    // {
-    //     style.enableVScroll.isNew = false;
-
-    //     /* Do update layout as scrollbars will pop up if needed */
-    //     if (style.enableVScroll.value && vsb == nullptr)
-    //     {
-    //         // Update
-    //         layoutNeedsUpdate = true;
-    //     }
-    //     /* Else if horizontal scrollbar is present, remove it.*/
-    //     else if (!style.enableVScroll.value && vsb)
-    //     {
-    //         if (hsb) { hsb->setOppositeScrollBarInactive(); }
-    //         removeAux(vsb);
-    //         delete vsb;
-    //         vsb = nullptr;
-    //         layoutNeedsUpdate = true;
-    //     }
-    // }
 }
 
 void Div::onPrepareToRender()

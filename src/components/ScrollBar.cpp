@@ -96,9 +96,9 @@ void ScrollBar::onScroll()
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
     {
         const auto knobSizeY = std::max(options.barSize, (int16_t)(getTransformRW().scale.y - overflow));
-        const int niceifyCornerOffset = isOppositeActive ? options.knobInset : 0;
+        const int niceifyCornerOffset = isOppositeActive ? 0 : options.knobInset;
         const auto sPos = thisTransform.pos.y + options.knobInset;
-        const auto ePos = sPos + thisTransform.scale.y - (knobSizeY - niceifyCornerOffset);
+        const auto ePos = sPos + thisTransform.scale.y - (knobSizeY + niceifyCornerOffset);
 
         knob.transform.pos.y -= getState()->scrollDirection * options.scrollSensitivity;
         knob.transform.pos.y = std::clamp(knob.transform.pos.y, sPos, ePos);
@@ -109,7 +109,6 @@ void ScrollBar::onScroll()
     knob.transform.markDirty();
 
     updateDueToResize = false;
-    // updateLayout();
     getState() ? getState()->triggerLayoutUpdate() : void();
 }
 
@@ -147,9 +146,9 @@ void ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
     {
         const auto knobSizeY = std::max(options.barSize, (int16_t)(getTransformRW().scale.y - overflow));
-        const int niceifyCornerOffset = isOppositeActive ? options.knobInset : 0;
+        const int niceifyCornerOffset = isOppositeActive ? 0 : options.knobInset;
         const auto sPos = thisTransform.pos.y + options.knobInset;
-        const auto ePos = sPos + thisTransform.scale.y - (knobSizeY - niceifyCornerOffset);
+        const auto ePos = sPos + thisTransform.scale.y - (knobSizeY + niceifyCornerOffset);
 
         knob.transform.pos.y = y - mouseOffset;
         knob.transform.pos.y = std::clamp(knob.transform.pos.y, sPos, ePos);
@@ -158,7 +157,6 @@ void ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
     }
 
     updateDueToResize = false;
-    // updateLayout();
     getState() ? getState()->triggerLayoutUpdate() : void();
 
     knob.transform.markDirty();
@@ -234,9 +232,10 @@ void ScrollBar::notifyLayoutHasChanged()
         }
 
         /* Calculate position and scale for knob to be in bounds */
-        const int niceifyCornerOffset = isOppositeActive ? options.knobInset : 0;
+        // const int niceifyCornerOffset = isOppositeActive ? options.knobInset : 0;
+        const int niceifyCornerOffset = isOppositeActive ? 0 : options.knobInset;
         const auto sPos = getTransformRW().pos.y + options.knobInset;
-        const auto ePos = sPos + getTransformRW().scale.y - (knobSizeY - niceifyCornerOffset);
+        const auto ePos = sPos + getTransformRW().scale.y - (knobSizeY + niceifyCornerOffset);
         knob.transform.pos = {getTransformRW().pos.x + options.knobInset, std::clamp(knob.transform.pos.y, sPos, ePos)};
         knob.transform.scale = {getTransformRW().scale.x - options.knobInset * 2, knobSizeY - options.knobInset};
 
