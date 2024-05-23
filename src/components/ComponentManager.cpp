@@ -145,9 +145,9 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
         /* If mouse is still pressed, we cannot switch who's the hovered element just yet. */
         if (state.mouseAction == HIDAction::Pressed) { return; }
 
-        const auto& childBox = childNode->getTransformRead();
-        bool xConstraint = state.mouseX >= childBox.pos.x && state.mouseX <= childBox.pos.x + childBox.scale.x;
-        bool yConstraint = state.mouseY >= childBox.pos.y && state.mouseY <= childBox.pos.y + childBox.scale.y;
+        const auto& childVA = childNode->viewArea;
+        bool xConstraint = state.mouseX >= childVA.start.x && state.mouseX <= childVA.start.x + childVA.scale.x;
+        bool yConstraint = state.mouseY >= childVA.start.y && state.mouseY <= childVA.start.y + childVA.scale.y;
         if (xConstraint && yConstraint)
         {
             /* This means we are still the currently hoeverd node, no need to do anything */
