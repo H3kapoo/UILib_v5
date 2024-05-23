@@ -39,7 +39,9 @@ private:
         float overflowY{0};
     };
 
-    OverflowResult calculateAndApplyOverflow(const int16_t scrollOffsetX, const int16_t scrollOffsetY);
+    OverflowResult calculateAndApplyOverflow(const int16_t scrollOffsetX,
+        const int16_t scrollOffsetY,
+        const ScrollBarDetails& sbDetails);
     float getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace);
     void calculateAndApplyAlignOffset(const ScrollBarDetails& sbDetails);
     void calculateAndApplyPosition(const ScrollBarDetails& sbDetails);

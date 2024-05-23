@@ -121,7 +121,12 @@ void ScrollBar::onStart()
      scrollbars are rendered on top of another one or that an element will render above another scrollbar. This
      eliminates those problems with minimal overhead. */
     static int16_t SB_DEPTH_COUNTUP = 512;
-    manuallyAdjustDepthTo(++SB_DEPTH_COUNTUP);
+
+    // Note: Do this in case you render back to front (alpha blending)
+    //  manuallyAdjustDepthTo(++SB_DEPTH_COUNTUP);
+
+    // Note: Do this in case you render front to back
+    manuallyAdjustDepthTo(--SB_DEPTH_COUNTUP);
     knob.transform.layer = getDepth() + 1;
 }
 

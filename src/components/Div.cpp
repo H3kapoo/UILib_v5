@@ -21,18 +21,14 @@ Div::Div()
     // style.imagePath.onReload = []() {};
 }
 
-Div::~Div() {}
+Div::~Div()
+{
+    if (hsb) { delete hsb; }
+    if (vsb) { delete vsb; }
+}
 
 void Div::imagePathChanged()
 {
-    utils::printlne("Function called {}", getId());
-
-    if (getState() == nullptr)
-    {
-        utils::printlne("State not found for refreshing options on node id {}", getId());
-        return;
-    }
-
     /* Note: User shall ensure valid path. */
     if (!std::string_view(style.imagePath.value).empty())
     {

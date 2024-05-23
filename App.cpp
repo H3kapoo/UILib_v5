@@ -2,6 +2,7 @@
 #include "src/UIState.hpp"
 #include "src/Utility.hpp"
 #include "src/components/AbstractComponent.hpp"
+#include "src/components/Div.hpp"
 #include "src/components/layoutCalc/LayoutData.hpp"
 
 App::~App()
@@ -14,8 +15,8 @@ void App::start(int initialWidth, int initialHeight)
 {
     rootDiv.style.color = utils::hexToVec4("#125ea9ff");
     rootDiv.style.borderColor = utils::hexToVec4("#c85c0fff");
-    rootDiv.style.enableVScroll = false;
-    rootDiv.style.enableVScroll = false;
+    // rootDiv.style.enableHScroll = false;
+    // rootDiv.style.enableVScroll = false;
     // rootDiv.style.imagePath = NewValue("/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg");
     // rootDiv.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/dummy.jpg";
 
@@ -32,7 +33,7 @@ void App::start(int initialWidth, int initialHeight)
     // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
 
     div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Absolute, 400}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 100}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 800}};
     div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
     div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 590}};
 
@@ -64,15 +65,20 @@ void App::start(int initialWidth, int initialHeight)
     utils::printlni("size of {}B", sizeof(Div));
     utils::printlni("size of {}Kb", sizeof(Div) / 1024.0f);
 
-    // void (*onReload)();
-    // utils::printlni("size of {}B", sizeof(onReload));
-
     // utils::printlni("size of {}", sizeof(Div::AssignReloadable<bool>));
     // rootDiv.refreshOptions();
 
     // div5.addOnEnterListener([this]() { div5.style.color = utils::hexToVec4("#336b55ff"); });
     // div5.addOnExitListener([this]() { div5.style.color = utils::hexToVec4("#3b1526ff"); });
 
+    Div* newDiv = new Div();
+    newDiv->style.color = utils::hexToVec4("#a10b88ff");
+    newDiv->layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 200}};
+    newDiv->style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+
+    divs.push_back(newDiv);
+
+    div6.append(newDiv);
     rootDiv.addClickListener(
         [this](auto, auto, MouseButton btn)
         {
@@ -80,14 +86,14 @@ void App::start(int initialWidth, int initialHeight)
             {
                 // rootDiv.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
                 // div3.style.enableVScroll = !div3.style.enableVScroll;
-                div3.style.scrollSensitivity += 10;
-                if (div3.style.scrollSensitivity > 40)
-                {
-                    div3.style.scrollSensitivity = 10;
-                    utils::printlnw("Back to 10");
-                }
-
-                rootDiv.refreshLayout();
+                // div3.style.scrollSensitivity += 10;
+                // if (div3.style.scrollSensitivity > 40)
+                // {
+                //     div3.style.scrollSensitivity = 10;
+                //     utils::printlnw("Back to 10");
+                // }
+                // rootDiv.append(&div5);
+                // rootDiv.refreshLayout();
 
                 // rootDiv.layout.orientation = LdOrientation::Vertical;
                 // div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 400}};

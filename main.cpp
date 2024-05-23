@@ -141,8 +141,8 @@ int main()
         // ZoneScoped;
         frameCounter(window);
 
-        // glfwWaitEvents();
-        glfwPollEvents();
+        glfwWaitEvents();
+        // glfwPollEvents();
         app.update();
         glfwSwapBuffers(window);
     }

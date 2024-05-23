@@ -32,14 +32,19 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
     calculateAndApplyAlignOffset(sbDetails);
 
     /* Overflow calculation */
-    const auto overflow = calculateAndApplyOverflow(scrollOffsetX, scrollOffsetY);
+    const auto overflow = calculateAndApplyOverflow(scrollOffsetX, scrollOffsetY, sbDetails);
 
     return {overflow.overflowX, overflow.overflowY};
 }
 
 LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(const int16_t scrollOffsetX,
-    const int16_t scrollOffsetY)
+    const int16_t scrollOffsetY,
+    const ScrollBarDetails& sbDetails)
 {
+    const auto xPlus = sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
+    const auto yPlus = sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
+
+    // If Y_BAR active => add to X_BAR overflow +scrollbarSize
     const auto bounds = getChildrenBound(root->getNodes());
 
     const auto rootLeftBorder = root->layout.borderSize.left;
@@ -48,7 +53,7 @@ LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(con
     const auto rootBotBorder = root->layout.borderSize.bottom;
 
     const auto& rts = root->getTransformRW().scale -
-                      glm::vec2{rootLeftBorder + rootRightBorder, rootBotBorder + rootTopBorder};
+                      glm::vec2{rootLeftBorder + rootRightBorder + yPlus, rootBotBorder + rootTopBorder + xPlus};
     const auto& rtp = root->getTransformRW().pos + glm::vec2{rootLeftBorder, rootTopBorder};
     const auto rte = rtp + rts;
 
@@ -65,6 +70,7 @@ LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(con
 
     totalOverflowY += topOverflow > 0 ? topOverflow : 0;
     totalOverflowY += bottomOverflow > 0 ? bottomOverflow : 0;
+
     // utils::printlnw("HO {} VO {}", totalOverflowX, totalOverflowY);
 
     /* Overflow application */
