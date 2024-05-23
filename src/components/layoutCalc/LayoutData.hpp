@@ -63,7 +63,7 @@ struct LayoutData
     struct ScalePair
     {
         ScalePolicy policy;
-        float val;
+        float value;
     };
 
     struct Scaling
@@ -80,12 +80,12 @@ struct LayoutData
         uint16_t bottom{0};
     };
 
-    ReloadableValue<Orientation> orientation{Orientation::Horizontal};
-    ReloadableValue<FillPolicy> fillPolicy{FillPolicy::Tightly};
-    ReloadableValue<Alignment> align{Alignment{Align::Left, Align::Top}};
-    ReloadableValue<Align> internalAlign{Align::Top};
-    ReloadableValue<Scaling> scaling{{ScalePair{ScalePolicy::Absolute, 10}, ScalePair{ScalePolicy::Absolute, 10}}};
-    ReloadableValue<WrapMode> wrap{WrapMode::NoWrap};
+    Orientation orientation{Orientation::Horizontal};
+    FillPolicy fillPolicy{FillPolicy::Tightly};
+    Alignment align{Alignment{Align::Left, Align::Top}};
+    Align internalAlign{Align::Top};
+    Scaling scaling{ScalePair{ScalePolicy::Absolute, 10}, ScalePair{ScalePolicy::Absolute, 10}};
+    WrapMode wrap{WrapMode::NoWrap};
 
     int16_t scrollBarSize{21};
 

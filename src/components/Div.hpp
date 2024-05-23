@@ -20,23 +20,19 @@ public:
     {
         glm::vec4 borderColor{0.0f};
         glm::vec4 color{0.0f};
-        glm::vec4 hOut{0.0f};
 
         /* Background texture path */
-        // std::optional<const char*> imagePath{""};
-        ReloadableValue<const char*> imagePath{""};
+        AssignReloadable<const char*> imagePath{""};
 
         /* Scrollbar related */
-        ReloadableValue<bool> enableHScroll{true};
-        ReloadableValue<bool> enableVScroll{true};
+        bool enableHScroll{true};
+        bool enableVScroll{true};
         int16_t knobInset{2};
         float scrollSensitivity{10.0f};
     };
 
     Div();
     ~Div();
-
-    void refreshOptions() override;
 
     void addClickListener(std::function<void(int, int, MouseButton)>&& func);
     void addOnEnterListener(std::function<void()>&& func);
@@ -46,6 +42,8 @@ public:
     Style style;
 
 private:
+    void imagePathChanged();
+
     void onPrepareToRender() override;
     void onRenderDone() override;
     void onClickEvent() override;
@@ -57,11 +55,10 @@ private:
     bool onLayoutUpdate() override;
 
     TextureLoader::TextureDataPtr textureData{nullptr};
-    // TextureLoader::TextureDataPtr textureData2{nullptr};
     TextureLoader& textureLoader;
 
     /* Layout related */
-    layoutcalc::LayoutCalculator layoutCalc{this}; // TODO: Singleton
+    layoutcalc::LayoutCalculator layoutCalc{this};
 
     /*Note: Pointers to due memory consumption reasons. Create/delete on demand. */
     computils::ScrollBar* hsb{nullptr};

@@ -17,84 +17,76 @@ Div::Div()
 
     , textureLoader(assetloaders::TextureLoader::get())
 {
-    // To be removed
-    // textureData = textureLoader.loadTexture("/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg");
+    style.imagePath.onReload = std::bind(&Div::imagePathChanged, this);
+    // style.imagePath.onReload = []() {};
 }
 
 Div::~Div() {}
 
-void Div::refreshOptions()
+void Div::imagePathChanged()
 {
+    utils::printlne("Function called {}", getId());
+
     if (getState() == nullptr)
     {
         utils::printlne("State not found for refreshing options on node id {}", getId());
         return;
     }
 
-    /* Maybe layout needs to be recalculated for changes to take effect */
-    AbstractComponent::refreshOptions();
-    bool layoutNeedsUpdate = false;
-
     /* Note: User shall ensure valid path. */
-    if (style.imagePath.isNew)
+    if (!std::string_view(style.imagePath.value).empty())
     {
-        style.imagePath.isNew = false;
-        if (!std::string_view(style.imagePath.value).empty())
-        {
-            textureData = textureLoader.loadTexture(style.imagePath.value);
-            changeShaderTo("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl");
-            utils::printlni("Div {} reloaded image to {}", getId(), style.imagePath.value);
-        }
-        else
-        {
-            changeShaderTo("/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl");
-            textureData = nullptr;
-        }
+        textureData = textureLoader.loadTexture(style.imagePath.value);
+        changeShaderTo("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl");
+        utils::printlni("Div {} reloaded image to {}", getId(), style.imagePath.value);
+    }
+    else
+    {
+        changeShaderTo("/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl");
+        textureData = nullptr;
     }
 
-    if (style.enableHScroll.isNew)
-    {
-        style.enableHScroll.isNew = false;
+    // if (style.enableHScroll.isNew)
+    // {
+    //     style.enableHScroll.isNew = false;
 
-        /* Do update layout as scrollbars will pop up if needed */
-        if (style.enableHScroll.value && hsb == nullptr)
-        {
-            // Update
-            layoutNeedsUpdate = true;
-        }
-        /* Else if horizontal scrollbar is present, remove it.*/
-        else if (!style.enableHScroll.value && hsb)
-        {
-            if (vsb) { vsb->setOppositeScrollBarInactive(); }
-            removeAux(hsb);
-            delete hsb;
-            hsb = nullptr;
-            layoutNeedsUpdate = true;
-        }
-    }
+    //     /* Do update layout as scrollbars will pop up if needed */
+    //     if (style.enableHScroll.value && hsb == nullptr)
+    //     {
+    //         // Update
+    //         layoutNeedsUpdate = true;
+    //     }
+    //     /* Else if horizontal scrollbar is present, remove it.*/
+    //     else if (!style.enableHScroll.value && hsb)
+    //     {
+    //         if (vsb) { vsb->setOppositeScrollBarInactive(); }
+    //         removeAux(hsb);
+    //         delete hsb;
+    //         hsb = nullptr;
+    //         layoutNeedsUpdate = true;
+    //     }
+    // }
 
-    if (style.enableVScroll.isNew)
-    {
-        style.enableVScroll.isNew = false;
+    // if (style.enableVScroll.isNew)
+    // {
+    //     style.enableVScroll.isNew = false;
 
-        /* Do update layout as scrollbars will pop up if needed */
-        if (style.enableVScroll.value && vsb == nullptr)
-        {
-            // Update
-            layoutNeedsUpdate = true;
-        }
-        /* Else if horizontal scrollbar is present, remove it.*/
-        else if (!style.enableVScroll.value && vsb)
-        {
-            if (hsb) { hsb->setOppositeScrollBarInactive(); }
-            removeAux(vsb);
-            delete vsb;
-            vsb = nullptr;
-            layoutNeedsUpdate = true;
-        }
-    }
-
-    if (layoutNeedsUpdate) { getState()->isSomeLayoutDirty = true; }
+    //     /* Do update layout as scrollbars will pop up if needed */
+    //     if (style.enableVScroll.value && vsb == nullptr)
+    //     {
+    //         // Update
+    //         layoutNeedsUpdate = true;
+    //     }
+    //     /* Else if horizontal scrollbar is present, remove it.*/
+    //     else if (!style.enableVScroll.value && vsb)
+    //     {
+    //         if (hsb) { hsb->setOppositeScrollBarInactive(); }
+    //         removeAux(vsb);
+    //         delete vsb;
+    //         vsb = nullptr;
+    //         layoutNeedsUpdate = true;
+    //     }
+    // }
 }
 
 void Div::onPrepareToRender()
@@ -142,34 +134,17 @@ void Div::onClickEvent()
     if (mouseClickCb && s->mouseAction == HIDAction::Pressed) { mouseClickCb(s->mouseX, s->mouseY, s->clickedButton); }
 }
 
-void Div::onKeyEvent()
-{
-    // const auto& s = getState();
-    // if (keyEventCb) { keyEventCb(s->keyboardActionState); }
-    // if (s->keyboardActionState[GLFW_KEY_A] == HIDAction::Pressed)
-    // {
-    //     overflow -= 15;
-    //     overflow = std::clamp(overflow, 0, deducedOverflow);
-    // }
-    // if (s->keyboardActionState[GLFW_KEY_D] == HIDAction::Pressed)
-    // {
-    //     overflow += 15;
-    //     overflow = std::clamp(overflow, 0, deducedOverflow);
-    // }
-    // s->triggerLayoutUpdate();
-}
+void Div::onKeyEvent() {}
 
 void Div::onMouseEnterEvent()
 {
-    // utils::printlni("[H] div element id {} has entered hover!", getId());
-    // style.color = style.hIn;
+
     if (mouseEnterCb) { mouseEnterCb(); }
 }
 
 void Div::onMouseExitEvent()
 {
-    // utils::printlni("[H] div element id {} has exited hover!", getId());
-    // style.color = style.hOut;
+
     if (mouseExitCb) { mouseExitCb(); }
 }
 
@@ -177,7 +152,6 @@ void Div::onMoveEvent() {}
 
 void Div::onStart()
 {
-    style.hOut = style.color;
     utils::printlni("[INF] I am node {} and onStart() called", getId());
 }
 
@@ -191,7 +165,7 @@ bool Div::onLayoutUpdate()
 
     /* Following IFs add or remove scrollbars on demand */
     bool needsUpdate = false;
-    if (style.enableHScroll.value && deducedOverflow.x > 0 && hsb == nullptr)
+    if (style.enableHScroll && deducedOverflow.x > 0 && hsb == nullptr)
     {
         hsb = new computils::ScrollBar();
         hsb->setActive();
@@ -199,7 +173,7 @@ bool Div::onLayoutUpdate()
         appendAux(hsb);
         needsUpdate = true;
     }
-    else if ((deducedOverflow.x <= 0 || !style.enableHScroll.value) && hsb != nullptr)
+    else if ((deducedOverflow.x <= 0 || !style.enableHScroll) && hsb != nullptr)
     {
         hsb->setInactive();
         if (vsb) { vsb->setOppositeScrollBarInactive(); }
@@ -209,7 +183,7 @@ bool Div::onLayoutUpdate()
         needsUpdate = true;
     }
 
-    if (style.enableVScroll.value && deducedOverflow.y > 0 && vsb == nullptr)
+    if (style.enableVScroll && deducedOverflow.y > 0 && vsb == nullptr)
     {
         vsb = new computils::ScrollBar();
         vsb->setActive();
@@ -218,7 +192,7 @@ bool Div::onLayoutUpdate()
         appendAux(vsb);
         needsUpdate = true;
     }
-    else if ((deducedOverflow.y <= 0 || !style.enableVScroll.value) && vsb != nullptr)
+    else if ((deducedOverflow.y <= 0 || !style.enableVScroll) && vsb != nullptr)
     {
         vsb->setInactive();
         removeAux(vsb);

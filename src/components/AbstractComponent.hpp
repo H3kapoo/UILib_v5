@@ -134,22 +134,14 @@ public:
     /* TODO: If we remove this node, remove the data of all children nodes as well */
     bool removeAux(AbstractComponent* node);
 
-    // /**
-    //  * @brief Triggers instant recalculation of the layout starting from root.
-    //  *
-    //  * Function needs to be used in cases when user updates layout settings at runtime in order for those settings to
-    //  * get applied right now.
-    //  *
-    //  */
-    // void updateLayout();
-
     /**
-     * @brief Some options need direct user involvement to be refreshed (e.g. texture reloading) and this function
-     * provides a way to tell the component to refresh any dependencies it might have.
+     * @brief Triggers instant recalculation of the layout starting from root.
      *
-     * @return True if some update was deduced and needed to be done.
+     * Function needs to be used in cases when user updates layout settings at runtime in order for those settings to
+     * get applied right now.
+     *
      */
-    virtual void refreshOptions();
+    void refreshLayout();
 
     /**
      * @brief Show details about this component.

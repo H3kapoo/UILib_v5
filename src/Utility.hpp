@@ -2,10 +2,11 @@
 
 #include <cstdio>
 #include <format>
+#include <functional>
 #include <glm/glm.hpp>
 
 // Just for now
-#include "/home/hekapoo/Downloads/tracy/public/tracy/Tracy.hpp"
+// #include "/home/hekapoo/Downloads/tracy/public/tracy/Tracy.hpp"
 
 namespace utils
 {
@@ -100,16 +101,22 @@ inline float remap(float value, const float startA, const float endA, const floa
 // Not really an utility but we need it outside of a scope for clean access
 /* Utility needed so that we know when we refresh components options what options really need reloading and actions to
    be taken. */
-template <typename T> struct ReloadableValue
+template <typename T> struct AssignReloadable
 {
-    ReloadableValue(const T& _value)
+    AssignReloadable(const T& _value)
         : value{_value}
     {}
 
-    T value;
-    bool isNew{true};
-};
+    AssignReloadable& operator=(const T& _value)
+    {
+        value = _value;
 
-// Deduction guide
-ReloadableValue(const char*) -> ReloadableValue<const char*>;
-template <typename T> ReloadableValue(const T&) -> ReloadableValue<T>;
+        if (onReload) onReload();
+        else { utils::printlne("AssignReloadable no funcion provided"); };
+
+        return *this;
+    }
+
+    T value;
+    std::function<void()> onReload{nullptr};
+};

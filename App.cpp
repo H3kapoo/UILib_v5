@@ -63,6 +63,11 @@ void App::start(int initialWidth, int initialHeight)
 
     utils::printlni("size of {}B", sizeof(Div));
     utils::printlni("size of {}Kb", sizeof(Div) / 1024.0f);
+
+    // void (*onReload)();
+    // utils::printlni("size of {}B", sizeof(onReload));
+
+    // utils::printlni("size of {}", sizeof(Div::AssignReloadable<bool>));
     // rootDiv.refreshOptions();
 
     // div5.addOnEnterListener([this]() { div5.style.color = utils::hexToVec4("#336b55ff"); });
@@ -73,15 +78,20 @@ void App::start(int initialWidth, int initialHeight)
         {
             if (btn == MouseButton::Left)
             {
+                // rootDiv.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+                // div3.style.enableVScroll = !div3.style.enableVScroll;
+                div3.style.scrollSensitivity += 10;
+                if (div3.style.scrollSensitivity > 40)
+                {
+                    div3.style.scrollSensitivity = 10;
+                    utils::printlnw("Back to 10");
+                }
+
+                rootDiv.refreshLayout();
+
                 // rootDiv.layout.orientation = LdOrientation::Vertical;
-                div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 400}};
-                div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 600}};
-
-                // rootDiv.updateLayout();
-                div3.refreshOptions();
-                div4.refreshOptions();
-
-                componentManager.applyRefreshActions();
+                // div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 400}};
+                // div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 600}};
             }
         });
 

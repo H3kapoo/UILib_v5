@@ -106,61 +106,12 @@ bool AbstractComponent::removeDeep(AbstractComponent* comp)
     return false;
 }
 
-// void AbstractComponent::updateLayout()
-// {
-//     /* If a node is added into a subtree that is not yet part of the big stateful tree, we will not
-//        have a "state" object to update layout on, so we just don't do it now. Update for the whole new
-//        subtree will be done when the root of this subtree is added to the main tree. */
-//     state ? state->triggerLayoutUpdate() : void();
-// }
-
-void AbstractComponent::refreshOptions()
+void AbstractComponent::refreshLayout()
 {
-    if (getState() == nullptr)
-    {
-        utils::printlne("State not found for refreshing options on node id {}", getId());
-        return;
-    }
-    // TODO: Better deduction of whats actually needed to be done by the program. Maybe we need just to recalculate the
-    // layout, not to flatten the tree as well for e.g.
-    bool isLayoutUpdateNeeded = false;
-    if (layout.orientation.isNew)
-    {
-        layout.orientation.isNew = false;
-        isLayoutUpdateNeeded = true;
-    }
-
-    if (layout.fillPolicy.isNew)
-    {
-        layout.fillPolicy.isNew = false;
-        isLayoutUpdateNeeded = true;
-    }
-
-    if (layout.align.isNew)
-    {
-        layout.align.isNew = false;
-        isLayoutUpdateNeeded = true;
-    }
-
-    if (layout.internalAlign.isNew)
-    {
-        layout.internalAlign.isNew = false;
-        isLayoutUpdateNeeded = true;
-    }
-
-    if (layout.scaling.isNew)
-    {
-        layout.scaling.isNew = false;
-        isLayoutUpdateNeeded = true;
-    }
-
-    if (layout.wrap.isNew)
-    {
-        layout.wrap.isNew = false;
-        isLayoutUpdateNeeded = true;
-    }
-
-    if (isLayoutUpdateNeeded) { getState()->isSomeLayoutDirty = true; }
+    /* If a node is added into a subtree that is not yet part of the big stateful tree, we will not
+       have a "state" object to update layout on, so we just don't do it now. Update for the whole new
+       subtree will be done when the root of this subtree is added to the main tree. */
+    state ? state->triggerLayoutUpdate() : void();
 }
 
 void AbstractComponent::changeShaderTo(const std::string& newShaderPath)

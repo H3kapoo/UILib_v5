@@ -1,7 +1,5 @@
 #include <cstdio>
-#include <memory>
 #include <string>
-#include <vector>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -15,7 +13,6 @@ int frameCount = 0;
 double previousTime = 0;
 void frameCounter(GLFWwindow* window)
 {
-    ZoneScoped;
     double currentTime = glfwGetTime();
     double delta = currentTime - previousTime;
     frameCount++;
@@ -134,21 +131,18 @@ int main()
 
     app.start(startWindowWidth, startWindowHeight);
 
-    // glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     // glEnable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    // glEnable(GL_ALPHA_TEST);
-    // glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // glBlendFunc(GL_SRC_ALPHA, GL_);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     while (!glfwWindowShouldClose(window))
     {
         // ZoneScoped;
         frameCounter(window);
 
-        glfwWaitEvents();
-        // glfwPollEvents();
+        // glfwWaitEvents();
+        glfwPollEvents();
         app.update();
         glfwSwapBuffers(window);
     }

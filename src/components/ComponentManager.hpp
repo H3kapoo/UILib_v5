@@ -43,13 +43,6 @@ public:
      */
     void render();
 
-    /**
-     * @brief Components can call 'refreshOptions' and that function deduces what actions are needed to be done for the
-     * options to apply correctly. This function applies those deduced actions.
-     *
-     */
-    void applyRefreshActions();
-
     /* Events handlers */
     /**
      * @brief Function to be called by Input management when mouse click happens.
