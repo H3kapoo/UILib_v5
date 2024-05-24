@@ -90,7 +90,6 @@ struct LayoutData
     int16_t scrollBarSize{21};
 
     BorderSize borderSize{0};
-    // glm::u16vec4 borderSize{0};
     // glm::u16vec4 marginSize{0};
     // glm::u16vec4 paddingSize{0};
 

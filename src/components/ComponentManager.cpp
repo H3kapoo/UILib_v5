@@ -149,9 +149,13 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
         /* If mouse is still pressed, we cannot switch who's the hovered element just yet. */
         if (state.mouseAction == HIDAction::Pressed) { return; }
 
+        /* Note: When using borders, it can happen that clicking on DEPTH_1 element border to actually trigger click
+           DEPTH_2 element directly underneath the border. This is really a minor issue and really visible and
+           noticeable only when using big sized borders.*/
         const auto& childVA = childNode->viewArea;
         bool xConstraint = state.mouseX >= childVA.start.x && state.mouseX <= childVA.start.x + childVA.scale.x;
         bool yConstraint = state.mouseY >= childVA.start.y && state.mouseY <= childVA.start.y + childVA.scale.y;
+
         if (xConstraint && yConstraint)
         {
             /* This means we are still the currently hoeverd node, no need to do anything */
@@ -162,6 +166,10 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
             state.hoveredId = childNode->getId();
             shouldNotify = true;
             break;
+        }
+        else
+        {
+            // utils::printlne("Conditions not met")
         }
     }
 
@@ -279,18 +287,25 @@ void ComponentManager::computeViewableArea()
     /* Compute viewable area from backmost element to frontmost element. Back to front. */
     for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
+        const auto& childLeftBorder = childNode->layout.borderSize.left;
+        const auto& childRightBorder = childNode->layout.borderSize.right;
+        const auto& childTopBorder = childNode->layout.borderSize.top;
+        const auto& childBotBorder = childNode->layout.borderSize.bottom;
+
         /* If we are root, viewable area is ourself */
         if (childNode->getId() == root->getId())
         {
-            childNode->viewArea.start = childNode->getTransformRead().pos;
-            childNode->viewArea.scale = childNode->getTransformRead().scale;
+            childNode->viewArea.start = childNode->getTransformRead().pos + glm::vec2(childLeftBorder, childTopBorder);
+            childNode->viewArea.scale = childNode->getTransformRead().scale -
+                                        glm::vec2(childLeftBorder + childRightBorder, childTopBorder + childBotBorder);
         }
         /* Else we are a child, our viewable area depends on the viewable area of the parent */
         else
         {
             const auto& pViewableArea = childNode->getParent()->viewArea;
-            const auto& childPos = childNode->getTransformRead().pos;
-            const auto& childScale = childNode->getTransformRead().scale;
+            const auto& childPos = childNode->getTransformRead().pos + glm::vec2(childLeftBorder, childTopBorder);
+            const auto& childScale = childNode->getTransformRead().scale -
+                                     glm::vec2(childLeftBorder + childRightBorder, childTopBorder + childBotBorder);
 
             const auto pViewAreaEndX = (int16_t)(pViewableArea.start.x + pViewableArea.scale.x);
             const auto pViewAreaEndY = (int16_t)(pViewableArea.start.y + pViewableArea.scale.y);

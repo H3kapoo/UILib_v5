@@ -37,60 +37,6 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
     return {overflow.overflowX, overflow.overflowY};
 }
 
-LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(const int16_t scrollOffsetX,
-    const int16_t scrollOffsetY,
-    const ScrollBarDetails& sbDetails)
-{
-    const auto xPlus = sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
-    const auto yPlus = sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
-
-    // If Y_BAR active => add to X_BAR overflow +scrollbarSize
-    const auto bounds = getChildrenBound(root->getNodes());
-
-    const auto rootLeftBorder = root->layout.borderSize.left;
-    const auto rootRightBorder = root->layout.borderSize.right;
-    const auto rootTopBorder = root->layout.borderSize.top;
-    const auto rootBotBorder = root->layout.borderSize.bottom;
-
-    const auto& rts = root->getTransformRW().scale -
-                      glm::vec2{rootLeftBorder + rootRightBorder + yPlus, rootBotBorder + rootTopBorder + xPlus};
-    const auto& rtp = root->getTransformRW().pos + glm::vec2{rootLeftBorder, rootTopBorder};
-    const auto rte = rtp + rts;
-
-    const auto rightOverflow = bounds.end.x - rte.x;  // x pos if overflow
-    const auto leftOverflow = rtp.x - bounds.start.x; // x pos if overflow
-    const auto topOverflow = rtp.y - bounds.start.y;  // y pos if overflow
-    const auto bottomOverflow = bounds.end.y - rte.y; // y pos if overflow
-
-    float totalOverflowX = 0;
-    float totalOverflowY = 0;
-
-    totalOverflowX += leftOverflow > 0 ? leftOverflow : 0;
-    totalOverflowX += rightOverflow > 0 ? rightOverflow : 0;
-
-    totalOverflowY += topOverflow > 0 ? topOverflow : 0;
-    totalOverflowY += bottomOverflow > 0 ? bottomOverflow : 0;
-
-    // utils::printlnw("HO {} VO {}", totalOverflowX, totalOverflowY);
-
-    /* Overflow application */
-    for (const auto& childNode : root->getNodes())
-    {
-        auto& childPos = childNode->getTransformRW().pos;
-
-        /* This will push the content in such a way that it doesn't overflow to the left or to the top. Scrollbars will
-           be shown instead for scrolling */
-        childPos.x += leftOverflow > 0 ? leftOverflow : 0;
-        childPos.y += topOverflow > 0 ? topOverflow : 0;
-
-        /* Apply user chosen overflow */
-        childPos.x -= scrollOffsetX;
-        childPos.y -= scrollOffsetY;
-    }
-
-    return OverflowResult{totalOverflowX, totalOverflowY};
-}
-
 void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
 {
     auto rootScale = root->getTransformRead().scale;
@@ -171,6 +117,60 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
 
     glm::vec2 offset = {0, 0};
 
+    /* Align relative to other elements on same level */
+    for (const auto& childNode : root->getNodes())
+    {
+        SKIP_SCROLLBAR(childNode)
+
+        if (root->layout.orientation == LdOrientation::Horizontal)
+        {
+            switch (root->layout.internalAlign)
+            {
+                case LdAlign::Top: {
+                    // Nothing to do
+                    break;
+                }
+                case LdAlign::Center: {
+                    offset.y += bound.end.y - (childNode->getTransformRW().pos.y + childNode->getTransformRW().scale.y);
+                    childNode->getTransformRW().pos += offset * 0.5f;
+                    break;
+                }
+                case LdAlign::Bot: {
+                    offset.y += bound.end.y - (childNode->getTransformRW().pos.y + childNode->getTransformRW().scale.y);
+                    childNode->getTransformRW().pos += offset;
+                    break;
+                }
+                case LdAlign::COUNT:
+                    break;
+            }
+        }
+
+        if (root->layout.orientation == LdOrientation::Vertical)
+        {
+            switch (root->layout.internalAlign)
+            {
+                case LdAlign::Left: {
+                    // Nothing to do
+                    break;
+                }
+                case LdAlign::Center: {
+                    offset.x += bound.end.x - (childNode->getTransformRW().pos.x + childNode->getTransformRW().scale.x);
+                    childNode->getTransformRW().pos += offset * 0.5f;
+                    break;
+                }
+                case LdAlign::Right: {
+                    offset.x += bound.end.x - (childNode->getTransformRW().pos.x + childNode->getTransformRW().scale.x);
+                    childNode->getTransformRW().pos += offset;
+                    break;
+                }
+                case LdAlign::COUNT:
+                    break;
+            }
+        }
+        offset = {0, 0};
+    }
+
+    /* Align relative to parent */
     switch (root->layout.align.horizontal)
     {
         case LdAlign::Left: {
@@ -218,6 +218,62 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
 
         childNode->getTransformRW().pos += offset;
     }
+}
+
+LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(const int16_t scrollOffsetX,
+    const int16_t scrollOffsetY,
+    const ScrollBarDetails& sbDetails)
+{
+    /* If Y_BAR is active, it means overflow (if exists) needs to be increased by 'scrollbar' size so we can scroll past
+       that bar and show all the content. Without this, some content will be hidden under the scrollbar. This applies
+       vice-versa aswell.*/
+    const auto xPlus = sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
+    const auto yPlus = sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
+
+    const auto bounds = getChildrenBound(root->getNodes());
+
+    const auto rootLeftBorder = root->layout.borderSize.left;
+    const auto rootRightBorder = root->layout.borderSize.right;
+    const auto rootTopBorder = root->layout.borderSize.top;
+    const auto rootBotBorder = root->layout.borderSize.bottom;
+
+    const auto& rts = root->getTransformRW().scale -
+                      glm::vec2{rootLeftBorder + rootRightBorder + yPlus, rootBotBorder + rootTopBorder + xPlus};
+    const auto& rtp = root->getTransformRW().pos + glm::vec2{rootLeftBorder, rootTopBorder};
+    const auto rte = rtp + rts;
+
+    const auto rightOverflow = bounds.end.x - rte.x;  // x pos if overflow
+    const auto leftOverflow = rtp.x - bounds.start.x; // x pos if overflow
+    const auto topOverflow = rtp.y - bounds.start.y;  // y pos if overflow
+    const auto bottomOverflow = bounds.end.y - rte.y; // y pos if overflow
+
+    float totalOverflowX = 0;
+    float totalOverflowY = 0;
+
+    totalOverflowX += leftOverflow > 0 ? leftOverflow : 0;
+    totalOverflowX += rightOverflow > 0 ? rightOverflow : 0;
+
+    totalOverflowY += topOverflow > 0 ? topOverflow : 0;
+    totalOverflowY += bottomOverflow > 0 ? bottomOverflow : 0;
+
+    // utils::printlnw("HO {} VO {}", totalOverflowX, totalOverflowY);
+
+    /* Overflow application */
+    for (const auto& childNode : root->getNodes())
+    {
+        auto& childPos = childNode->getTransformRW().pos;
+
+        /* This will push the content in such a way that it doesn't overflow to the left or to the top. Scrollbars will
+           be shown instead for scrolling */
+        childPos.x += leftOverflow > 0 ? leftOverflow : 0;
+        childPos.y += topOverflow > 0 ? topOverflow : 0;
+
+        /* Apply user chosen overflow */
+        childPos.x -= scrollOffsetX;
+        childPos.y -= scrollOffsetY;
+    }
+
+    return OverflowResult{totalOverflowX, totalOverflowY};
 }
 
 float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace)

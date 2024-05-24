@@ -259,6 +259,7 @@ bool AbstractComponent::removeAux(AbstractComponent* node)
 
     // TODO: on remove X, we shall remove and reset state of all nodes underneath X
     // For now, it's just a shallow remove
+    // Later edit: At least set 'isRuntimeInitialized' to false for them.
     const auto it = std::find_if(children.begin(), children.end(),
         [&node](AbstractComponent* n) { return n->getId() == node->getId(); });
 

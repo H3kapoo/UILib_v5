@@ -22,20 +22,20 @@ void App::start(int initialWidth, int initialHeight)
 
     // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
-    rootDiv.layout.orientation = LdOrientation::Horizontal;
+    rootDiv.layout.orientation = LdOrientation::Vertical;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
-    rootDiv.layout.align = LdAlignment{LdAlign::Top, LdAlign::Center};
-    rootDiv.layout.internalAlign = LdAlign::Top;
+    rootDiv.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
+    rootDiv.layout.internalAlign = LdAlign::Center;
     rootDiv.layout.wrap = LdWrapMode::NoWrap;
     // rootDiv.layout.scrollBarSize = 11;
 
     div3.style.borderColor = utils::hexToVec4("#13b613ff");
     // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
 
-    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 500}, {LdScalePolicy::Absolute, 400}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 800}};
-    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 250}};
-    div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 590}};
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 400}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 110}, {LdScalePolicy::Absolute, 100}};
+    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 400}, {LdScalePolicy::Absolute, 250}};
+    div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 290}};
 
     div2.style.color = utils::hexToVec4("#6de025ff");
     div3.style.color = utils::hexToVec4("#bc115bff");
@@ -52,11 +52,11 @@ void App::start(int initialWidth, int initialHeight)
     div3.layout.internalAlign = LdAlign::Top;
     div3.layout.wrap = LdWrapMode::NoWrap;
     div3.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
-
     // div3.append({&div6});
     // rootDiv.append({&div3});
-    rootDiv.append({&div3, &div4});
-    div3.append({&div5, &div6});
+    rootDiv.append({&div3, &div4, &div5, &div6});
+    // rootDiv.append({&div3, &div4});
+    // div3.append({&div5, &div6});
 
     rootDiv.showTree();
 
@@ -71,34 +71,24 @@ void App::start(int initialWidth, int initialHeight)
     // div5.addOnEnterListener([this]() { div5.style.color = utils::hexToVec4("#336b55ff"); });
     // div5.addOnExitListener([this]() { div5.style.color = utils::hexToVec4("#3b1526ff"); });
 
-    Div* newDiv = new Div();
-    newDiv->style.color = utils::hexToVec4("#a10b88ff");
-    newDiv->layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 200}};
-    newDiv->style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+    // Div* newDiv = new Div();
+    // newDiv->style.color = utils::hexToVec4("#a10b88ff");
+    // newDiv->layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 200}};
+    // newDiv->style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
-    divs.push_back(newDiv);
+    // divs.push_back(newDiv);
 
-    div6.append(newDiv);
+    // div6.append(newDiv);
+
     rootDiv.addClickListener(
         [this](auto, auto, MouseButton btn)
         {
-            if (btn == MouseButton::Left)
-            {
-                // rootDiv.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
-                // div3.style.enableVScroll = !div3.style.enableVScroll;
-                // div3.style.scrollSensitivity += 10;
-                // if (div3.style.scrollSensitivity > 40)
-                // {
-                //     div3.style.scrollSensitivity = 10;
-                //     utils::printlnw("Back to 10");
-                // }
-                // rootDiv.append(&div5);
-                // rootDiv.refreshLayout();
-
-                // rootDiv.layout.orientation = LdOrientation::Vertical;
-                // div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 400}};
-                // div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 410}, {LdScalePolicy::Absolute, 600}};
-            }
+            // if (btn == MouseButton::Left)
+            // {
+            //     if (rootDiv.remove(&div3)) { utils::printlnw("Removed"); }
+            //     else { utils::printlnw("NOT removed"); }
+            // }
+            // else if (btn == MouseButton::Right) { rootDiv.append(&div3); }
         });
 
     // rootDiv.addOnKeyListener(

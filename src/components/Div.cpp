@@ -84,7 +84,7 @@ void Div::addOnKeyListener(std::function<void(const HIDAction*)>&& func)
 
 void Div::onClickEvent()
 {
-    utils::printlni("[INF] I am node {} and onClick() called", getId());
+    // utils::printlni("[INF] I am node {} and onClick() called", getId());
 
     const auto& s = getState();
     if (mouseClickCb && s->mouseAction == HIDAction::Pressed) { mouseClickCb(s->mouseX, s->mouseY, s->clickedButton); }
