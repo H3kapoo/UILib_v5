@@ -22,10 +22,10 @@ void App::start(int initialWidth, int initialHeight)
 
     // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
-    rootDiv.layout.orientation = LdOrientation::Vertical;
+    rootDiv.layout.orientation = LdOrientation::Horizontal;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
-    rootDiv.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
-    rootDiv.layout.internalAlign = LdAlign::Center;
+    rootDiv.layout.align = LdAlignment{LdAlign::Left, LdAlign::Top};
+    rootDiv.layout.internalAlign = LdAlign::Center; // check this later after margins are implemented
     rootDiv.layout.wrap = LdWrapMode::NoWrap;
     // rootDiv.layout.scrollBarSize = 11;
 
@@ -45,20 +45,20 @@ void App::start(int initialWidth, int initialHeight)
     div6.style.color = utils::hexToVec4("#0608a5ff");
 
     componentManager.setRoot(&rootDiv);
-    componentManager.resizeEvent(initialWidth, initialHeight);
 
     div3.layout.orientation = LdOrientation::Horizontal;
     div3.layout.fillPolicy = LdFillPolicy::Tightly;
     div3.layout.internalAlign = LdAlign::Top;
     div3.layout.wrap = LdWrapMode::NoWrap;
     div3.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
-    // div3.append({&div6});
-    // rootDiv.append({&div3});
+
     rootDiv.append({&div3, &div4, &div5, &div6});
-    // rootDiv.append({&div3, &div4});
-    // div3.append({&div5, &div6});
 
     rootDiv.showTree();
+
+    div3.layout.marginSize = {0, 0, 20, 20};
+    // div5.layout.marginSize = {50, 50, 50, 50};
+    div5.layout.marginSize = {5, 5, 5, 5};
 
     /* Trigger initial resize event to "stabilize" the scene */
 
@@ -106,6 +106,7 @@ void App::start(int initialWidth, int initialHeight)
     //         }
     //         rootDiv.updateLayout();
     //     });
+    componentManager.resizeEvent(initialWidth, initialHeight);
 }
 
 void App::update()

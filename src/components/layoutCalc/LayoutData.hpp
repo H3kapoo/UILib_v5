@@ -72,7 +72,7 @@ struct LayoutData
         ScalePair vertical;
     };
 
-    struct BorderSize
+    struct SpacialSize
     {
         uint16_t left{0};
         uint16_t right{0};
@@ -89,11 +89,11 @@ struct LayoutData
 
     int16_t scrollBarSize{21};
 
-    BorderSize borderSize{0};
-    // glm::u16vec4 marginSize{0};
+    SpacialSize borderSize{0};
+    SpacialSize marginSize{0};
     // glm::u16vec4 paddingSize{0};
 
-    glm::vec4 marginSize{0};
+    // glm::vec4 marginSize{0};
     glm::vec4 paddingSize{0};
 };
 

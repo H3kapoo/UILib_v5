@@ -3,6 +3,7 @@
 #include "../AbstractComponent.hpp"
 #include "LayoutUtils.hpp"
 #include <cstdint>
+#include <glm/fwd.hpp>
 
 namespace components::layoutcalc
 {
@@ -21,6 +22,12 @@ public:
         const bool isVScrollActive = false);
 
 private:
+    struct AdjustedTransform
+    {
+        glm::i16vec2 pos;
+        glm::i16vec2 scale;
+    };
+
     struct Bounds
     {
         glm::vec2 start{9999};
@@ -42,8 +49,9 @@ private:
     OverflowResult calculateAndApplyOverflow(const int16_t scrollOffsetX,
         const int16_t scrollOffsetY,
         const ScrollBarDetails& sbDetails);
-    float getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace);
+    float getNextFillPolicyPosition(float& bufferPos, float compScale, float remainingSpace);
     void calculateAndApplyAlignOffset(const ScrollBarDetails& sbDetails);
+    void calculateAndApplyInternalAlignOffset(const Bounds& bounds);
     void calculateAndApplyPosition(const ScrollBarDetails& sbDetails);
     void calculateAndApplyScale(const ScrollBarDetails& sbDetails);
     void calculateNextBasePosition(glm::vec2& currentXY, AbstractComponent* comp);
@@ -51,6 +59,7 @@ private:
     void resetPositions();
     glm::vec2 getRemainingSpaceAfterScale(const ScrollBarDetails& sbDetails);
     Bounds getChildrenBound(const std::vector<AbstractComponent*>& childComps);
+    AdjustedTransform getAdjustedTransform(AbstractComponent* comp);
 
     /* TODO: Maybe in the future this root can be removed and class can be made static so we are fully stateless */
     AbstractComponent* root;

@@ -39,7 +39,8 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
 
 void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
 {
-    auto rootScale = root->getTransformRead().scale;
+    // auto rootScale = root->getTransformRead().scale;
+    auto rootScale = getAdjustedTransform(root).scale;
 
     /* They are reversed, it's justified */
     rootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
@@ -85,11 +86,15 @@ void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetai
     {
         SKIP_SCROLLBAR(childNode)
 
+        const auto& childMargin = childNode->layout.marginSize;
+        const auto& childTransform = getAdjustedTransform(childNode);
         auto& childPos = childNode->getTransformRW().pos;
         auto& childScale = childNode->getTransformRW().scale;
         if (root->layout.orientation == LayoutData::Orientation::Horizontal)
         {
-            childPos.x = getNextFillPolicyPosition(startXY.x, childScale.x, remainingSpace.x);
+            childPos.x = getNextFillPolicyPosition(startXY.x, childTransform.scale.x, remainingSpace.x);
+            childPos.x += childMargin.left;
+            childPos.y += childMargin.top;
         }
         else if (root->layout.orientation == LayoutData::Orientation::Vertical)
         {
@@ -98,30 +103,16 @@ void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetai
     }
 }
 
-void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDetails)
+void LayoutCalculator::calculateAndApplyInternalAlignOffset(const Bounds& bound)
 {
-    const auto rootLeftBorder = root->layout.borderSize.left;
-    const auto rootRightBorder = root->layout.borderSize.right;
-    const auto rootTopBorder = root->layout.borderSize.top;
-    const auto rootBotBorder = root->layout.borderSize.bottom;
-
-    const auto& rootBox = root->getTransformRead();
-    const auto bound = getChildrenBound(root->getNodes());
-    const auto boundsDiff = bound.end - bound.start;
-
-    auto adjustedRootScale = rootBox.scale;
-
-    /* They are reversed, it's justified */
-    adjustedRootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
-    adjustedRootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
-
     glm::vec2 offset = {0, 0};
 
-    /* Align relative to other elements on same level */
     for (const auto& childNode : root->getNodes())
     {
         SKIP_SCROLLBAR(childNode)
 
+        auto& childPos = childNode->getTransformRead().pos;
+        const auto& childTransform = getAdjustedTransform(childNode);
         if (root->layout.orientation == LdOrientation::Horizontal)
         {
             switch (root->layout.internalAlign)
@@ -131,13 +122,13 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
                     break;
                 }
                 case LdAlign::Center: {
-                    offset.y += bound.end.y - (childNode->getTransformRW().pos.y + childNode->getTransformRW().scale.y);
-                    childNode->getTransformRW().pos += offset * 0.5f;
+                    offset.y += bound.end.y - (childTransform.pos.y + childTransform.scale.y);
+                    childPos += offset * 0.5f;
                     break;
                 }
                 case LdAlign::Bot: {
-                    offset.y += bound.end.y - (childNode->getTransformRW().pos.y + childNode->getTransformRW().scale.y);
-                    childNode->getTransformRW().pos += offset;
+                    offset.y += bound.end.y - (childTransform.pos.y + childTransform.scale.y);
+                    childPos += offset;
                     break;
                 }
                 case LdAlign::COUNT:
@@ -154,13 +145,13 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
                     break;
                 }
                 case LdAlign::Center: {
-                    offset.x += bound.end.x - (childNode->getTransformRW().pos.x + childNode->getTransformRW().scale.x);
-                    childNode->getTransformRW().pos += offset * 0.5f;
+                    offset.x += bound.end.x - (childTransform.pos.x + childTransform.scale.x);
+                    childPos += offset * 0.5f;
                     break;
                 }
                 case LdAlign::Right: {
-                    offset.x += bound.end.x - (childNode->getTransformRW().pos.x + childNode->getTransformRW().scale.x);
-                    childNode->getTransformRW().pos += offset;
+                    offset.x += bound.end.x - (childTransform.pos.x + childTransform.scale.x);
+                    childPos += offset;
                     break;
                 }
                 case LdAlign::COUNT:
@@ -169,6 +160,29 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
         }
         offset = {0, 0};
     }
+}
+
+void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDetails)
+{
+    const auto rootLeftBorder = root->layout.borderSize.left;
+    const auto rootRightBorder = root->layout.borderSize.right;
+    const auto rootTopBorder = root->layout.borderSize.top;
+    const auto rootBotBorder = root->layout.borderSize.bottom;
+
+    const auto& rootBox = root->getTransformRead();
+    const auto bound = getChildrenBound(root->getNodes());
+    const auto boundsDiff = bound.end - bound.start;
+
+    auto adjustedRootScale = getAdjustedTransform(root).scale;
+
+    /* They are reversed, it's justified */
+    adjustedRootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
+    adjustedRootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
+
+    glm::vec2 offset = {0, 0};
+
+    /* Align relative to other elements on same level */
+    calculateAndApplyInternalAlignOffset(bound);
 
     /* Align relative to parent */
     switch (root->layout.align.horizontal)
@@ -216,7 +230,7 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
     {
         SKIP_SCROLLBAR(childNode)
 
-        childNode->getTransformRW().pos += offset;
+        childNode->getTransformRead().pos += offset;
     }
 }
 
@@ -237,9 +251,10 @@ LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(con
     const auto rootTopBorder = root->layout.borderSize.top;
     const auto rootBotBorder = root->layout.borderSize.bottom;
 
-    const auto& rts = root->getTransformRW().scale -
-                      glm::vec2{rootLeftBorder + rootRightBorder + yPlus, rootBotBorder + rootTopBorder + xPlus};
-    const auto& rtp = root->getTransformRW().pos + glm::vec2{rootLeftBorder, rootTopBorder};
+    const auto& rootAdjustedScale = getAdjustedTransform(root);
+    const auto& rts = rootAdjustedScale.scale -
+                      glm::i16vec2{rootLeftBorder + rootRightBorder + yPlus, rootBotBorder + rootTopBorder + xPlus};
+    const auto& rtp = rootAdjustedScale.pos + glm::i16vec2{rootLeftBorder, rootTopBorder};
     const auto rte = rtp + rts;
 
     const auto rightOverflow = bounds.end.x - rte.x;  // x pos if overflow
@@ -276,7 +291,7 @@ LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(con
     return OverflowResult{totalOverflowX, totalOverflowY};
 }
 
-float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float& compScale, float& remainingSpace)
+float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float compScale, float remainingSpace)
 {
     float nextPos = 0;
     switch (root->layout.fillPolicy)
@@ -318,33 +333,32 @@ void LayoutCalculator::resetPositions()
 
 glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale(const ScrollBarDetails& sbDetails)
 {
-    // TODO: Wrongly calculates remaning usable space. Doesnt take into account
-    //  current orientation
     const auto rootLeftBorder = root->layout.borderSize.left;
     const auto rootRightBorder = root->layout.borderSize.right;
     const auto rootTopBorder = root->layout.borderSize.top;
     const auto rootBotBorder = root->layout.borderSize.bottom;
 
-    glm::vec2 accumulatedSize = {0, 0};
+    glm::i16vec2 accumulatedSize = {0, 0};
     for (const auto& childNode : root->getNodes())
     {
         SKIP_SCROLLBAR(childNode)
 
-        const auto& chScale = childNode->getTransformRead().scale;
+        const auto& childTransform = getAdjustedTransform(childNode);
         if (root->layout.orientation == LdOrientation::Horizontal)
         {
-            accumulatedSize.x += chScale.x;
-            accumulatedSize.y = chScale.y > accumulatedSize.y ? chScale.y : accumulatedSize.y;
+            accumulatedSize.x += childTransform.scale.x;
+            accumulatedSize.y = childTransform.scale.y > accumulatedSize.y ? childTransform.scale.y : accumulatedSize.y;
         }
         else if (root->layout.orientation == LdOrientation::Vertical)
         {
-            accumulatedSize.x = chScale.x > accumulatedSize.x ? chScale.x : accumulatedSize.x;
-            accumulatedSize.y += chScale.y;
+            accumulatedSize.x = childTransform.scale.x > accumulatedSize.x ? childTransform.scale.x : accumulatedSize.x;
+            accumulatedSize.y += childTransform.scale.y;
         }
     }
 
-    // TODO: take into accound margin/border/padd
-    auto remainingSpace = root->getTransformRead().scale - accumulatedSize;
+    // TODO: take into accound padd
+    const auto& rootScale = getAdjustedTransform(root).scale;
+    auto remainingSpace = rootScale - accumulatedSize;
     remainingSpace.x -= (rootLeftBorder + rootRightBorder);
     remainingSpace.y -= (rootTopBorder + rootBotBorder);
 
@@ -357,16 +371,15 @@ glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale(const ScrollBarDetails& 
 
 LayoutCalculator::Bounds LayoutCalculator::getChildrenBound(const std::vector<AbstractComponent*>& childComps)
 {
-    // TODO: Take into account MARGINs
     Bounds result;
     for (const auto& comp : childComps)
     {
         SKIP_SCROLLBAR(comp)
 
         /* X related */
-        const auto& childTransform = comp->getTransformRead();
-        if (childTransform.pos.x <= result.start.x) { result.start.x = childTransform.pos.x; }
+        const auto& childTransform = getAdjustedTransform(comp);
 
+        if (childTransform.pos.x <= result.start.x) { result.start.x = childTransform.pos.x; }
         if (childTransform.pos.x + childTransform.scale.x >= result.end.x)
         {
             result.end.x = childTransform.pos.x + childTransform.scale.x;
@@ -374,32 +387,22 @@ LayoutCalculator::Bounds LayoutCalculator::getChildrenBound(const std::vector<Ab
 
         /* Y related */
         if (childTransform.pos.y <= result.start.y) { result.start.y = childTransform.pos.y; }
-
         if (childTransform.pos.y + childTransform.scale.y >= result.end.y)
         {
             result.end.y = childTransform.pos.y + childTransform.scale.y;
         }
     }
 
-    /* Any other FillPolicy will take up the whole axis space */
-    // if (root->layout.fillPolicy != LdFillPolicy::Tightly)
-    // {
-    //     const auto rootLeftBorder = root->layout.borderSize.left;
-    //     const auto rootRightBorder = root->layout.borderSize.right;
-    //     const auto rootTopBorder = root->layout.borderSize.top;
-    //     const auto rootBotBorder = root->layout.borderSize.bottom;
-    //     if (root->layout.orientation == LdOrientation::Horizontal)
-    //     {
-    //         result.start.x = root->getTransformRead().pos.x + rootLeftBorder;
-    //         result.end.x = root->getTransformRead().scale.x - rootRightBorder;
-    //     }
-    //     else if (root->layout.orientation == LdOrientation::Vertical)
-    //     {
-    //         result.start.y = root->getTransformRead().pos.y + rootTopBorder;
-    //         result.end.y = root->getTransformRead().scale.y - rootBotBorder;
-    //     }
-    // }
-
     return result;
+}
+
+LayoutCalculator::AdjustedTransform LayoutCalculator::getAdjustedTransform(AbstractComponent* comp)
+{
+    AdjustedTransform newTransform;
+    const auto& childMargin = comp->layout.marginSize;
+    newTransform.pos = comp->getTransformRead().pos - glm::vec2(childMargin.left, childMargin.top);
+    newTransform.scale = comp->getTransformRead().scale +
+                         glm::vec2(childMargin.left + childMargin.right, childMargin.top + childMargin.bottom);
+    return newTransform;
 }
 } // namespace components::layoutcalc
