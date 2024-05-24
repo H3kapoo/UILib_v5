@@ -90,9 +90,13 @@ void ComponentManager::render()
         }
         else
         {
-            const auto& pViewableArea = childNode->viewArea;
-            glScissor(pViewableArea.start.x, state.windowHeight - (pViewableArea.start.y + pViewableArea.scale.y),
-                pViewableArea.scale.x, pViewableArea.scale.y);
+            /* Note: No point in rendering invisible components. Maybe this could be extended to layout updates too,
+             * make them more conservative. */
+            const auto& childVA = childNode->viewArea;
+            if (childVA.scale.x <= 0 || childVA.scale.y <= 0) { continue; }
+
+            glScissor(childVA.start.x, state.windowHeight - (childVA.start.y + childVA.scale.y), childVA.scale.x,
+                childVA.scale.y);
         }
 
         childNode->onPrepareToRender();
