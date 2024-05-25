@@ -91,10 +91,7 @@ struct LayoutData
 
     SpacialSize borderSize{0};
     SpacialSize marginSize{0};
-    // glm::u16vec4 paddingSize{0};
-
-    // glm::vec4 marginSize{0};
-    glm::vec4 paddingSize{0};
+    SpacialSize paddingSize{0};
 };
 
 using LdOrientation = LayoutData::Orientation;

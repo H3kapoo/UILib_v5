@@ -20,14 +20,14 @@ void App::start(int initialWidth, int initialHeight)
     // rootDiv.style.imagePath = NewValue("/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg");
     div3.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
-    // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
+    rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
     rootDiv.layout.orientation = LdOrientation::Horizontal;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
     // rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
     // rootDiv.layout.internalAlign = LdAlign::Center; // check this later after margins are implemented
     // rootDiv.layout.wrap = LdWrapMode::NoWrap;
-    rootDiv.layout.wrap = LdWrapMode::WrapAround;
+    // rootDiv.layout.wrap = LdWrapMode::WrapAround;
     // rootDiv.layout.scrollBarSize = 11;
 
     div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 220}, {LdScalePolicy::Absolute, 200}};
@@ -57,7 +57,8 @@ void App::start(int initialWidth, int initialHeight)
 
     // div3.layout.internalAlign = LdAlign::Center; // check this later after margins are implemented
 
-    div5.layout.marginSize = {10, 5, 5, 0};
+    rootDiv.layout.paddingSize = {5, 5, 5, 5};
+    // div5.layout.marginSize = {10, 5, 5, 0};
     // div3.layout.wrap = LdWrapMode::WrapAround;
 
     // div3.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};

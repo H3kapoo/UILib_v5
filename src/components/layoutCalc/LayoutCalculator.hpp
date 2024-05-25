@@ -60,6 +60,7 @@ private:
     glm::vec2 getRemainingSpaceAfterScale(const ScrollBarDetails& sbDetails);
     Bounds getChildrenBound(const std::vector<AbstractComponent*>& childComps);
     AdjustedTransform getAdjustedTransform(AbstractComponent* comp);
+    AdjustedTransform getPaddedRootTransform();
 
     /* TODO: Maybe in the future this root can be removed and class can be made static so we are fully stateless */
     AbstractComponent* root;
