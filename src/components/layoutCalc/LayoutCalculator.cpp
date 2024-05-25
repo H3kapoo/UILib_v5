@@ -1,6 +1,7 @@
 #include "LayoutCalculator.hpp"
 #include "../../Utility.hpp"
 #include "LayoutData.hpp"
+#include <cstdint>
 #include <glm/fwd.hpp>
 
 namespace components::layoutcalc
@@ -79,6 +80,8 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
 void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetails)
 {
     glm::vec2 startXY = {0, 0};
+    int16_t maxY = 0;
+    int16_t maxX = 0;
 
     auto remainingSpace = getRemainingSpaceAfterScale(sbDetails);
     for (const auto& childNode : root->getNodes())
@@ -86,79 +89,48 @@ void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetai
         SKIP_SCROLLBAR(childNode)
 
         const auto& childMargin = childNode->layout.marginSize;
+        glm::i16vec2 nextPos = {0, 0};
+
         const auto& childTransform = getAdjustedTransform(childNode);
         auto& childPos = childNode->getTransformRW().pos;
+
+        // TODO: 3 lvl deep IFs need to be fixed
         if (root->layout.orientation == LayoutData::Orientation::Horizontal)
         {
-            childPos.x = getNextFillPolicyPosition(startXY.x, childTransform.scale.x, remainingSpace.x);
-            childPos.x += childMargin.left;
-            childPos.y += childMargin.top;
+            nextPos.x += getNextFillPolicyPosition(startXY.x, childTransform.scale.x, remainingSpace.x);
+            nextPos.x += childMargin.left;
+            if (root->layout.wrap == LdWrapMode::WrapAround && root->layout.fillPolicy == LdFillPolicy::Tightly)
+            {
+                if (nextPos.x + childTransform.scale.x > root->getTransformRead().scale.x)
+                {
+                    startXY.x = childTransform.scale.x;
+                    startXY.y += maxY;
+                    nextPos.x = childMargin.left;
+                    nextPos.y = startXY.y + childMargin.top;
+                    maxY = 0;
+                }
+                maxY = std::max(childTransform.scale.y, maxY);
+            }
+            childPos = {nextPos.x, startXY.y + childMargin.top};
         }
         else if (root->layout.orientation == LayoutData::Orientation::Vertical)
         {
-            childPos.y = getNextFillPolicyPosition(startXY.y, childTransform.scale.y, remainingSpace.y);
-            childPos.y += childMargin.top;
-            childPos.x += childMargin.left;
-        }
-    }
-}
-
-void LayoutCalculator::calculateAndApplyInternalAlignOffset(const Bounds& bound)
-{
-    glm::vec2 offset = {0, 0};
-
-    for (const auto& childNode : root->getNodes())
-    {
-        SKIP_SCROLLBAR(childNode)
-
-        auto& childPos = childNode->getTransformRead().pos;
-        const auto& childTransform = getAdjustedTransform(childNode);
-        if (root->layout.orientation == LdOrientation::Horizontal)
-        {
-            switch (root->layout.internalAlign)
+            nextPos.y += getNextFillPolicyPosition(startXY.y, childTransform.scale.y, remainingSpace.y);
+            nextPos.y += childMargin.top;
+            if (root->layout.wrap == LdWrapMode::WrapAround && root->layout.fillPolicy == LdFillPolicy::Tightly)
             {
-                case LdAlign::Top: {
-                    // Nothing to do
-                    break;
+                if (nextPos.y + childTransform.scale.y > root->getTransformRead().scale.y)
+                {
+                    startXY.y = childTransform.scale.y;
+                    startXY.x += maxX;
+                    nextPos.y = childMargin.top;
+                    nextPos.x = startXY.x + childMargin.left;
+                    maxX = 0;
                 }
-                case LdAlign::Center: {
-                    offset.y += bound.end.y - (childTransform.pos.y + childTransform.scale.y);
-                    childPos += offset * 0.5f;
-                    break;
-                }
-                case LdAlign::Bot: {
-                    offset.y += bound.end.y - (childTransform.pos.y + childTransform.scale.y);
-                    childPos += offset;
-                    break;
-                }
-                case LdAlign::COUNT:
-                    break;
+                maxX = std::max(childTransform.scale.x, maxX);
             }
+            childPos = {startXY.x + childMargin.left, nextPos.y};
         }
-
-        if (root->layout.orientation == LdOrientation::Vertical)
-        {
-            switch (root->layout.internalAlign)
-            {
-                case LdAlign::Left: {
-                    // Nothing to do
-                    break;
-                }
-                case LdAlign::Center: {
-                    offset.x += bound.end.x - (childTransform.pos.x + childTransform.scale.x);
-                    childPos += offset * 0.5f;
-                    break;
-                }
-                case LdAlign::Right: {
-                    offset.x += bound.end.x - (childTransform.pos.x + childTransform.scale.x);
-                    childPos += offset;
-                    break;
-                }
-                case LdAlign::COUNT:
-                    break;
-            }
-        }
-        offset = {0, 0};
     }
 }
 
@@ -231,6 +203,65 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
         SKIP_SCROLLBAR(childNode)
 
         childNode->getTransformRead().pos += offset;
+    }
+}
+
+void LayoutCalculator::calculateAndApplyInternalAlignOffset(const Bounds& bound)
+{
+    glm::vec2 offset = {0, 0};
+
+    for (const auto& childNode : root->getNodes())
+    {
+        SKIP_SCROLLBAR(childNode)
+
+        auto& childPos = childNode->getTransformRead().pos;
+        const auto& childTransform = getAdjustedTransform(childNode);
+        if (root->layout.orientation == LdOrientation::Horizontal)
+        {
+            switch (root->layout.internalAlign)
+            {
+                case LdAlign::Top: {
+                    // Nothing to do
+                    break;
+                }
+                case LdAlign::Center: {
+                    offset.y += bound.end.y - (childTransform.pos.y + childTransform.scale.y);
+                    childPos += offset * 0.5f;
+                    break;
+                }
+                case LdAlign::Bot: {
+                    offset.y += bound.end.y - (childTransform.pos.y + childTransform.scale.y);
+                    childPos += offset;
+                    break;
+                }
+                case LdAlign::COUNT:
+                    break;
+            }
+        }
+
+        if (root->layout.orientation == LdOrientation::Vertical)
+        {
+            switch (root->layout.internalAlign)
+            {
+                case LdAlign::Left: {
+                    // Nothing to do
+                    break;
+                }
+                case LdAlign::Center: {
+                    offset.x += bound.end.x - (childTransform.pos.x + childTransform.scale.x);
+                    childPos += offset * 0.5f;
+                    break;
+                }
+                case LdAlign::Right: {
+                    offset.x += bound.end.x - (childTransform.pos.x + childTransform.scale.x);
+                    childPos += offset;
+                    break;
+                }
+                case LdAlign::COUNT:
+                    break;
+            }
+        }
+        offset = {0, 0};
     }
 }
 
