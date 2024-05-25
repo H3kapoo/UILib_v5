@@ -20,7 +20,7 @@ void App::start(int initialWidth, int initialHeight)
     // rootDiv.style.imagePath = NewValue("/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg");
     div6.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
-    // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
+    rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
     rootDiv.layout.orientation = LdOrientation::Horizontal;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
@@ -28,9 +28,6 @@ void App::start(int initialWidth, int initialHeight)
     // rootDiv.layout.internalAlign = LdAlign::Center; // check this later after margins are implemented
     rootDiv.layout.wrap = LdWrapMode::NoWrap;
     // rootDiv.layout.scrollBarSize = 11;
-
-    div3.style.borderColor = utils::hexToVec4("#13b613ff");
-    // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
 
     div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 600}, {LdScalePolicy::Absolute, 500}};
     div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 110}, {LdScalePolicy::Absolute, 100}};
@@ -56,9 +53,12 @@ void App::start(int initialWidth, int initialHeight)
     div3.append({&div4, &div5, &div6});
     rootDiv.showTree();
 
-    div3.layout.marginSize = {50, 5, 0, 0};
+    // div3.layout.marginSize = {50, 5, 0, 0};
+    div3.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
+    div3.style.borderColor = utils::hexToVec4("#283a6cff");
+
     // div5.layout.marginSize = {50, 50, 50, 50};
-    div5.layout.marginSize = {0, 0, 5, 5};
+    // div5.layout.marginSize = {0, 0, 5, 5};
     // div6.layout.marginSize = {0, 2, 4, 5};
 
     /* Trigger initial resize event to "stabilize" the scene */

@@ -92,7 +92,7 @@ void ComponentManager::render()
         {
             /* Note: No point in rendering invisible components. Maybe this could be extended to layout updates too,
              * make them more conservative. */
-            const auto& childVA = childNode->viewArea;
+            const auto& childVA = childNode->getParent()->viewArea;
             if (childVA.scale.x <= 0 || childVA.scale.y <= 0) { continue; }
 
             glScissor(childVA.start.x, state.windowHeight - (childVA.start.y + childVA.scale.y), childVA.scale.x,
@@ -127,6 +127,9 @@ void ComponentManager::mouseClickEvent(MouseButton button, HIDAction action, Act
 
 void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
 {
+    /* Note: Viewable area simply doesn't care about borders when searching for hovered/clicked component, to take this
+       into account.*/
+
     /* Conversion double -> int done here since in 99% of the cases we dont have fractional mouse position.
        Might be different on MacOS, but I dont have one. */
     state.mouseX = (int)mouseX;
