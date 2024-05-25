@@ -18,21 +18,21 @@ void App::start(int initialWidth, int initialHeight)
     // rootDiv.style.enableHScroll = false;
     // rootDiv.style.enableVScroll = false;
     // rootDiv.style.imagePath = NewValue("/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg");
-    // rootDiv.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/dummy.jpg";
+    div6.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
     // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
     rootDiv.layout.orientation = LdOrientation::Horizontal;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
-    rootDiv.layout.align = LdAlignment{LdAlign::Left, LdAlign::Top};
-    rootDiv.layout.internalAlign = LdAlign::Center; // check this later after margins are implemented
+    // rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
+    // rootDiv.layout.internalAlign = LdAlign::Center; // check this later after margins are implemented
     rootDiv.layout.wrap = LdWrapMode::NoWrap;
     // rootDiv.layout.scrollBarSize = 11;
 
     div3.style.borderColor = utils::hexToVec4("#13b613ff");
     // div3.layout.borderSize = {.left = 4, .right = 4, .top = 4, .bottom = 4};
 
-    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Absolute, 400}};
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 600}, {LdScalePolicy::Absolute, 500}};
     div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 110}, {LdScalePolicy::Absolute, 100}};
     div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 400}, {LdScalePolicy::Absolute, 250}};
     div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 290}};
@@ -50,15 +50,16 @@ void App::start(int initialWidth, int initialHeight)
     div3.layout.fillPolicy = LdFillPolicy::Tightly;
     div3.layout.internalAlign = LdAlign::Top;
     div3.layout.wrap = LdWrapMode::NoWrap;
-    div3.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
+    // div3.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
 
-    rootDiv.append({&div3, &div4, &div5, &div6});
-
+    rootDiv.append(&div3);
+    div3.append({&div4, &div5, &div6});
     rootDiv.showTree();
 
-    div3.layout.marginSize = {0, 0, 20, 20};
+    div3.layout.marginSize = {50, 5, 0, 0};
     // div5.layout.marginSize = {50, 50, 50, 50};
-    div5.layout.marginSize = {5, 5, 5, 5};
+    div5.layout.marginSize = {0, 0, 5, 5};
+    // div6.layout.marginSize = {0, 2, 4, 5};
 
     /* Trigger initial resize event to "stabilize" the scene */
 

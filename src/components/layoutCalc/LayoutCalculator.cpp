@@ -39,8 +39,7 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
 
 void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
 {
-    // auto rootScale = root->getTransformRead().scale;
-    auto rootScale = getAdjustedTransform(root).scale;
+    auto rootScale = root->getTransformRead().scale;
 
     /* They are reversed, it's justified */
     rootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
@@ -89,7 +88,6 @@ void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetai
         const auto& childMargin = childNode->layout.marginSize;
         const auto& childTransform = getAdjustedTransform(childNode);
         auto& childPos = childNode->getTransformRW().pos;
-        auto& childScale = childNode->getTransformRW().scale;
         if (root->layout.orientation == LayoutData::Orientation::Horizontal)
         {
             childPos.x = getNextFillPolicyPosition(startXY.x, childTransform.scale.x, remainingSpace.x);
@@ -98,7 +96,9 @@ void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetai
         }
         else if (root->layout.orientation == LayoutData::Orientation::Vertical)
         {
-            childPos.y = getNextFillPolicyPosition(startXY.y, childScale.y, remainingSpace.y);
+            childPos.y = getNextFillPolicyPosition(startXY.y, childTransform.scale.y, remainingSpace.y);
+            childPos.y += childMargin.top;
+            childPos.x += childMargin.left;
         }
     }
 }
@@ -173,7 +173,7 @@ void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDe
     const auto bound = getChildrenBound(root->getNodes());
     const auto boundsDiff = bound.end - bound.start;
 
-    auto adjustedRootScale = getAdjustedTransform(root).scale;
+    auto adjustedRootScale = rootBox.scale;
 
     /* They are reversed, it's justified */
     adjustedRootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
@@ -251,10 +251,10 @@ LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(con
     const auto rootTopBorder = root->layout.borderSize.top;
     const auto rootBotBorder = root->layout.borderSize.bottom;
 
-    const auto& rootAdjustedScale = getAdjustedTransform(root);
+    const auto& rootAdjustedScale = root->getTransformRead();
     const auto& rts = rootAdjustedScale.scale -
-                      glm::i16vec2{rootLeftBorder + rootRightBorder + yPlus, rootBotBorder + rootTopBorder + xPlus};
-    const auto& rtp = rootAdjustedScale.pos + glm::i16vec2{rootLeftBorder, rootTopBorder};
+                      glm::vec2{rootLeftBorder + rootRightBorder + yPlus, rootBotBorder + rootTopBorder + xPlus};
+    const auto& rtp = rootAdjustedScale.pos + glm::vec2{rootLeftBorder, rootTopBorder};
     const auto rte = rtp + rts;
 
     const auto rightOverflow = bounds.end.x - rte.x;  // x pos if overflow
@@ -338,7 +338,7 @@ glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale(const ScrollBarDetails& 
     const auto rootTopBorder = root->layout.borderSize.top;
     const auto rootBotBorder = root->layout.borderSize.bottom;
 
-    glm::i16vec2 accumulatedSize = {0, 0};
+    glm::vec2 accumulatedSize = {0, 0};
     for (const auto& childNode : root->getNodes())
     {
         SKIP_SCROLLBAR(childNode)
@@ -357,7 +357,7 @@ glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale(const ScrollBarDetails& 
     }
 
     // TODO: take into accound padd
-    const auto& rootScale = getAdjustedTransform(root).scale;
+    const auto& rootScale = root->getTransformRead().scale;
     auto remainingSpace = rootScale - accumulatedSize;
     remainingSpace.x -= (rootLeftBorder + rootRightBorder);
     remainingSpace.y -= (rootTopBorder + rootBotBorder);
@@ -398,6 +398,8 @@ LayoutCalculator::Bounds LayoutCalculator::getChildrenBound(const std::vector<Ab
 
 LayoutCalculator::AdjustedTransform LayoutCalculator::getAdjustedTransform(AbstractComponent* comp)
 {
+    /* This basically extends the components "box" by the margins effectively making the following calculationg think
+       the object is objectSize+marginsSize*/
     AdjustedTransform newTransform;
     const auto& childMargin = comp->layout.marginSize;
     newTransform.pos = comp->getTransformRead().pos - glm::vec2(childMargin.left, childMargin.top);
