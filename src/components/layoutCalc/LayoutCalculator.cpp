@@ -1,6 +1,7 @@
 #include "LayoutCalculator.hpp"
 #include "../../Utility.hpp"
 #include "LayoutData.hpp"
+#include <cmath>
 #include <cstdint>
 #include <glm/fwd.hpp>
 #include <numeric>
@@ -47,11 +48,8 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
 
     /* Overflow calculation */
     const auto overflow = calculateAndApplyOverflow(scrollOffsetX, scrollOffsetY, sbDetails);
-    // utils::printlne("X {}  Y {}", overflow.overflowX, overflow.overflowY);
 
     return {overflow.overflowX, overflow.overflowY};
-
-    // return {0, 0};
 }
 
 void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDetails)
@@ -78,12 +76,16 @@ void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDeta
         {
             comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
                                              (equalSliceValueH * childSpan.colSpan);
+            /* Needed so we don't get pixel imperfect visual artifacts */
+            comp->getTransformRead().scale.x = std::round(comp->getTransformRead().scale.x);
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
         {
             comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
                                              (equalSliceValueV * childSpan.rowSpan);
+            /* Needed so we don't get pixel imperfect visual artifacts */
+            comp->getTransformRead().scale.y = std::round(comp->getTransformRead().scale.y);
         }
 
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
@@ -165,6 +167,9 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
             const auto rightSubtract = root->layout.borderSize.right + childMargins.right;
             comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
                                              (rootScale.x - (leftSubtract + rightSubtract));
+
+            /* Needed so we don't get pixel imperfect visual artifacts */
+            comp->getTransformRead().scale.x = std::round(comp->getTransformRead().scale.x);
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
@@ -174,6 +179,9 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
             const auto botSubtract = root->layout.borderSize.bottom + childMargins.bottom;
             comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
                                              (rootScale.y - (topSubtract + botSubtract));
+
+            /* Needed so we don't get pixel imperfect visual artifacts */
+            comp->getTransformRead().scale.y = std::round(comp->getTransformRead().scale.);
         }
     }
 }

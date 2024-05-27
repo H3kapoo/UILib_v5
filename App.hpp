@@ -31,6 +31,6 @@ public:
 private:
     ComponentManager componentManager;
     Div rootDiv;
-    Div div2, div3, div4, div5, div6, div7;
+    Div div2, div3, div4, div5, div6, div7, div8, div9;
     std::vector<AbstractComponent*> divs;
 };

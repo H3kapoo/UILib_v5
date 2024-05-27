@@ -227,7 +227,7 @@ void ComponentManager::keyEvent(int key, HIDAction action, int mods)
 
 void ComponentManager::resizeEvent(int newWidth, int newHeight)
 {
-    // utils::printlni("Resizing to {} {}...", newWidth, newHeight);
+    utils::printlni("Resizing to {} {}...", newWidth, newHeight);
 
     const int16_t WINDOW_FULLSCREEN_SENSE_VALUE = 200;
     bool sensedWindowFullscreen = std::abs(newWidth - state.windowWidth) > WINDOW_FULLSCREEN_SENSE_VALUE;
