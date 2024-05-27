@@ -18,31 +18,47 @@ void App::start(int initialWidth, int initialHeight)
     // rootDiv.style.enableHScroll = false;
     // rootDiv.style.enableVScroll = false;
     // rootDiv.style.imagePath = NewValue("/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg");
-    div3.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+    div4.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
-    rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
+    // rootDiv.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
     // rootDiv.layout.borderSize = glm::vec4(6);
     rootDiv.layout.orientation = LdOrientation::Horizontal;
     rootDiv.layout.fillPolicy = LdFillPolicy::Tightly;
+
+    // rootDiv.layout.grid.row = 1;
+    // rootDiv.layout.grid.rowSpan = 2;
+    // rootDiv.layout.grid.col = 1;
+    // rootDiv.layout.grid.colSpan = 1;
     // rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
     // rootDiv.layout.internalAlign = LdAlign::Center; // check this later after margins are implemented
     // rootDiv.layout.wrap = LdWrapMode::NoWrap;
     // rootDiv.layout.wrap = LdWrapMode::WrapAround;
     // rootDiv.layout.scrollBarSize = 11;
 
-    div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 220}, {LdScalePolicy::Absolute, 200}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 110}, {LdScalePolicy::Absolute, 100}};
-    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 250}};
-    div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 290}};
+    // div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 320}, {LdScalePolicy::Absolute, 300}};
+    // div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 110}, {LdScalePolicy::Absolute, 100}};
+    // div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 290}};
+
+    // div3.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 50}, {LdScalePolicy::Absolute, 50}};
+    // div4.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 50}, {LdScalePolicy::Absolute, 50}};
+    // div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 50}, {LdScalePolicy::Absolute, 50}};
+    div5.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 400}, {LdScalePolicy::Absolute, 550}};
+
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.f}};
+    div6.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.f}};
+    div5.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
 
     div2.style.color = utils::hexToVec4("#6de025ff");
     div3.style.color = utils::hexToVec4("#bc115bff");
     // div4.style.color = glm::vec4(0.4f, 0.2f, 0.9f, 1.0f); // utils::hexToVec4("#932758ff");
-    div4.style.color = utils::hexToVec4("#932758ff");
+    div4.style.color = utils::hexToVec4("#0a038cff");
     div5.style.color = utils::hexToVec4("#d5317bff");
     div6.style.color = utils::hexToVec4("#0608a5ff");
 
     componentManager.setRoot(&rootDiv);
+
+    // Theres a bug when appending a GRID layout and a NON-GRID layout on same layer
 
     div3.layout.orientation = LdOrientation::Horizontal;
     div3.layout.fillPolicy = LdFillPolicy::Tightly;
@@ -51,19 +67,39 @@ void App::start(int initialWidth, int initialHeight)
     // div3.layout.align = LdAlignment{LdAlign::Right, LdAlign::Center};
 
     // rootDiv.append(&div3);
-    rootDiv.append({&div3, &div4, &div5, &div6});
-    rootDiv.showTree();
+    // rootDiv.append({&div3, &div4, &div5, &div6});
+    rootDiv.layout.paddingSize = {5, 5, 0, 0};
+    rootDiv.append(&div5);
+
+    div5.append({&div4, &div6, &div3});
+    // div5.append({&div3, &div4, &div6});
     // div3.append({&div4, &div5, &div6});
+    div3.layout.grid.pos = {0, 0};
+    div3.layout.grid.span = {1, 1};
+    // div3.layout.grid.span = {1, 3};
+    div4.layout.grid.pos = {0, 1};
+    div4.layout.grid.span = {1, 1};
+    // div5.layout.grid.pos = {1, 0};
+    div6.layout.grid.pos = {1, 0};
+    div6.layout.grid.span = {1, 1};
 
     // div3.layout.internalAlign = LdAlign::Center; // check this later after margins are implemented
 
-    rootDiv.layout.paddingSize = {5, 5, 5, 5};
-    // div5.layout.marginSize = {10, 5, 5, 0};
+    div5.layout.fillPolicy = LdFillPolicy::Grid;
+    div5.layout.grid.config = LdGridConfig{.rows{2}, .cols{2}};
+    // div6.append(&div7);
+    div5.layout.marginSize = {5, 5, 5, 5};
+    // div6.layout.marginSize = {5, 25, 5, 30};
+    // div3.layout.paddingSize = {5, 5, 5, 5};
+    div3.layout.marginSize = {10, 5, 5, 0};
     // div3.layout.wrap = LdWrapMode::WrapAround;
 
-    // div3.layout.borderSize = {.left = 6, .right = 50, .top = 20, .bottom = 14};
-    div3.style.borderColor = utils::hexToVec4("#283a6cff");
+    div3.layout.borderSize = {.left = 6, .right = 6, .top = 6, .bottom = 6};
+    div3.style.borderColor = utils::hexToVec4("#cacacaff");
 
+    div7.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 100}, {LdScalePolicy::Absolute, 100}};
+    div7.style.color = utils::hexToVec4("#810011ff");
+    div6.append(&div7);
     // div4.layout.marginSize = {5, 5, 5, 5};
     // div5.layout.marginSize = {0, 0, 5, 5};
     // div6.layout.marginSize = {0, 2, 4, 5};
@@ -115,6 +151,7 @@ void App::start(int initialWidth, int initialHeight)
     //         rootDiv.updateLayout();
     //     });
     componentManager.resizeEvent(initialWidth, initialHeight);
+    rootDiv.showTree();
 }
 
 void App::update()

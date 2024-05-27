@@ -3,6 +3,7 @@
 #include "LayoutData.hpp"
 #include <cstdint>
 #include <glm/fwd.hpp>
+#include <numeric>
 
 namespace components::layoutcalc
 {
@@ -23,19 +24,117 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
     /* Reset positions */
     resetPositions();
 
-    /* Calculate scale */
-    calculateAndApplyScale(sbDetails);
+    if (root->layout.fillPolicy == LdFillPolicy::Grid)
+    {
+        /* Calculate scale for grid*/
+        gridCalculateAndApplyScale(sbDetails);
 
-    /* Calculate position based on FillPolicy & Orientation */
-    calculateAndApplyPosition(sbDetails);
+        /* Calculate position for grid*/
+        gridCalculateAndApplyPosition(sbDetails);
+    }
+    else
+    {
 
-    /* Calculate and add offset to the position based on Align & internalAlign */
-    calculateAndApplyAlignOffset(sbDetails);
+        /* Calculate scale */
+        calculateAndApplyScale(sbDetails);
+
+        /* Calculate position based on FillPolicy & Orientation */
+        calculateAndApplyPosition(sbDetails);
+
+        /* Calculate and add offset to the position based on Align & internalAlign */
+        calculateAndApplyAlignOffset(sbDetails);
+    }
 
     /* Overflow calculation */
     const auto overflow = calculateAndApplyOverflow(scrollOffsetX, scrollOffsetY, sbDetails);
+    // utils::printlne("X {}  Y {}", overflow.overflowX, overflow.overflowY);
 
     return {overflow.overflowX, overflow.overflowY};
+
+    // return {0, 0};
+}
+
+void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDetails)
+{
+    auto rootScale = getPaddedRootTransform().scale;
+    /* They are reversed, it's justified */
+    rootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
+    rootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
+
+    const auto& gridConfig = root->layout.grid.config;
+    float equalSliceH = 1.0f / gridConfig.cols;
+    float equalSliceV = 1.0f / gridConfig.rows;
+
+    float equalSliceValueH = equalSliceH * rootScale.x;
+    float equalSliceValueV = equalSliceV * rootScale.y;
+
+    for (const auto& comp : root->getNodes())
+    {
+        SKIP_SCROLLBAR(comp)
+
+        const auto& childMargins = comp->layout.marginSize;
+        const auto& childSpan = comp->layout.grid.span;
+        if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
+        {
+            comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
+                                             (equalSliceValueH * childSpan.colSpan);
+        }
+
+        if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
+        {
+            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
+                                             (equalSliceValueV * childSpan.rowSpan);
+        }
+
+        if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
+        {
+            comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value;
+        }
+
+        if (comp->layout.scaling.vertical.policy == LdScalePolicy::Absolute)
+        {
+            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value;
+        }
+
+        // Reduce by margins
+        comp->getTransformRW().scale -= glm::vec2(childMargins.left + childMargins.right,
+            childMargins.top + childMargins.bottom);
+    }
+}
+
+void LayoutCalculator::gridCalculateAndApplyPosition(const ScrollBarDetails& sbDetails)
+{
+    const auto& paddedRoot = getPaddedRootTransform();
+    auto rootScale = paddedRoot.scale;
+
+    /* They are reversed, it's justified */
+    rootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
+    rootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
+
+    const auto& gridConfig = root->layout.grid.config;
+    float equalSliceH = 1.0f / gridConfig.cols;
+    float equalSliceV = 1.0f / gridConfig.rows;
+
+    float equalSliceValueH = equalSliceH * rootScale.x;
+    float equalSliceValueV = equalSliceV * rootScale.y;
+
+    for (const auto& childNode : root->getNodes())
+    {
+        SKIP_SCROLLBAR(childNode)
+
+        const auto& childMargins = childNode->layout.marginSize;
+        const auto& childGridPos = childNode->layout.grid.pos;
+
+        auto& childPos = childNode->getTransformRW().pos;
+        childPos.x += equalSliceValueH * childGridPos.col;
+        childPos.y += equalSliceValueV * childGridPos.row;
+
+        /* Make child take root padding into account */
+        childNode->getTransformRead().pos += paddedRoot.pos;
+
+        // Push by margins
+        childNode->getTransformRW().pos += glm::vec2(childMargins.left, childMargins.top);
+    }
 }
 
 void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
@@ -61,18 +160,20 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
 
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
         {
-            const auto rootLeftBorder = root->layout.borderSize.left;
-            const auto rootRightBorder = root->layout.borderSize.right;
+            const auto childMargins = comp->layout.marginSize;
+            const auto leftSubtract = root->layout.borderSize.left + childMargins.left;
+            const auto rightSubtract = root->layout.borderSize.right + childMargins.right;
             comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
-                                             (rootScale.x - (rootLeftBorder + rootRightBorder));
+                                             (rootScale.x - (leftSubtract + rightSubtract));
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
         {
-            const auto rootTopBorder = root->layout.borderSize.top;
-            const auto rootBotBorder = root->layout.borderSize.bottom;
+            const auto childMargins = comp->layout.marginSize;
+            const auto topSubtract = root->layout.borderSize.top + childMargins.top;
+            const auto botSubtract = root->layout.borderSize.bottom + childMargins.bottom;
             comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
-                                             (rootScale.y - (rootTopBorder + rootBotBorder));
+                                             (rootScale.y - (topSubtract + botSubtract));
         }
     }
 }
@@ -347,6 +448,8 @@ float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float compSc
             bufferPos += offset + compScale;
             break;
         }
+        case LayoutData::FillPolicy::Grid:
+        // Not supported here
         case LayoutData::FillPolicy::COUNT:
             break;
     }

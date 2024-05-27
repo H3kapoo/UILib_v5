@@ -56,6 +56,9 @@ private:
     void calculateAndApplyScale(const ScrollBarDetails& sbDetails);
     void calculateNextBasePosition(glm::vec2& currentXY, AbstractComponent* comp);
 
+    void gridCalculateAndApplyScale(const ScrollBarDetails& sbDetails);
+    void gridCalculateAndApplyPosition(const ScrollBarDetails& sbDetails);
+
     void resetPositions();
     glm::vec2 getRemainingSpaceAfterScale(const ScrollBarDetails& sbDetails);
     Bounds getChildrenBound(const std::vector<AbstractComponent*>& childComps);

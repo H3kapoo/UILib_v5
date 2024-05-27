@@ -2,6 +2,7 @@
 
 #include "../Utility.hpp"
 #include "../mesh/QuadMesh.hpp"
+#include "layoutCalc/LayoutData.hpp"
 
 namespace components
 {
@@ -123,7 +124,7 @@ void AbstractComponent::details()
 {
     const auto pid = parent ? std::to_string(parent->getId()) : "N/A";
     const auto dep = depth ? std::to_string(depth) : "Root(0)";
-    std::string stringType;
+    std::string stringType, layoutType;
 
     switch (type)
     {
@@ -143,7 +144,24 @@ void AbstractComponent::details()
             stringType = "Unknown";
     }
 
-    utils::println("{{id: {}, pid={}, depth={}, type: {}}}", id, pid, dep, stringType);
+    switch (layout.fillPolicy)
+    {
+        case components::layoutcalc::LdFillPolicy::Tightly:
+            layoutType = "Tightly";
+            break;
+        case components::layoutcalc::LdFillPolicy::SpaceBetween:
+            layoutType = "SpaceBetween";
+            break;
+        case components::layoutcalc::LdFillPolicy::EvenlySpaced:
+            layoutType = "EvenlySpaced";
+            break;
+        case components::layoutcalc::LdFillPolicy::Grid:
+            layoutType = "Grid";
+            break;
+        case components::layoutcalc::LdFillPolicy::COUNT:
+            layoutType = "Unknown";
+    }
+    utils::println("{{id: {}, pid={}, depth={}, type: {}, layout: {}}}", id, pid, dep, stringType, layoutType);
 }
 
 void AbstractComponent::showTree()

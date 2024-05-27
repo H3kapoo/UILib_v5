@@ -45,6 +45,7 @@ struct LayoutData
         Tightly,
         EvenlySpaced,
         SpaceBetween,
+        Grid,
         COUNT
     };
 
@@ -80,21 +81,51 @@ struct LayoutData
         uint16_t bottom{0};
     };
 
+    struct GridConfig
+    {
+        uint16_t rows;
+        uint16_t cols;
+    };
+
+    struct GridPos
+    {
+        uint16_t row{0};
+        uint16_t col{0};
+    };
+
+    struct GridSpan
+    {
+        uint16_t rowSpan{1};
+        uint16_t colSpan{1};
+    };
+
+    struct Grid
+    {
+        GridConfig config;
+        GridPos pos;
+        GridSpan span;
+    };
+
     Orientation orientation{Orientation::Horizontal};
     FillPolicy fillPolicy{FillPolicy::Tightly};
     Alignment align{Alignment{Align::Left, Align::Top}};
     Align internalAlign{Align::Top};
     Scaling scaling{ScalePair{ScalePolicy::Absolute, 10}, ScalePair{ScalePolicy::Absolute, 10}};
     WrapMode wrap{WrapMode::NoWrap};
-
-    int16_t scrollBarSize{21};
+    Grid grid{GridConfig{{1}, {1}}, GridPos{1, 1}, GridSpan{1, 1}};
 
     SpacialSize borderSize{0};
     SpacialSize marginSize{0};
     SpacialSize paddingSize{0};
+
+    int16_t scrollBarSize{21};
 };
 
 using LdOrientation = LayoutData::Orientation;
+using LdGrid = LayoutData::Grid;
+using LdGridPos = LayoutData::GridPos;
+using LdGridSpan = LayoutData::GridSpan;
+using LdGridConfig = LayoutData::GridConfig;
 using LdFillPolicy = LayoutData::FillPolicy;
 using LdAlignment = LayoutData::Alignment;
 using LdAlign = LayoutData::Align;
