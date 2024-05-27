@@ -168,10 +168,10 @@ void ScrollBar::notifyLayoutHasChanged()
 
     const auto& parentTransform = getParent()->getTransformRead();
     const auto& parentLayout = getParent()->layout;
-    const auto rootLeftBorder = parentLayout.borderSize.left;
-    const auto rootRightBorder = parentLayout.borderSize.right;
-    const auto rootTopBorder = parentLayout.borderSize.top;
-    const auto rootBotBorder = parentLayout.borderSize.bottom;
+    const auto rootLeftBorder = parentLayout.border.left;
+    const auto rootRightBorder = parentLayout.border.right;
+    const auto rootTopBorder = parentLayout.border.top;
+    const auto rootBotBorder = parentLayout.border.bottom;
 
     if (options.orientation == layoutcalc::LdOrientation::Horizontal)
     {

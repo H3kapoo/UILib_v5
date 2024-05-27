@@ -45,8 +45,7 @@ void Div::imagePathChanged()
 
 void Div::onPrepareToRender()
 {
-    auto border = glm::vec4(layout.borderSize.top, layout.borderSize.bottom, layout.borderSize.left,
-        layout.borderSize.right);
+    auto border = glm::vec4(layout.border.top, layout.border.bottom, layout.border.left, layout.border.right);
 
     getShader().setActiveShaderId(getShaderId());
 

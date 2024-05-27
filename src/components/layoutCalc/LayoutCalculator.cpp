@@ -55,9 +55,17 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
 void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDetails)
 {
     auto rootScale = getPaddedRootTransform().scale;
+
+    const auto rootLeftBorder = root->layout.border.left;
+    const auto rootRightBorder = root->layout.border.right;
+    const auto rootTopBorder = root->layout.border.top;
+    const auto rootBotBorder = root->layout.border.bottom;
+
     /* They are reversed, it's justified */
     rootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
+    rootScale.x -= rootLeftBorder + rootRightBorder;
     rootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
+    rootScale.y -= rootTopBorder + rootBotBorder;
 
     const auto& gridConfig = root->layout.grid.config;
     float equalSliceH = 1.0f / gridConfig.cols;
@@ -70,7 +78,7 @@ void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDeta
     {
         SKIP_SCROLLBAR(comp)
 
-        const auto& childMargins = comp->layout.marginSize;
+        const auto& childMargins = comp->layout.margin;
         const auto& childSpan = comp->layout.grid.span;
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
         {
@@ -109,9 +117,16 @@ void LayoutCalculator::gridCalculateAndApplyPosition(const ScrollBarDetails& sbD
     const auto& paddedRoot = getPaddedRootTransform();
     auto rootScale = paddedRoot.scale;
 
+    const auto rootLeftBorder = root->layout.border.left;
+    const auto rootRightBorder = root->layout.border.right;
+    const auto rootTopBorder = root->layout.border.top;
+    const auto rootBotBorder = root->layout.border.bottom;
+
     /* They are reversed, it's justified */
     rootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
+    rootScale.x -= rootLeftBorder + rootRightBorder;
     rootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
+    rootScale.y -= rootTopBorder + rootBotBorder;
 
     const auto& gridConfig = root->layout.grid.config;
     float equalSliceH = 1.0f / gridConfig.cols;
@@ -124,7 +139,7 @@ void LayoutCalculator::gridCalculateAndApplyPosition(const ScrollBarDetails& sbD
     {
         SKIP_SCROLLBAR(childNode)
 
-        const auto& childMargins = childNode->layout.marginSize;
+        const auto& childMargins = childNode->layout.margin;
         const auto& childGridPos = childNode->layout.grid.pos;
 
         auto& childPos = childNode->getTransformRW().pos;
@@ -132,7 +147,7 @@ void LayoutCalculator::gridCalculateAndApplyPosition(const ScrollBarDetails& sbD
         childPos.y += equalSliceValueV * childGridPos.row;
 
         /* Make child take root padding into account */
-        childNode->getTransformRead().pos += paddedRoot.pos;
+        childNode->getTransformRead().pos += paddedRoot.pos + glm::i16vec2(rootLeftBorder, rootTopBorder);
 
         // Push by margins
         childNode->getTransformRW().pos += glm::vec2(childMargins.left, childMargins.top);
@@ -162,9 +177,9 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
 
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
         {
-            const auto childMargins = comp->layout.marginSize;
-            const auto leftSubtract = root->layout.borderSize.left;
-            const auto rightSubtract = root->layout.borderSize.right;
+            const auto childMargins = comp->layout.margin;
+            const auto leftSubtract = root->layout.border.left;
+            const auto rightSubtract = root->layout.border.right;
             comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
                                              (rootScale.x - (leftSubtract + rightSubtract));
             comp->getTransformRW().scale.x -= childMargins.left + childMargins.right;
@@ -175,9 +190,9 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
         {
-            const auto childMargins = comp->layout.marginSize;
-            const auto topSubtract = root->layout.borderSize.top;
-            const auto botSubtract = root->layout.borderSize.bottom;
+            const auto childMargins = comp->layout.margin;
+            const auto topSubtract = root->layout.border.top;
+            const auto botSubtract = root->layout.border.bottom;
             comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
                                              (rootScale.y - (topSubtract + botSubtract));
             comp->getTransformRW().scale.y -= childMargins.top + childMargins.bottom;
@@ -200,7 +215,7 @@ void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetai
     {
         SKIP_SCROLLBAR(childNode)
 
-        const auto& childMargin = childNode->layout.marginSize;
+        const auto& childMargin = childNode->layout.margin;
         glm::i16vec2 nextPos = {0, 0};
 
         const auto& childTransform = getAdjustedTransform(childNode);
@@ -248,10 +263,10 @@ void LayoutCalculator::calculateAndApplyPosition(const ScrollBarDetails& sbDetai
 
 void LayoutCalculator::calculateAndApplyAlignOffset(const ScrollBarDetails& sbDetails)
 {
-    const auto rootLeftBorder = root->layout.borderSize.left;
-    const auto rootRightBorder = root->layout.borderSize.right;
-    const auto rootTopBorder = root->layout.borderSize.top;
-    const auto rootBotBorder = root->layout.borderSize.bottom;
+    const auto rootLeftBorder = root->layout.border.left;
+    const auto rootRightBorder = root->layout.border.right;
+    const auto rootTopBorder = root->layout.border.top;
+    const auto rootBotBorder = root->layout.border.bottom;
 
     const auto& rootBox = getPaddedRootTransform();
     const auto bound = getChildrenBound(root->getNodes());
@@ -389,10 +404,10 @@ LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(con
 
     const auto bounds = getChildrenBound(root->getNodes());
 
-    const auto rootLeftBorder = root->layout.borderSize.left;
-    const auto rootRightBorder = root->layout.borderSize.right;
-    const auto rootTopBorder = root->layout.borderSize.top;
-    const auto rootBotBorder = root->layout.borderSize.bottom;
+    const auto rootLeftBorder = root->layout.border.left;
+    const auto rootRightBorder = root->layout.border.right;
+    const auto rootTopBorder = root->layout.border.top;
+    const auto rootBotBorder = root->layout.border.bottom;
 
     const auto& rootAdjustedTransform = getPaddedRootTransform();
     const auto& rts = rootAdjustedTransform.scale -
@@ -478,10 +493,10 @@ void LayoutCalculator::resetPositions()
 
 glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale(const ScrollBarDetails& sbDetails)
 {
-    const auto rootLeftBorder = root->layout.borderSize.left;
-    const auto rootRightBorder = root->layout.borderSize.right;
-    const auto rootTopBorder = root->layout.borderSize.top;
-    const auto rootBotBorder = root->layout.borderSize.bottom;
+    const auto rootLeftBorder = root->layout.border.left;
+    const auto rootRightBorder = root->layout.border.right;
+    const auto rootTopBorder = root->layout.border.top;
+    const auto rootBotBorder = root->layout.border.bottom;
 
     // glm::vec2 accumulatedSize = {0, 0};
     glm::i16vec2 accumulatedSize = {0, 0};
@@ -546,7 +561,7 @@ LayoutCalculator::AdjustedTransform LayoutCalculator::getAdjustedTransform(Abstr
     /* This basically extends the components "box" by the margins effectively making the following calculationg think
        the object is objectSize+marginsSize*/
     AdjustedTransform newTransform;
-    const auto& childMargin = comp->layout.marginSize;
+    const auto& childMargin = comp->layout.margin;
     newTransform.pos = comp->getTransformRead().pos - glm::vec2(childMargin.left, childMargin.top);
     newTransform.scale = comp->getTransformRead().scale +
                          glm::vec2(childMargin.left + childMargin.right, childMargin.top + childMargin.bottom);
@@ -556,7 +571,7 @@ LayoutCalculator::AdjustedTransform LayoutCalculator::getAdjustedTransform(Abstr
 LayoutCalculator::AdjustedTransform LayoutCalculator::getPaddedRootTransform()
 {
     AdjustedTransform newTransform;
-    const auto& rootPadding = root->layout.paddingSize;
+    const auto& rootPadding = root->layout.padding;
     const auto& rootTransform = root->getTransformRead();
     newTransform.pos = rootTransform.pos + glm::vec2(rootPadding.left, rootPadding.top);
     newTransform.scale = rootTransform.scale -

@@ -290,10 +290,10 @@ void ComponentManager::computeViewableArea()
     /* Compute viewable area from backmost element to frontmost element. Back to front. */
     for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
-        const auto& childLeftBorder = childNode->layout.borderSize.left;
-        const auto& childRightBorder = childNode->layout.borderSize.right;
-        const auto& childTopBorder = childNode->layout.borderSize.top;
-        const auto& childBotBorder = childNode->layout.borderSize.bottom;
+        const auto& childLeftBorder = childNode->layout.border.left;
+        const auto& childRightBorder = childNode->layout.border.right;
+        const auto& childTopBorder = childNode->layout.border.top;
+        const auto& childBotBorder = childNode->layout.border.bottom;
 
         /* If we are root, viewable area is ourself */
         if (childNode->getId() == root->getId())

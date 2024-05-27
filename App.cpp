@@ -16,17 +16,19 @@ void App::start(int initialWidth, int initialHeight)
     componentManager.setRoot(&rootDiv);
 
     rootDiv.style.color = utils::hexToVec4("#125ea9ff");
-    rootDiv.layout.paddingSize = {5, 5, 5, 5};
+    // rootDiv.layout.padding = {5, 5, 5, 5};
 
     rootDiv.append({&div2, &div3});
 
     div2.layout.orientation = LdOrientation::Vertical;
-    div2.layout.align = LdAlignment{LdAlign::Left, LdAlign::Center};
     div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.2f}, {LdScalePolicy::Relative, 1.0f}};
-    div2.layout.marginSize = {0, 0, 10, 0};
+    // div2.layout.margin = {0, 0, 10, 0};
     div2.style.color = utils::hexToVec4("#c85c0fff");
 
     div3.layout.fillPolicy = LdFillPolicy::Grid;
+    div3.layout.grid.config = LdGridConfig{2, 2};
+    div3.layout.border = {10, 10, 10, 10};
+    div3.style.borderColor = utils::hexToVec4("#090406ff");
     div3.style.color = utils::hexToVec4("#bc115bff");
     div3.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.8f}, {LdScalePolicy::Relative, 1.0f}};
 
@@ -38,6 +40,24 @@ void App::start(int initialWidth, int initialHeight)
     div5.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Absolute, 300}};
     div5.style.color = utils::hexToVec4("#381b28ff");
 
+    div6.style.color = utils::hexToVec4("#24a40dff");
+    div6.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
+
+    div7.style.color = utils::hexToVec4("#24a42dff");
+    div7.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
+
+    div8.style.color = utils::hexToVec4("#24a44dff");
+    div8.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
+
+    div9.style.color = utils::hexToVec4("#24a46dff");
+    div9.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
+    div6.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+
+    div6.layout.grid.pos = {0, 0};
+    div7.layout.grid.pos = {0, 1};
+    div8.layout.grid.pos = {1, 0};
+    div9.layout.grid.pos = {1, 1};
+    div3.append({&div6, &div7, &div8, &div9});
     // rootDiv.style.color = utils::hexToVec4("#125ea9ff");
     // rootDiv.style.borderColor = utils::hexToVec4("#c85c0fff");
     // // rootDiv.style.enableHScroll = false;
