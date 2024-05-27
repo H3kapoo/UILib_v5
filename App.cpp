@@ -16,11 +16,14 @@ void App::start(int initialWidth, int initialHeight)
     componentManager.setRoot(&rootDiv);
 
     rootDiv.style.color = utils::hexToVec4("#125ea9ff");
+    rootDiv.layout.paddingSize = {5, 5, 5, 5};
 
     rootDiv.append({&div2, &div3});
 
     div2.layout.orientation = LdOrientation::Vertical;
+    div2.layout.align = LdAlignment{LdAlign::Left, LdAlign::Center};
     div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.2f}, {LdScalePolicy::Relative, 1.0f}};
+    div2.layout.marginSize = {0, 0, 10, 0};
     div2.style.color = utils::hexToVec4("#c85c0fff");
 
     div3.layout.fillPolicy = LdFillPolicy::Grid;

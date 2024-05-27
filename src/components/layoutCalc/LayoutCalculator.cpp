@@ -48,7 +48,7 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
 
     /* Overflow calculation */
     const auto overflow = calculateAndApplyOverflow(scrollOffsetX, scrollOffsetY, sbDetails);
-
+    // utils::printlne("OX {}", overflow.overflowX);
     return {overflow.overflowX, overflow.overflowY};
 }
 
@@ -77,7 +77,7 @@ void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDeta
             comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
                                              (equalSliceValueH * childSpan.colSpan);
             /* Needed so we don't get pixel imperfect visual artifacts */
-            comp->getTransformRead().scale.x = std::round(comp->getTransformRead().scale.x);
+            comp->getTransformRW().scale.x = std::round(comp->getTransformRead().scale.x);
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
@@ -85,7 +85,7 @@ void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDeta
             comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
                                              (equalSliceValueV * childSpan.rowSpan);
             /* Needed so we don't get pixel imperfect visual artifacts */
-            comp->getTransformRead().scale.y = std::round(comp->getTransformRead().scale.y);
+            comp->getTransformRW().scale.y = std::round(comp->getTransformRead().scale.y);
         }
 
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
@@ -163,25 +163,27 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
         {
             const auto childMargins = comp->layout.marginSize;
-            const auto leftSubtract = root->layout.borderSize.left + childMargins.left;
-            const auto rightSubtract = root->layout.borderSize.right + childMargins.right;
+            const auto leftSubtract = root->layout.borderSize.left;
+            const auto rightSubtract = root->layout.borderSize.right;
             comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
                                              (rootScale.x - (leftSubtract + rightSubtract));
+            comp->getTransformRW().scale.x -= childMargins.left + childMargins.right;
 
             /* Needed so we don't get pixel imperfect visual artifacts */
-            comp->getTransformRead().scale.x = std::round(comp->getTransformRead().scale.x);
+            comp->getTransformRW().scale.x = std::round(comp->getTransformRead().scale.x);
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
         {
             const auto childMargins = comp->layout.marginSize;
-            const auto topSubtract = root->layout.borderSize.top + childMargins.top;
-            const auto botSubtract = root->layout.borderSize.bottom + childMargins.bottom;
+            const auto topSubtract = root->layout.borderSize.top;
+            const auto botSubtract = root->layout.borderSize.bottom;
             comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
                                              (rootScale.y - (topSubtract + botSubtract));
+            comp->getTransformRW().scale.y -= childMargins.top + childMargins.bottom;
 
             /* Needed so we don't get pixel imperfect visual artifacts */
-            comp->getTransformRead().scale.y = std::round(comp->getTransformRead().scale.y);
+            comp->getTransformRW().scale.y = std::round(comp->getTransformRead().scale.y);
         }
     }
 }
@@ -500,7 +502,6 @@ glm::vec2 LayoutCalculator::getRemainingSpaceAfterScale(const ScrollBarDetails& 
         }
     }
 
-    // TODO: take into accound padd
     const auto& rootScale = getPaddedRootTransform().scale;
     auto remainingSpace = rootScale - accumulatedSize;
     remainingSpace.x -= (rootLeftBorder + rootRightBorder);
