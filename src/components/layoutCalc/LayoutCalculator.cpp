@@ -181,7 +181,7 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
                                              (rootScale.y - (topSubtract + botSubtract));
 
             /* Needed so we don't get pixel imperfect visual artifacts */
-            comp->getTransformRead().scale.y = std::round(comp->getTransformRead().scale.);
+            comp->getTransformRead().scale.y = std::round(comp->getTransformRead().scale.y);
         }
     }
 }
