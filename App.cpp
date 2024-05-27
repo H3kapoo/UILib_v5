@@ -22,7 +22,6 @@ void App::start(int initialWidth, int initialHeight)
 
     div2.layout.orientation = LdOrientation::Vertical;
     div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.2f}, {LdScalePolicy::Relative, 1.0f}};
-    // div2.layout.margin = {0, 0, 10, 0};
     div2.style.color = utils::hexToVec4("#c85c0fff");
 
     div3.layout.fillPolicy = LdFillPolicy::Grid;
@@ -41,6 +40,8 @@ void App::start(int initialWidth, int initialHeight)
     div5.style.color = utils::hexToVec4("#381b28ff");
 
     div6.style.color = utils::hexToVec4("#24a40dff");
+    div6.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+    div6.layout.margin = {5, 5, 5, 0};
     div6.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
 
     div7.style.color = utils::hexToVec4("#24a42dff");
@@ -51,7 +52,6 @@ void App::start(int initialWidth, int initialHeight)
 
     div9.style.color = utils::hexToVec4("#24a46dff");
     div9.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
-    div6.style.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
     div6.layout.grid.pos = {0, 0};
     div7.layout.grid.pos = {0, 1};
