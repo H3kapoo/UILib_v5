@@ -5,6 +5,7 @@
 #include "src/components/Button.hpp"
 #include "src/components/ComponentManager.hpp"
 #include "src/components/Div.hpp"
+#include "src/components/TabSwitcher.hpp"
 #include "src/components/layoutCalc/LayoutData.hpp"
 #include "src/inputManagement/Input.hpp"
 
@@ -32,5 +33,7 @@ private:
     ComponentManager componentManager;
     Div rootDiv;
     Div div2, div3, div4, div5, div6, div7, div8, div9;
+    Button btn;
+    TabSwitcher ts;
     std::vector<AbstractComponent*> divs;
 };

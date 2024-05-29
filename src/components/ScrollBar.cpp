@@ -121,11 +121,14 @@ void ScrollBar::onStart()
      eliminates those problems with minimal overhead. */
     static int16_t SB_DEPTH_COUNTUP = 512;
 
-    // Note: Do this in case you render back to front (alpha blending)
-    //  manuallyAdjustDepthTo(++SB_DEPTH_COUNTUP);
-
+#ifdef RENDER_FRONT_TO_BACK
     // Note: Do this in case you render front to back
-    manuallyAdjustDepthTo(--SB_DEPTH_COUNTUP);
+    // manuallyAdjustDepthTo(--SB_DEPTH_COUNTUP);
+#else
+    // Note: Do this in case you render back to front (alpha blending)
+    manuallyAdjustDepthTo(++SB_DEPTH_COUNTUP);
+#endif
+
     knob.transform.layer = getDepth() + 1;
 }
 

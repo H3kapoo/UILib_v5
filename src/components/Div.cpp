@@ -10,15 +10,13 @@
 namespace components
 {
 Div::Div()
-    // : AbstractComponent({.type = "Div", .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl"})
     : AbstractComponent({.type = CompType::Div,
           .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
     //   .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl"})
 
     , textureLoader(assetloaders::TextureLoader::get())
 {
-    style.imagePath.onReload = std::bind(&Div::imagePathChanged, this);
-    // style.imagePath.onReload = []() {};
+    imagePath.onReload = std::bind(&Div::reloadImage, this);
 }
 
 Div::~Div()
@@ -27,14 +25,14 @@ Div::~Div()
     if (vsb) { delete vsb; }
 }
 
-void Div::imagePathChanged()
+void Div::reloadImage()
 {
     /* Note: User shall ensure valid path. */
-    if (!std::string_view(style.imagePath.value).empty())
+    if (!std::string_view(imagePath.value).empty())
     {
-        textureData = textureLoader.loadTexture(style.imagePath.value);
+        textureData = textureLoader.loadTexture(imagePath.value);
         changeShaderTo("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl");
-        utils::printlni("Div {} reloaded image to {}", getId(), style.imagePath.value);
+        utils::printlni("Div {} reloaded image to {}", getId(), imagePath.value);
     }
     else
     {

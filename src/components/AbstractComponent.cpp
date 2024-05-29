@@ -140,6 +140,9 @@ void AbstractComponent::details()
         case CompType::ScrollBar:
             stringType = "ScrollBar";
             break;
+        case CompType::TabSwitcher:
+            stringType = "TabSwitcher";
+            break;
         default:
             stringType = "Unknown";
     }
@@ -284,6 +287,7 @@ bool AbstractComponent::removeAux(AbstractComponent* node)
     if (it != children.end())
     {
         /* Reset values */
+        (*it)->invalidateSubtree();
         (*it)->isParented = false;
         (*it)->isRuntimeInitialized = false;
         (*it)->parent = nullptr;
@@ -294,6 +298,17 @@ bool AbstractComponent::removeAux(AbstractComponent* node)
     }
 
     return false;
+}
+
+void AbstractComponent::invalidateSubtree()
+{
+    for (const auto& child : children)
+    {
+        child->isRuntimeInitialized = false;
+        child->depth = 0;
+        child->state = nullptr;
+        child->invalidateSubtree();
+    }
 }
 
 int AbstractComponent::generateNextId()
@@ -346,7 +361,7 @@ void AbstractComponent::updateNodeStructure()
            means the node is already ok. */
         if (!node->state)
         {
-            utils::printlnw("Node nId {} came from unparented at that point subtree!", node->getId());
+            utils::printlnw("Node nId {} came from unparented at that point subtree {}!", node->getId(), getId());
             node->setState(state);
             node->depth = getDepth() + 1;
             node->getTransformRW().layer = getDepth();

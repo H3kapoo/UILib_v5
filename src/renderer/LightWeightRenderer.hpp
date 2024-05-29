@@ -22,7 +22,10 @@ public:
         shaderLoader.setMatrix4("uProjMatrix", projMatrix);
         shaderLoader.setMatrix4("uModelMatrix", dummy.transform.getTransform());
 
-        shaderLoader.setVec4f("uColor", dummy.options.color);
+        // TODO: Quick for testing only. Refactor later.
+        if (dummy.options.isForTextures) { shaderLoader.setInt("uTexture", dummy.options.textureId); }
+        else { shaderLoader.setVec4f("uColor", dummy.options.color); }
+
         glBindVertexArray(dummy.vaoId);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }

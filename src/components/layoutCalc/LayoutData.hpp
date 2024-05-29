@@ -112,7 +112,7 @@ struct LayoutData
     Align internalAlign{Align::Top};
     Scaling scaling{ScalePair{ScalePolicy::Absolute, 10}, ScalePair{ScalePolicy::Absolute, 10}};
     WrapMode wrap{WrapMode::NoWrap};
-    Grid grid{GridConfig{1, 1}, GridPos{1, 1}, GridSpan{1, 1}};
+    Grid grid{GridConfig{1, 1}, GridPos{0, 0}, GridSpan{1, 1}};
 
     SpacialSize border{0};
     SpacialSize margin{0};

@@ -48,7 +48,9 @@ void ComponentManager::updateLayout()
     bool needsUpdate = false;
     for (const auto& childNode : flattenedNodes | std::views::reverse)
     {
-        if (childNode->getNodes().empty()) { continue; }
+        // TODO: For now let every child go thru this. But in the future we should reduce these calls even if the called
+        // code is inexistent (empty virtual func)
+        //  if (childNode->getNodes().empty()) { continue; }
 
         if (childNode->onLayoutUpdate())
         {
@@ -77,8 +79,11 @@ void ComponentManager::render()
     /* Note: For alpha blending to work, we unfortunatelly have to render objects back to front and disable depth
        testing. This introduces a bit of overdraw sadly. If it's know there will be no alpha blending, 'reverse' can be
        removed and depth testing SHALL be enabled. */
-    // for (const auto& childNode : flattenedNodes | std::views::reverse)
+#ifdef RENDER_FRONT_TO_BACK
     for (const auto& childNode : flattenedNodes)
+#else
+    for (const auto& childNode : flattenedNodes | std::views::reverse)
+#endif
     {
         if (!childNode->isComponentRenderable()) { continue; }
 
@@ -92,11 +97,11 @@ void ComponentManager::render()
         {
             /* Note: No point in rendering invisible components. Maybe this could be extended to layout updates too,
              * make them more conservative. */
-            const auto& childVA = childNode->getParent()->viewArea;
-            if (childVA.scale.x <= 0 || childVA.scale.y <= 0) { continue; }
+            const auto& parentVA = childNode->getParent()->viewArea;
+            if (parentVA.scale.x <= 0 || parentVA.scale.y <= 0) { continue; }
 
-            glScissor(childVA.start.x, state.windowHeight - (childVA.start.y + childVA.scale.y), childVA.scale.x,
-                childVA.scale.y);
+            glScissor(parentVA.start.x, state.windowHeight - (parentVA.start.y + parentVA.scale.y), parentVA.scale.x,
+                parentVA.scale.y);
         }
 
         childNode->onPrepareToRender();

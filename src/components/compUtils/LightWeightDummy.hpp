@@ -21,6 +21,8 @@ public:
     struct Options
     {
         glm::vec4 color{1.0f};
+        int64_t textureId{0};
+        bool isForTextures{false};
         std::string shaderPath;
     };
 

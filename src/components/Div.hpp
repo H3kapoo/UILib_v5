@@ -21,9 +21,6 @@ public:
         glm::vec4 borderColor{0.0f};
         glm::vec4 color{0.0f};
 
-        /* Background texture path */
-        AssignReloadable<const char*> imagePath{""};
-
         /* Scrollbar related */
         bool enableHScroll{true};
         bool enableVScroll{true};
@@ -41,8 +38,11 @@ public:
 
     Style style;
 
+    /* Background texture path */
+    AssignReloadable<const char*> imagePath{""};
+
 private:
-    void imagePathChanged();
+    void reloadImage();
 
     void onPrepareToRender() override;
     void onRenderDone() override;

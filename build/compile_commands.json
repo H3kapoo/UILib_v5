@@ -36,6 +36,11 @@
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/TabSwitcher.cpp.o -c /home/hekapoo/newTryAtUI/src/components/TabSwitcher.cpp",
+  "file": "/home/hekapoo/newTryAtUI/src/components/TabSwitcher.cpp"
+},
+{
+  "directory": "/home/hekapoo/newTryAtUI/build",
   "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/AbstractComponent.cpp.o -c /home/hekapoo/newTryAtUI/src/components/AbstractComponent.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/components/AbstractComponent.cpp"
 },

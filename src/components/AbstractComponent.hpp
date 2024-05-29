@@ -24,6 +24,7 @@ public:
         Button,
         Div,
         ScrollBar,
+        TabSwitcher
     };
 
     struct Options
@@ -177,6 +178,7 @@ public:
 
 private:
     /* Internal helpers */
+    void invalidateSubtree();
     int generateNextId();
     void showTree(int currentDepth);
 
