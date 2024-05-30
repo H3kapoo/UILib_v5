@@ -30,7 +30,7 @@ void Button::onPrepareToRender()
 }
 void Button::onStart()
 {
-    imageDummy.transform.layer = getDepth() + 10;
+    imageDummy.transform.layer = getDepth() + 1;
     utils::printlni("[INF] I am node {} and onStart() called {}", getId(), imageDummy.transform.layer);
 }
 

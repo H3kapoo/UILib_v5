@@ -17,12 +17,17 @@ void App::start(int initialWidth, int initialHeight)
 
     rootDiv.style.color = utils::hexToVec4("#125ea9ff");
     rootDiv.layout.padding = {5, 5, 5, 5};
+    rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
 
     ts.style.color = utils::hexToVec4("#c85c0fff");
     ts.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.8f}, {LdScalePolicy::Relative, 0.8f}};
+    ts2.style.color = utils::hexToVec4("#c85c0fff");
+    // ts2.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 400}, {LdScalePolicy::Absolute, 400}};
 
     div2.style.color = utils::hexToVec4("#c85c0fff");
-    div3.style.color = utils::hexToVec4("#672d04ff");
+    div3.style.color = utils::hexToVec4("#1c0995ff");
+    div4.style.color = utils::hexToVec4("#ab0ea6ff");
+
     div5.style.color = utils::hexToVec4("#0b9073ff");
     div6.style.color = utils::hexToVec4("#5e0667ff");
     div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 600}};
@@ -31,9 +36,17 @@ void App::start(int initialWidth, int initialHeight)
     div5.append(&div6);
 
     ts.addTab("LeftTab", 0, &div3);
-    ts.addTab("RightTab", 1, &div4);
+    ts.addTab("RightTab", 1, &ts2);
     ts.addTab("MidTab", 2, &div5);
     ts.showTree();
+
+    div7.style.color = utils::hexToVec4("#c85c0fff");
+    div8.style.color = utils::hexToVec4("#1c0995ff");
+    div9.style.color = utils::hexToVec4("#ab0ea6ff");
+
+    ts2.addTab("LeftTab", 0, &div7);
+    ts2.addTab("RightTab", 1, &div8);
+    ts2.addTab("MidTab", 2, &div9);
     rootDiv.append(&ts);
 
     // rootDiv.append({&div2, &div3});

@@ -29,7 +29,7 @@ public:
     struct TabData
     {
         Button* tabBtn;
-        Div* root{nullptr};
+        AbstractComponent* root{nullptr};
         std::string name{"?"};
         uint16_t pos{0};
     };
@@ -37,7 +37,7 @@ public:
     TabSwitcher();
     ~TabSwitcher();
 
-    void addTab(const std::string& name, uint16_t pos, Div* root);
+    void addTab(const std::string& name, uint16_t pos, AbstractComponent* root);
 
     Style style;
 
@@ -45,6 +45,7 @@ private:
     std::vector<TabData> tabData;
     Div tabsSelector;
     Div tabView;
+    Button* currentTabBtn;
     // std::array<TabData, 4> tabData;
 
     /* User shall not be able to add or remove children to TabSwitcher */
