@@ -21,10 +21,21 @@ void App::start(int initialWidth, int initialHeight)
     ts.style.color = utils::hexToVec4("#c85c0fff");
     ts.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.8f}, {LdScalePolicy::Relative, 0.8f}};
 
-    // ts.addTab("LeftTab", 0, &div2);
-    // ts.addTab("RightTab", 1, &div3);
+    div2.style.color = utils::hexToVec4("#c85c0fff");
+    div3.style.color = utils::hexToVec4("#672d04ff");
+    div5.style.color = utils::hexToVec4("#0b9073ff");
+    div6.style.color = utils::hexToVec4("#5e0667ff");
+    div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 600}};
+    div6.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
+    div5.append(&div6);
+
+    ts.addTab("LeftTab", 0, &div3);
+    ts.addTab("RightTab", 1, &div4);
+    ts.addTab("MidTab", 2, &div5);
+    ts.showTree();
     rootDiv.append(&ts);
+
     // rootDiv.append({&div2, &div3});
 
     // div2.layout.orientation = LdOrientation::Vertical;

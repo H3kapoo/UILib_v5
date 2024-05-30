@@ -50,7 +50,8 @@ void Button::reloadImage()
     else
     {
         textureData = textureLoader.loadTexture(sideImage.path.value);
-        utils::printlni("Button {} reloaded image to {}", getId(), sideImage.path.value);
+        imageDummy.options.textureId = textureData->id;
+        // utils::printlni("Button {} reloaded image to {}", getId(), sideImage.path.value);
     }
 }
 
@@ -64,12 +65,15 @@ void Button::onClickEvent()
     // println("Button element id {} has been clicked!", getId());
 
     const auto& s = getState();
-    if (mouseClickCb) mouseClickCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
+    if (s->mouseAction == HIDAction::Pressed)
+    {
+        if (mouseClickCb) mouseClickCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
+    }
 };
 
 void Button::onMouseEnterEvent()
 {
-    utils::printlni("Button element id {} has been entered!", getId());
+    // utils::printlni("Button element id {} has been entered!", getId());
     style.color = utils::hexToVec4("#606160ff");
     // const auto& s = getState();
     // println("For Button {} mouse position is {}-{}", getId(), s->mouseX, s->mouseY);
@@ -77,7 +81,7 @@ void Button::onMouseEnterEvent()
 
 void Button::onMouseExitEvent()
 {
-    utils::printlni("Button element id {} has been exited!", getId());
+    // utils::printlni("Button element id {} has been exited!", getId());
     style.color = utils::hexToVec4("#404140ff");
     // const auto& s = getState();
     // println("For Button {} mouse position is {}-{}", getId(), s->mouseX, s->mouseY);

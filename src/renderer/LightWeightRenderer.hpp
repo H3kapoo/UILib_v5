@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Utility.hpp"
 #include "../components/compUtils/LightWeightDummy.hpp"
 #include "../shaderManagement/ShaderLoader.hpp"
 
@@ -23,7 +24,10 @@ public:
         shaderLoader.setMatrix4("uModelMatrix", dummy.transform.getTransform());
 
         // TODO: Quick for testing only. Refactor later.
-        if (dummy.options.isForTextures) { shaderLoader.setInt("uTexture", dummy.options.textureId); }
+        if (dummy.options.isForTextures)
+        {
+            shaderLoader.set2DTextureUnit("uTexture", dummy.options.textureId, GL_TEXTURE0);
+        }
         else { shaderLoader.setVec4f("uColor", dummy.options.color); }
 
         glBindVertexArray(dummy.vaoId);

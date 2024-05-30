@@ -287,7 +287,7 @@ bool AbstractComponent::removeAux(AbstractComponent* node)
     if (it != children.end())
     {
         /* Reset values */
-        (*it)->invalidateSubtree();
+        // (*it)->invalidateSubtree();
         (*it)->isParented = false;
         (*it)->isRuntimeInitialized = false;
         (*it)->parent = nullptr;

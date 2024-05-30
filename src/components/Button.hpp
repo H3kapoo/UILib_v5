@@ -30,6 +30,7 @@ public:
     };
 
     Button();
+    Button(const Button&) = default;
     ~Button();
 
     void addClickListener(std::function<void(int, int, MouseButton)> func);

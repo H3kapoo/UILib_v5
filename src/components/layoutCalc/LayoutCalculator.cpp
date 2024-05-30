@@ -54,6 +54,12 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
 
 void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDetails)
 {
+    /* We can get 1 pixel off errors due to rounding inaccuracy. We need to counteract this by keeping track of the
+       current error. If this error is greater than epsilon, we need to add +1 to the scale of the currently under
+       calculation component. */
+    glm::vec2 accumulatedScaleError = {0, 0};
+    float epsi = 1.0f / root->getNodes().size();
+
     auto rootScale = getPaddedRootTransform().scale;
 
     const auto rootLeftBorder = root->layout.border.left;
@@ -84,16 +90,34 @@ void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDeta
         {
             comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value *
                                              (equalSliceValueH * childSpan.colSpan);
+
             /* Needed so we don't get pixel imperfect visual artifacts */
+            float preRoundX = comp->getTransformRW().scale.x;
             comp->getTransformRW().scale.x = std::round(comp->getTransformRead().scale.x);
+
+            accumulatedScaleError.x += preRoundX - comp->getTransformRW().scale.x;
+            if (accumulatedScaleError.x > epsi)
+            {
+                comp->getTransformRW().scale.x += 1.0f;
+                accumulatedScaleError.x = 0.0f;
+            }
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
         {
             comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
                                              (equalSliceValueV * childSpan.rowSpan);
+
             /* Needed so we don't get pixel imperfect visual artifacts */
+            float preRoundY = comp->getTransformRW().scale.y;
             comp->getTransformRW().scale.y = std::round(comp->getTransformRead().scale.y);
+
+            accumulatedScaleError.y += preRoundY - comp->getTransformRW().scale.y;
+            if (accumulatedScaleError.y > epsi)
+            {
+                comp->getTransformRW().scale.y += 1.0f;
+                accumulatedScaleError.y = 0.0f;
+            }
         }
 
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
@@ -161,6 +185,26 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
     /* They are reversed, it's justified */
     rootScale.x -= sbDetails.isVBarActive ? root->layout.scrollBarSize : 0;
     rootScale.y -= sbDetails.isHBarActive ? root->layout.scrollBarSize : 0;
+
+    /* If we have some children with Absolute scale, then Relative scale of the other children of root will be relative
+       to the space remaining after subtracting thr Absolute scales from the root. */
+    glm::i16vec2 absSubtract = {0, 0};
+    for (const auto& comp : root->getNodes())
+    {
+        SKIP_SCROLLBAR(comp)
+
+        if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
+        {
+            absSubtract.x += comp->layout.scaling.horizontal.value;
+        }
+
+        if (comp->layout.scaling.vertical.policy == LdScalePolicy::Absolute)
+        {
+            absSubtract.y = comp->layout.scaling.vertical.value;
+        }
+    }
+    rootScale -= absSubtract;
+
     for (const auto& comp : root->getNodes())
     {
         SKIP_SCROLLBAR(comp)
