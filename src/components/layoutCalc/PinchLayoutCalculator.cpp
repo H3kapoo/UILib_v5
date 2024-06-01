@@ -26,16 +26,16 @@ void PinchLayoutCalculator::calculate()
 
 void PinchLayoutCalculator::calculateAndApplyScale()
 {
-    auto rootScale = getPaddedRootTransform().scale;
+    auto rootScale = root->getTransformRead().scale;
     auto& rootNodes = root->getNodes();
-    /* If we have some children with Absolute scale, then Relative scale of the other children of root will be relative
-       to the space remaining after subtracting thr Absolute scales from the root. */
+    glm::i16vec2 runningTotoal = {0, 0};
     glm::i16vec2 absSubtract = {0, 0};
     const bool isLayoutHorizontal = root->layout.orientation == LdOrientation::Horizontal;
+
+    /* If we have some children with Absolute scale, then Relative scale of the other children of root will be relative
+       to the space remaining after subtracting the Absolute scales from the root. */
     for (const auto& comp : rootNodes)
     {
-        SKIP_SCROLLBAR(comp)
-
         if (isLayoutHorizontal && comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
         {
             absSubtract.x += comp->layout.scaling.horizontal.value;
@@ -48,7 +48,6 @@ void PinchLayoutCalculator::calculateAndApplyScale()
     }
     rootScale -= absSubtract;
 
-    float totalX = 0;
     for (const auto& comp : rootNodes)
     {
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
@@ -71,49 +70,47 @@ void PinchLayoutCalculator::calculateAndApplyScale()
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
         {
-            const auto childMargins = comp->layout.margin;
-            const auto topSubtract = root->layout.border.top;
-            const auto botSubtract = root->layout.border.bottom;
-            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value *
-                                             (rootScale.y - (topSubtract + botSubtract));
-            comp->getTransformRW().scale.y -= childMargins.top + childMargins.bottom;
+            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value * rootScale.y;
 
             /* Needed so we don't get pixel imperfect visual artifacts */
             comp->getTransformRW().scale.y = std::round(comp->getTransformRead().scale.y);
         }
-        totalX += comp->getTransformRW().scale.x;
+
+        runningTotoal += comp->getTransformRW().scale;
     }
 
-    if ((int)totalX != (int)root->getTransformRead().scale.x && rootNodes.size() >= 2)
+    /* Accounting for rounding error unable to be caught above. This makes sure the last element doesn't get past the
+       parent */
+    if (isLayoutHorizontal && (int)runningTotoal.x != (int)root->getTransformRead().scale.x && rootNodes.size() >= 2)
     {
         const auto lastComp = rootNodes[rootNodes.size() - 1];
-        lastComp->getTransformRW().scale.x += (root->getTransformRead().scale.x - totalX);
+        lastComp->getTransformRW().scale.x += (root->getTransformRead().scale.x - runningTotoal.x);
+    }
+
+    if (!isLayoutHorizontal && (int)runningTotoal.y != (int)root->getTransformRead().scale.y && rootNodes.size() >= 2)
+    {
+        const auto lastComp = rootNodes[rootNodes.size() - 1];
+        lastComp->getTransformRW().scale.y += (root->getTransformRead().scale.y - runningTotoal.y);
     }
 }
 
 void PinchLayoutCalculator::calculateAndApplyPosition()
 {
-    glm::vec2 startXY = {0, 0};
-
+    glm::vec2 startXY = root->getTransformRead().pos;
     for (const auto& childNode : root->getNodes())
     {
-        SKIP_SCROLLBAR(childNode)
-
-        const auto& childMargin = childNode->layout.margin;
-        glm::i16vec2 nextPos = {childMargin.left, childMargin.top};
-
-        const auto& childTransform = getAdjustedTransform(childNode);
         auto& childPos = childNode->getTransformRW().pos;
+        auto& childScale = childNode->getTransformRW().scale;
 
         if (root->layout.orientation == LayoutData::Orientation::Horizontal)
         {
-            childPos.x += startXY.x;
-            startXY.x += childTransform.scale.x;
+            childPos += startXY;
+            startXY.x += childScale.x;
         }
         else if (root->layout.orientation == LayoutData::Orientation::Vertical)
         {
-            childPos.y += startXY.y;
-            startXY.y += childTransform.scale.y;
+            childPos += startXY;
+            startXY.y += childScale.y;
         }
     }
 }

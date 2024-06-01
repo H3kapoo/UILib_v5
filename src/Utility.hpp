@@ -96,6 +96,11 @@ inline float remap(float value, const float startA, const float endA, const floa
     return (1.0f - t) * startB + t * endB;
 }
 
+inline float dist(const glm::vec2 start, const glm::vec2 end)
+{
+    return std::sqrt((start.x - end.x) * (start.x - end.x) + (start.y - end.y) * (start.y - end.y));
+}
+
 } // namespace utils
 
 // Not really an utility but we need it outside of a scope for clean access

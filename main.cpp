@@ -31,7 +31,7 @@ void frameCounter(GLFWwindow* window)
 
 int main()
 {
-    const auto startWindowWidth = 1280;
+    const auto startWindowWidth = 1282;
     const auto startWindowHeight = 720;
     const auto appName = "Another App";
 

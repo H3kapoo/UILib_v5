@@ -5,12 +5,10 @@
 #include "src/components/Button.hpp"
 #include "src/components/ComponentManager.hpp"
 #include "src/components/Div.hpp"
+#include "src/components/PinchDiv.hpp"
 #include "src/components/TabSwitcher.hpp"
-#include "src/components/layoutCalc/LayoutData.hpp"
-#include "src/inputManagement/Input.hpp"
 
 using namespace components;
-using namespace inputManagement;
 using namespace layoutcalc;
 
 class App
@@ -35,5 +33,6 @@ private:
     Div div2, div3, div4, div5, div6, div7, div8, div9;
     // Button btn;
     TabSwitcher ts, ts2;
+    PinchDiv pdiv, pdiv2, pdiv3;
     std::vector<AbstractComponent*> divs;
 };

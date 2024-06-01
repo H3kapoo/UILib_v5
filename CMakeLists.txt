@@ -30,11 +30,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         src/assetLoaders/TextureLoader.cpp
         src/components/ScrollBar.cpp
         src/components/Div.cpp
+        src/components/PinchDiv.cpp
         src/components/Button.cpp
         src/components/TabSwitcher.cpp
         src/components/AbstractComponent.cpp
         src/components/ComponentManager.cpp
         src/components/layoutCalc/LayoutCalculator.cpp
+        src/components/layoutCalc/PinchLayoutCalculator.cpp
         src/inputManagement/Input.cpp
         src/mesh/QuadMesh.cpp
         src/renderer/Renderer.cpp

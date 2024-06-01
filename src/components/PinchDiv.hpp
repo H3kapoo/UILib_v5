@@ -28,7 +28,7 @@ public:
 
     Style style;
 
-    void append(AbstractComponent* comp);
+    void append(std::vector<AbstractComponent*>&& comp);
 
 private:
     struct PinchPair
@@ -36,6 +36,10 @@ private:
         AbstractComponent* first;
         AbstractComponent* second;
     };
+
+    void separatorClick(int16_t x, int16_t y, MouseButton b);
+    void separatorRelease(int16_t x, int16_t y, MouseButton b);
+    void separatorMove(int16_t x, int16_t y);
 
     /* User shall not be able to add or remove children to button */
     bool remove();
@@ -59,7 +63,8 @@ private:
 
     int16_t prevX{0};
     int16_t prevY{0};
-    int16_t deltaX{0};
+    int16_t delta{0};
+    bool pinchLocked{false};
 
     /* Layout related */
     layoutcalc::PinchLayoutCalculator layoutCalc{this};

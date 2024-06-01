@@ -31,6 +31,11 @@
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/PinchDiv.cpp.o -c /home/hekapoo/newTryAtUI/src/components/PinchDiv.cpp",
+  "file": "/home/hekapoo/newTryAtUI/src/components/PinchDiv.cpp"
+},
+{
+  "directory": "/home/hekapoo/newTryAtUI/build",
   "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/Button.cpp.o -c /home/hekapoo/newTryAtUI/src/components/Button.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/components/Button.cpp"
 },
@@ -53,6 +58,11 @@
   "directory": "/home/hekapoo/newTryAtUI/build",
   "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/layoutCalc/LayoutCalculator.cpp.o -c /home/hekapoo/newTryAtUI/src/components/layoutCalc/LayoutCalculator.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/components/layoutCalc/LayoutCalculator.cpp"
+},
+{
+  "directory": "/home/hekapoo/newTryAtUI/build",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/layoutCalc/PinchLayoutCalculator.cpp.o -c /home/hekapoo/newTryAtUI/src/components/layoutCalc/PinchLayoutCalculator.cpp",
+  "file": "/home/hekapoo/newTryAtUI/src/components/layoutCalc/PinchLayoutCalculator.cpp"
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",

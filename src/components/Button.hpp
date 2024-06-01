@@ -41,6 +41,11 @@ public:
     std::string text;
     SideImage sideImage;
 
+    // Direct invoke, rm later
+    std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
+    std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
+    std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
+
 private:
     void reloadImage();
 
@@ -65,9 +70,9 @@ private:
     TextureLoader::TextureDataPtr textureData{nullptr};
     TextureLoader& textureLoader;
 
-    std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
-    std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
-    std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
+    // std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
+    // std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
+    // std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
 
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this};
