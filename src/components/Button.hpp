@@ -6,6 +6,7 @@
 #include "compUtils/LightWeightDummy.hpp"
 #include "layoutCalc/LayoutCalculator.hpp"
 #include "layoutCalc/LayoutData.hpp"
+#include <cstdint>
 
 namespace components
 {
@@ -33,6 +34,8 @@ public:
     ~Button();
 
     void addClickListener(std::function<void(int, int, MouseButton)> func);
+    void addReleaseListener(std::function<void(int, int, MouseButton)> func);
+    void addMouseMoveListener(std::function<void(int16_t, int16_t)> func);
 
     Style style;
     std::string text;
@@ -63,6 +66,8 @@ private:
     TextureLoader& textureLoader;
 
     std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
+    std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
+    std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
 
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this};

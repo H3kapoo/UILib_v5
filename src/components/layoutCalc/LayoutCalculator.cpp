@@ -1,10 +1,7 @@
 #include "LayoutCalculator.hpp"
 #include "../../Utility.hpp"
 #include "LayoutData.hpp"
-#include <cmath>
 #include <cstdint>
-#include <glm/fwd.hpp>
-#include <numeric>
 
 namespace components::layoutcalc
 {
@@ -189,18 +186,19 @@ void LayoutCalculator::calculateAndApplyScale(const ScrollBarDetails& sbDetails)
     /* If we have some children with Absolute scale, then Relative scale of the other children of root will be relative
        to the space remaining after subtracting thr Absolute scales from the root. */
     glm::i16vec2 absSubtract = {0, 0};
+    const bool isLayoutHorizontal = root->layout.orientation == LdOrientation::Horizontal;
     for (const auto& comp : root->getNodes())
     {
         SKIP_SCROLLBAR(comp)
 
-        if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
+        if (isLayoutHorizontal && comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
         {
             absSubtract.x += comp->layout.scaling.horizontal.value;
         }
 
-        if (comp->layout.scaling.vertical.policy == LdScalePolicy::Absolute)
+        if (!isLayoutHorizontal && comp->layout.scaling.vertical.policy == LdScalePolicy::Absolute)
         {
-            absSubtract.y = comp->layout.scaling.vertical.value;
+            absSubtract.y += comp->layout.scaling.vertical.value;
         }
     }
     rootScale -= absSubtract;
@@ -498,11 +496,13 @@ float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float compSc
     float nextPos = 0;
     switch (root->layout.fillPolicy)
     {
+        /* Position elements one after the other tightly */
         case LayoutData::FillPolicy::Tightly: {
             nextPos = bufferPos;
             bufferPos += compScale;
             break;
         }
+        /* Position elements equaly spaced one from another and from parent ends */
         case LayoutData::FillPolicy::EvenlySpaced: {
             const auto offset = remainingSpace / (root->getNodes().size() + 1);
             bufferPos += offset;
@@ -510,6 +510,7 @@ float LayoutCalculator::getNextFillPolicyPosition(float& bufferPos, float compSc
             bufferPos += compScale;
             break;
         }
+        /* Position elements equaly spaced one from another but stuck to the parent ends */
         case LayoutData::FillPolicy::SpaceBetween: {
             // TODO: Treat division by zero. Currently this is ok due to .size() being size_t
             nextPos = bufferPos;

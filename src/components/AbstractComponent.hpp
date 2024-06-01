@@ -24,7 +24,8 @@ public:
         Button,
         Div,
         ScrollBar,
-        TabSwitcher
+        TabSwitcher,
+        PinchDiv
     };
 
     struct Options

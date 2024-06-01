@@ -1,6 +1,7 @@
 #include "Button.hpp"
 
 #include "../Utility.hpp"
+#include <cstdint>
 #include <string_view>
 
 namespace components
@@ -60,6 +61,16 @@ void Button::addClickListener(std::function<void(int, int, MouseButton)> func)
     mouseClickCb = func;
 }
 
+void Button::addReleaseListener(std::function<void(int, int, MouseButton)> func)
+{
+    mouseReleaseCb = func;
+}
+
+void Button::addMouseMoveListener(std::function<void(int16_t, int16_t)> func)
+{
+    mouseMoveCb = func;
+}
+
 void Button::onClickEvent()
 {
     // println("Button element id {} has been clicked!", getId());
@@ -68,6 +79,10 @@ void Button::onClickEvent()
     if (s->mouseAction == HIDAction::Pressed)
     {
         if (mouseClickCb) mouseClickCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
+    }
+    else if (s->mouseAction == HIDAction::Released)
+    {
+        if (mouseReleaseCb) mouseReleaseCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
     }
 };
 
@@ -91,6 +106,11 @@ void Button::onMoveEvent()
 {
     // getBoxModelRW().pos.z = getDepth(); // TODO: Shall not exist
     // utils::printlni("[INF] I am node {} and onStart() called", getId());
+    const auto& s = getState();
+    if (s->mouseAction == HIDAction::Pressed && s->clickedButton == MouseButton::Left)
+    {
+        if (mouseMoveCb) mouseMoveCb(s->mouseX, s->mouseY);
+    }
 }
 
 bool Button::onLayoutUpdate()

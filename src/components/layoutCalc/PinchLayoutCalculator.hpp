@@ -3,6 +3,7 @@
 #include "../AbstractComponent.hpp"
 #include "LayoutUtils.hpp"
 #include <cstdint>
+#include <glm/fwd.hpp>
 
 namespace components::layoutcalc
 {
@@ -11,14 +12,11 @@ namespace components::layoutcalc
  * @brief Stateless class responsible for positioning elements with respect to their parent and user supplied options
  *
  */
-class LayoutCalculator
+class PinchLayoutCalculator
 {
 public:
-    LayoutCalculator(AbstractComponent* comp);
-    glm::i16vec2 calculate(const int scrollOffsetX = 0,
-        const int scrollOffsetY = 0,
-        const bool isHScrollActive = false,
-        const bool isVScrollActive = false);
+    PinchLayoutCalculator(AbstractComponent* comp);
+    void calculate();
 
 private:
     struct AdjustedTransform
@@ -45,21 +43,16 @@ private:
         float overflowY{0};
     };
 
-    OverflowResult calculateAndApplyOverflow(const int16_t scrollOffsetX,
-        const int16_t scrollOffsetY,
-        const ScrollBarDetails& sbDetails);
+    void resetPositions();
+    void calculateAndApplyPosition();
+    void calculateAndApplyScale();
     float getNextFillPolicyPosition(float& bufferPos, float compScale, float remainingSpace);
-    void calculateAndApplyAlignOffset(const ScrollBarDetails& sbDetails);
-    void calculateAndApplyInternalAlignOffset(const Bounds& bounds);
-    void calculateAndApplyPosition(const ScrollBarDetails& sbDetails);
-    void calculateAndApplyScale(const ScrollBarDetails& sbDetails);
     void calculateNextBasePosition(glm::vec2& currentXY, AbstractComponent* comp);
 
     void gridCalculateAndApplyScale(const ScrollBarDetails& sbDetails);
     void gridCalculateAndApplyPosition(const ScrollBarDetails& sbDetails);
 
-    void resetPositions();
-    glm::vec2 getRemainingSpaceAfterScale(const ScrollBarDetails& sbDetails);
+    glm::vec2 getRemainingSpaceAfterScale();
     Bounds getChildrenBound(const std::vector<AbstractComponent*>& childComps);
     AdjustedTransform getAdjustedTransform(AbstractComponent* comp);
     AdjustedTransform getPaddedRootTransform();
