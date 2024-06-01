@@ -39,7 +39,7 @@ private:
 
     void separatorClick(int16_t x, int16_t y, MouseButton b);
     void separatorRelease(int16_t x, int16_t y, MouseButton b);
-    void separatorMove(int16_t x, int16_t y);
+    void separatorMove(int16_t x, int16_t y, int16_t index);
 
     /* User shall not be able to add or remove children to button */
     bool remove();
@@ -64,7 +64,8 @@ private:
     int16_t prevX{0};
     int16_t prevY{0};
     int16_t delta{0};
-    bool pinchLocked{false};
+    int16_t pinchedId{0};
+    int16_t pinchedId2{0};
 
     /* Layout related */
     layoutcalc::PinchLayoutCalculator layoutCalc{this};

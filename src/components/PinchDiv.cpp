@@ -69,159 +69,14 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
             pinchPairs.emplace_back(it, c);
             int16_t index = pinchPairs.size() - 1;
 
-            btn->addClickListener(
-                [this](auto x, auto y, MouseButton b)
-                {
-                    if (b == MouseButton::Left)
-                    {
-                        //
-                        if (!pinchLocked)
-                        {
-                            for (const auto& comp : getNodes())
-                            {
-                                if (comp->getType() == CompType::PinchDiv)
-                                {
-                                    const auto& pDivNodes = comp->getNodes();
-                                    for (const auto& pDivChild : pDivNodes)
-                                    {
-                                        if (pDivChild->getType() == CompType::Button)
-                                        {
-                                            float d = utils::dist(glm::vec2(x, y), pDivChild->getTransformRead().pos);
-                                            float d2 = utils::dist(glm::vec2(x, y),
-                                                pDivChild->getTransformRead().pos +
-                                                    pDivChild->getTransformRead().scale);
-                                            if (d <= 5 || d2 <= 5)
-                                            {
-                                                pinchLocked = true;
-                                                dynamic_cast<Button*>(pDivChild)->mouseClickCb(x, y, b);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+            btn->addClickListener(std::bind(&PinchDiv::separatorClick, this, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3));
 
-                        //
-                        delta = 0;
-                        prevX = x;
-                        prevY = y;
-                        for (const auto& comp : getNodes())
-                        {
-                            if (comp->getType() == CompType::Button) { continue; }
-                            if (layout.orientation == LdOrientation::Horizontal)
-                            {
-                                comp->layout.scaling.horizontal.policy = LdScalePolicy::Absolute;
-                                comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x;
-                            }
-                            else
-                            {
-                                comp->layout.scaling.vertical.policy = LdScalePolicy::Absolute;
-                                comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y;
-                            }
-                        }
-                    }
-                });
+            btn->addReleaseListener(std::bind(&PinchDiv::separatorRelease, this, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3));
 
-            btn->addReleaseListener(
-                [this](auto x, auto y, MouseButton b)
-                {
-                    if (b == MouseButton::Left)
-                    {
-                        //
-                        pinchLocked = false;
-                        for (const auto& comp : getNodes())
-                        {
-                            if (comp->getType() == CompType::PinchDiv)
-                            {
-                                const auto& pDivNodes = comp->getNodes();
-                                for (const auto& pDivChild : pDivNodes)
-                                {
-                                    if (pDivChild->getType() == CompType::Button)
-                                    {
-                                        // float d = utils::dist(glm::vec2(x, y), pDivChild->getTransformRead().pos);
-                                        // float d2 = utils::dist(glm::vec2(x, y),
-                                        //     pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale);
-                                        // if (d <= 5 || d2 <= 5)
-                                        dynamic_cast<Button*>(pDivChild)->mouseReleaseCb(x, y, b);
-                                    }
-                                }
-                            }
-                        }
-                        //
-                        delta = 0;
-                        prevX = x;
-                        prevY = y;
-                        float decreaseBy = 0;
-                        for (const auto& comp : getNodes())
-                        {
-                            if (comp->getType() != CompType::Button) { continue; }
-                            if (layout.orientation == LdOrientation::Horizontal)
-                            {
-                                decreaseBy += comp->layout.scaling.horizontal.value;
-                            }
-                            else { decreaseBy += comp->layout.scaling.vertical.value; }
-                        }
-                        for (const auto& comp : getNodes())
-                        {
-                            if (comp->getType() == CompType::Button) { continue; }
-                            if (layout.orientation == LdOrientation::Horizontal)
-                            {
-
-                                comp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
-                                comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x /
-                                                                        (getTransformRead().scale.x - decreaseBy);
-                            }
-                            else
-                            {
-                                comp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
-                                comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y /
-                                                                      (getTransformRead().scale.y - decreaseBy);
-                            }
-                        }
-                    }
-                });
-
-            btn->addMouseMoveListener(
-                [this, index](auto x, auto y)
-                {
-                    //
-                    for (const auto& comp : getNodes())
-                    {
-                        if (comp->getType() == CompType::PinchDiv)
-                        {
-                            const auto& pDivNodes = comp->getNodes();
-                            for (const auto& pDivChild : pDivNodes)
-                            {
-                                if (pDivChild->getType() == CompType::Button)
-                                {
-                                    // float d = utils::dist(glm::vec2(x, y), pDivChild->getTransformRead().pos);
-                                    // float d2 = utils::dist(glm::vec2(x, y),
-                                    //     pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale);
-                                    if (pinchLocked) dynamic_cast<Button*>(pDivChild)->mouseMoveCb(x, y);
-                                }
-                            }
-                        }
-                    }
-                    //
-                    PinchPair& pp = pinchPairs[index];
-                    if (layout.orientation == LdOrientation::Horizontal)
-                    {
-
-                        delta = x - prevX;
-                        pp.first->layout.scaling.horizontal.value += delta;
-                        pp.second->layout.scaling.horizontal.value -= delta;
-                    }
-                    else
-                    {
-                        delta = y - prevY;
-                        pp.first->layout.scaling.vertical.value += delta;
-                        pp.second->layout.scaling.vertical.value -= delta;
-                    }
-
-                    prevX = x;
-                    prevY = y;
-                    refreshLayout();
-                });
+            btn->addMouseMoveListener(std::bind(&PinchDiv::separatorMove, this, std::placeholders::_1,
+                std::placeholders::_2, index));
             continue;
         }
 
@@ -234,31 +89,28 @@ void PinchDiv::separatorClick(int16_t x, int16_t y, MouseButton b)
     if (b == MouseButton::Left)
     {
         //
-        if (!pinchLocked)
+        for (const auto& comp : getNodes())
         {
-            for (const auto& comp : getNodes())
+            if (comp->getType() == CompType::PinchDiv)
             {
-                if (comp->getType() == CompType::PinchDiv)
+                const auto& pDivNodes = comp->getNodes();
+                for (const auto& pDivChild : pDivNodes)
                 {
-                    const auto& pDivNodes = comp->getNodes();
-                    for (const auto& pDivChild : pDivNodes)
+                    if (pDivChild->getType() == CompType::Button)
                     {
-                        if (pDivChild->getType() == CompType::Button)
+                        float d = utils::dist(glm::vec2(x, y), pDivChild->getTransformRead().pos);
+                        float d2 = utils::dist(glm::vec2(x, y),
+                            pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale);
+                        if (d <= 5 || d2 <= 5)
                         {
-                            float d = utils::dist(glm::vec2(x, y), pDivChild->getTransformRead().pos);
-                            float d2 = utils::dist(glm::vec2(x, y),
-                                pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale);
-                            if (d <= 5 || d2 <= 5)
-                            {
-                                pinchLocked = true;
-                                dynamic_cast<Button*>(pDivChild)->mouseClickCb(x, y, b);
-                            }
+                            if (pinchedId2 == 0 && pinchedId != 0) { pinchedId2 = pDivChild->getId(); }
+                            if (pinchedId == 0 && pinchedId2 == 0) { pinchedId = pDivChild->getId(); }
+                            dynamic_cast<Button*>(pDivChild)->mouseClickCb(x, y, b);
                         }
                     }
                 }
             }
         }
-
         //
         delta = 0;
         prevX = x;
@@ -279,8 +131,102 @@ void PinchDiv::separatorClick(int16_t x, int16_t y, MouseButton b)
         }
     }
 }
-void PinchDiv::separatorRelease(int16_t x, int16_t y, MouseButton b) {}
-void PinchDiv::separatorMove(int16_t x, int16_t y) {}
+
+void PinchDiv::separatorRelease(int16_t x, int16_t y, MouseButton b)
+{
+    if (b == MouseButton::Left)
+    {
+        //
+        for (const auto& comp : getNodes())
+        {
+            if (comp->getType() == CompType::PinchDiv)
+            {
+                const auto& pDivNodes = comp->getNodes();
+                for (const auto& pDivChild : pDivNodes)
+                {
+                    if (pDivChild->getType() == CompType::Button)
+                    {
+                        if (pDivChild->getId() == pinchedId) dynamic_cast<Button*>(pDivChild)->mouseReleaseCb(x, y, b);
+                        if (pDivChild->getId() == pinchedId2) dynamic_cast<Button*>(pDivChild)->mouseReleaseCb(x, y, b);
+                    }
+                }
+            }
+        }
+        pinchedId = 0;
+        pinchedId2 = 0;
+        //
+        delta = 0;
+        prevX = x;
+        prevY = y;
+        float decreaseBy = 0;
+        for (const auto& comp : getNodes())
+        {
+            if (comp->getType() != CompType::Button) { continue; }
+            if (layout.orientation == LdOrientation::Horizontal)
+            {
+                decreaseBy += comp->layout.scaling.horizontal.value;
+            }
+            else { decreaseBy += comp->layout.scaling.vertical.value; }
+        }
+        for (const auto& comp : getNodes())
+        {
+            if (comp->getType() == CompType::Button) { continue; }
+            if (layout.orientation == LdOrientation::Horizontal)
+            {
+
+                comp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
+                comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x /
+                                                        (getTransformRead().scale.x - decreaseBy);
+            }
+            else
+            {
+                comp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
+                comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y /
+                                                      (getTransformRead().scale.y - decreaseBy);
+            }
+        }
+    }
+}
+
+void PinchDiv::separatorMove(int16_t x, int16_t y, int16_t index)
+{
+    //
+    for (const auto& comp : getNodes())
+    {
+        if (comp->getType() == CompType::PinchDiv)
+        {
+            const auto& pDivNodes = comp->getNodes();
+            for (const auto& pDivChild : pDivNodes)
+            {
+                if (pDivChild->getType() == CompType::Button)
+                {
+                    if (pDivChild->getId() == pinchedId) dynamic_cast<Button*>(pDivChild)->mouseMoveCb(x, y);
+                    if (pDivChild->getId() == pinchedId2) dynamic_cast<Button*>(pDivChild)->mouseMoveCb(x, y);
+                }
+            }
+        }
+    }
+    //
+
+    PinchPair& pp = pinchPairs[index];
+    if (layout.orientation == LdOrientation::Horizontal)
+    {
+
+        delta = x - prevX;
+        pp.first->layout.scaling.horizontal.value += delta;
+        pp.second->layout.scaling.horizontal.value -= delta;
+    }
+    else
+    {
+        delta = y - prevY;
+        pp.first->layout.scaling.vertical.value += delta;
+        pp.second->layout.scaling.vertical.value -= delta;
+    }
+
+    prevX = x;
+    prevY = y;
+    refreshLayout();
+}
 
 void PinchDiv::onPrepareToRender()
 {
