@@ -47,20 +47,19 @@ void App::start(int initialWidth, int initialHeight)
     div9.style.color = utils::hexToVec4("#1b021aff");
 
     div7.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
-    // div7.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
-    div7.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 400}};
+    div7.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
+    // div7.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 400}};
     rootDiv.append(&pdiv);
 
     div4.layout.orientation = LdOrientation::Vertical;
     div9.append(&div7);
-    div9.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 0.5f}};
-
+    div9.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
     // div9.append(&pdiv2);
 
     pdiv.append({&div4, &pdiv2, &div5});
     // pdiv2.append({&pdiv3, &div9});
-    pdiv2.append({&div9, &pdiv3});
-    pdiv3.append({&div2, &div3});
+    pdiv2.append({&div9, &div2});
+    // pdiv3.append({&div2, &div3});
 
     rootDiv.showTree();
 

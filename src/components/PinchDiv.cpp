@@ -16,12 +16,13 @@ PinchDiv::PinchDiv()
 // , textureLoader(TextureLoader::get())
 
 {
-    /* This object should not be renderable. It should serve only as a skeleton */
+    /* This object should not be renderable. It should serve only as a skeleton. */
     setRenderable(false);
 }
 
 PinchDiv::~PinchDiv()
 {
+    /* Free separators occupied memory. */
     for (const auto& sep : separators)
     {
         if (sep) { delete sep; }
@@ -36,59 +37,77 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
         return;
     }
 
-    const auto& nodes = getNodes();
+    // TODO: User should be able to decide the percentage sizes
     const float scalingFactor = 1.0f / comps.size();
-    for (const auto& c : comps)
+    const auto& nodes = getNodes();
+    for (const auto& inComp : comps)
     {
+        /* Occupy an equal part on H or V depending on the orientation. Fill the other orientation completely. */
         if (layout.orientation == LdOrientation::Horizontal)
         {
-            c->layout.scaling = LdScaling{{LdScalePolicy::Relative, scalingFactor}, {LdScalePolicy::Relative, 1.0f}};
+            inComp->layout.scaling = LdScaling{
+                {LdScalePolicy::Relative, scalingFactor}, {LdScalePolicy::Relative, 1.0f}};
         }
         else
         {
-            c->layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, scalingFactor}};
+            inComp->layout.scaling = LdScaling{
+                {LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, scalingFactor}};
         }
 
+        /* If we are not empty, means there's already at least one pane as a child. When addin the next pane child, put
+           a PinchBar between them.*/
         if (!nodes.empty())
         {
-            // prev comp
+            /* Create PinchBar and store it. */
+            PinchBar* pinchBar = new PinchBar();
+            separators.push_back(pinchBar);
+
+            /* Get the last element. */
             AbstractComponent* it = *(nodes.end() - 1);
 
-            // append separator
-            PinchBar* bar = new PinchBar();
-            separators.push_back(bar);
+            /* Save this pane and the previous one in a pair for later. Save it's index to pass to the button so the
+               button knows what elements to scale on event. */
+            pinchPairs.emplace_back(it, inComp);
+            int16_t index = pinchPairs.size() - 1;
+
+            /* Depending on orietation, scale the PinchBar accordingly. */
             if (layout.orientation == LdOrientation::Horizontal)
             {
-                bar->layout.scaling = LdScaling{
+                pinchBar->layout.scaling = LdScaling{
                     {LdScalePolicy::Absolute, (float)separatorSize}, {LdScalePolicy::Relative, 1.0f}};
             }
             else
             {
-                bar->layout.scaling = LdScaling{
+                pinchBar->layout.scaling = LdScaling{
                     {LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Absolute, (float)separatorSize}};
             }
 
-            AbstractComponent::append(bar);
-            AbstractComponent::append(c);
+            AbstractComponent::append(pinchBar);
+            AbstractComponent::append(inComp);
 
-            pinchPairs.emplace_back(it, c);
-            int16_t index = pinchPairs.size() - 1;
-
-            bar->addClickListener(std::bind(&PinchDiv::separatorClick, this, std::placeholders::_1,
+            /* Called when the pinchBar is clicked. Sets the pinchPair associated with it to Absolute scale policy. This
+               is so that we don't get shaky scaling due to floating point imprecision of Relative policy. */
+            pinchBar->addClickListener(std::bind(&PinchDiv::separatorClick, this, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3));
 
-            bar->addReleaseListener(std::bind(&PinchDiv::separatorRelease, this, std::placeholders::_1,
+            /* Called when the pinchBar is released. It resets the layout policy of associated pinchPair back to
+               Relative. */
+            pinchBar->addReleaseListener(std::bind(&PinchDiv::separatorRelease, this, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3));
 
-            bar->addMoveClickedListener(std::bind(&PinchDiv::separatorClickedMove, this, std::placeholders::_1,
+            /* Called when the pinchBar is still clicked and the mouse moves. This effectively scales up or down the
+               pinchBar associated pinchPair. */
+            pinchBar->addMoveClickedListener(std::bind(&PinchDiv::separatorClickedMove, this, std::placeholders::_1,
                 std::placeholders::_2, index));
 
-            bar->addMoveListener(std::bind(&PinchDiv::separatorGeneralMove, this, std::placeholders::_1,
+            /* Called whenever the mouse moves. This "scans" for other available pinchBars for 3-way/4-way pinching. If
+               that is not needed, comment this.*/
+            pinchBar->addMoveListener(std::bind(&PinchDiv::separatorGeneralMove, this, std::placeholders::_1,
                 std::placeholders::_2));
             continue;
         }
 
-        AbstractComponent::append(c);
+        AbstractComponent::append(inComp);
     }
 }
 
@@ -132,6 +151,8 @@ void PinchDiv::separatorRelease(int16_t x, int16_t y, MouseButton b)
     delta = 0;
     prevX = x;
     prevY = y;
+
+    // TODO: This part can be extracted, its constant
     float decreaseBy = 0;
     for (const auto& comp : getNodes())
     {
@@ -139,12 +160,12 @@ void PinchDiv::separatorRelease(int16_t x, int16_t y, MouseButton b)
         if (layout.orientation == LdOrientation::Horizontal) { decreaseBy += comp->layout.scaling.horizontal.value; }
         else { decreaseBy += comp->layout.scaling.vertical.value; }
     }
+
     for (const auto& comp : getNodes())
     {
         if (comp->getType() == CompType::PinchBar) { continue; }
         if (layout.orientation == LdOrientation::Horizontal)
         {
-
             comp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
             comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x /
                                                     (getTransformRead().scale.x - decreaseBy);
@@ -211,6 +232,7 @@ void PinchDiv::separatorGeneralMove(int16_t x, int16_t y)
             {
                 if (pDivChild->getType() == CompType::PinchBar)
                 {
+                    // TODO: These checks need to be extracted to separate function
                     if (layout.orientation == LdOrientation::Horizontal)
                     {
                         start = pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale;

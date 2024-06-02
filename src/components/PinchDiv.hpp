@@ -56,10 +56,9 @@ private:
     std::vector<PinchBar*> separators;
     std::vector<PinchPair> pinchPairs;
 
-    int16_t prevX{0};
-    int16_t prevY{0};
+    int16_t prevX{0}, prevY{0};
     int16_t delta{0};
-    int16_t separatorSize{15};
+    int16_t separatorSize{5};
     PinchBar* firstBar{nullptr};
     PinchBar* secondBar{nullptr};
     bool currentlyDragging{false};
