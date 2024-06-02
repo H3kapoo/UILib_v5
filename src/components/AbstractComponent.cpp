@@ -146,6 +146,9 @@ void AbstractComponent::details()
         case CompType::PinchDiv:
             stringType = "PinchDiv";
             break;
+        case CompType::PinchBar:
+            stringType = "PinchBar";
+            break;
         default:
             stringType = "Unknown";
     }

@@ -13,7 +13,7 @@ namespace components
 
 using namespace layoutcalc;
 using namespace assetloaders;
-class Button : public AbstractComponent
+class PinchBar : public AbstractComponent
 {
 
 public:
@@ -30,16 +30,32 @@ public:
         LdAlign align{LdAlign::Left};
     };
 
-    Button();
-    ~Button();
+    PinchBar();
+    ~PinchBar();
 
     void addClickListener(std::function<void(int, int, MouseButton)> func);
     void addReleaseListener(std::function<void(int, int, MouseButton)> func);
-    void addMouseMoveListener(std::function<void(int16_t, int16_t)> func);
+    void addMoveClickedListener(std::function<void(int16_t, int16_t)> func);
+    void addMoveListener(std::function<void(int16_t, int16_t)> func);
+
+    void addSideBar(PinchBar* sideBar);
+    void rmSideBar();
 
     Style style;
     std::string text;
     SideImage sideImage;
+
+    // Direct invoke, rm later
+    std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
+    std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
+    std::function<void(int16_t, int16_t)> mouseMoveClickedCb{nullptr};
+    std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
+    // std::function<void()> mouseHoverCb{nullptr};
+
+    void onClickEvent() override;
+    void onMoveEvent() override;
+    void onMouseExitEvent() override;
+    void onMouseEnterEvent() override;
 
 private:
     void reloadImage();
@@ -52,10 +68,10 @@ private:
 
     void onPrepareToRender() override;
     void onRenderDone() override;
-    void onClickEvent() override;
-    void onMoveEvent() override;
-    void onMouseExitEvent() override;
-    void onMouseEnterEvent() override;
+    // void onClickEvent() override;
+    // void onMoveEvent() override;
+    // void onMouseExitEvent() override;
+    // void onMouseEnterEvent() override;
     void onStart() override;
     bool onLayoutUpdate() override;
 
@@ -65,9 +81,11 @@ private:
     TextureLoader::TextureDataPtr textureData{nullptr};
     TextureLoader& textureLoader;
 
-    std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
-    std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
-    std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
+    PinchBar* sideBar{nullptr};
+
+    // std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
+    // std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
+    // std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
 
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this};
