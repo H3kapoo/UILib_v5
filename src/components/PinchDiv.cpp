@@ -57,7 +57,6 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
             // append separator
             PinchBar* bar = new PinchBar();
             separators.push_back(bar);
-            // bar->style.color = utils::hexToVec4("#b000c4ff");
             if (layout.orientation == LdOrientation::Horizontal)
             {
                 bar->layout.scaling = LdScaling{
@@ -76,16 +75,16 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
             int16_t index = pinchPairs.size() - 1;
 
             bar->addClickListener(std::bind(&PinchDiv::separatorClick, this, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3, bar));
+                std::placeholders::_2, std::placeholders::_3));
 
             bar->addReleaseListener(std::bind(&PinchDiv::separatorRelease, this, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3, bar));
+                std::placeholders::_2, std::placeholders::_3));
 
             bar->addMoveClickedListener(std::bind(&PinchDiv::separatorClickedMove, this, std::placeholders::_1,
                 std::placeholders::_2, index));
 
-            bar->addMoveListener(std::bind(&PinchDiv::separatorMove, this, std::placeholders::_1, std::placeholders::_2,
-                bar));
+            bar->addMoveListener(std::bind(&PinchDiv::separatorGeneralMove, this, std::placeholders::_1,
+                std::placeholders::_2));
             continue;
         }
 
@@ -93,147 +92,82 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
     }
 }
 
-void PinchDiv::separatorClick(int16_t x, int16_t y, MouseButton b, PinchBar* thisBar)
+void PinchDiv::separatorClick(int16_t x, int16_t y, MouseButton b)
 {
-    if (b == MouseButton::Left)
+    if (b != MouseButton::Left) { return; }
+    currentlyDragging = true;
+
+    /* Simulate mouse click on other PinchBars first due to click on this PinchBar */
+    if (firstBar) firstBar->mouseClickCb(x, y, b);
+    if (secondBar) secondBar->mouseClickCb(x, y, b);
+
+    delta = 0;
+    prevX = x;
+    prevY = y;
+    for (const auto& comp : getNodes())
     {
-        //
-        // utils::printlne("id is {}", thisBar->getId());
-        for (const auto& comp : getNodes())
+        if (comp->getType() == CompType::PinchBar) { continue; }
+        if (layout.orientation == LdOrientation::Horizontal)
         {
-            if (comp->getType() == CompType::PinchDiv)
-            {
-                const auto& pDivNodes = comp->getNodes();
-                for (const auto& pDivChild : pDivNodes)
-                {
-                    if (pDivChild->getType() == CompType::PinchBar)
-                    {
-                        float d = utils::dist(glm::vec2(x, y), pDivChild->getTransformRead().pos);
-                        float d2 = utils::dist(glm::vec2(x, y),
-                            pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale);
-                        if (d <= separatorSize || d2 <= separatorSize)
-                        {
-                            if (pinchedId2 == 0 && pinchedId != 0) { pinchedId2 = pDivChild->getId(); }
-                            if (pinchedId == 0 && pinchedId2 == 0) { pinchedId = pDivChild->getId(); }
-                            dynamic_cast<PinchBar*>(pDivChild)->mouseClickCb(x, y, b);
-                        }
-                    }
-                }
-            }
+            comp->layout.scaling.horizontal.policy = LdScalePolicy::Absolute;
+            comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x;
         }
-        //
-        delta = 0;
-        prevX = x;
-        prevY = y;
-        for (const auto& comp : getNodes())
+        else
         {
-            if (comp->getType() == CompType::PinchBar) { continue; }
-            if (layout.orientation == LdOrientation::Horizontal)
-            {
-                comp->layout.scaling.horizontal.policy = LdScalePolicy::Absolute;
-                comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x;
-            }
-            else
-            {
-                comp->layout.scaling.vertical.policy = LdScalePolicy::Absolute;
-                comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y;
-            }
+            comp->layout.scaling.vertical.policy = LdScalePolicy::Absolute;
+            comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y;
         }
     }
 }
 
-void PinchDiv::separatorRelease(int16_t x, int16_t y, MouseButton b, PinchBar* thisBar)
+void PinchDiv::separatorRelease(int16_t x, int16_t y, MouseButton b)
 {
-    if (b == MouseButton::Left)
-    {
-        //
-        for (const auto& comp : getNodes())
-        {
-            if (comp->getType() == CompType::PinchDiv)
-            {
-                const auto& pDivNodes = comp->getNodes();
-                for (const auto& pDivChild : pDivNodes)
-                {
-                    if (pDivChild->getType() == CompType::PinchBar)
-                    {
-                        if (pDivChild->getId() == pinchedId)
-                        {
-                            dynamic_cast<PinchBar*>(pDivChild)->mouseReleaseCb(x, y, b);
-                        }
-                        if (pDivChild->getId() == pinchedId2)
-                        {
-                            dynamic_cast<PinchBar*>(pDivChild)->mouseReleaseCb(x, y, b);
-                        }
-                    }
-                }
-            }
-        }
-        pinchedId = 0;
-        pinchedId2 = 0;
-        //
-        delta = 0;
-        prevX = x;
-        prevY = y;
-        float decreaseBy = 0;
-        for (const auto& comp : getNodes())
-        {
-            if (comp->getType() != CompType::PinchBar) { continue; }
-            if (layout.orientation == LdOrientation::Horizontal)
-            {
-                decreaseBy += comp->layout.scaling.horizontal.value;
-            }
-            else { decreaseBy += comp->layout.scaling.vertical.value; }
-        }
-        for (const auto& comp : getNodes())
-        {
-            if (comp->getType() == CompType::PinchBar) { continue; }
-            if (layout.orientation == LdOrientation::Horizontal)
-            {
+    if (b != MouseButton::Left) { return; }
+    currentlyDragging = false;
 
-                comp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
-                comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x /
-                                                        (getTransformRead().scale.x - decreaseBy);
-            }
-            else
-            {
-                comp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
-                comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y /
-                                                      (getTransformRead().scale.y - decreaseBy);
-            }
+    /* Simulate mouse release on other PinchBars first due to click on this PinchBar */
+    if (firstBar) firstBar->mouseReleaseCb(x, y, b);
+    if (secondBar) secondBar->mouseReleaseCb(x, y, b);
+
+    delta = 0;
+    prevX = x;
+    prevY = y;
+    float decreaseBy = 0;
+    for (const auto& comp : getNodes())
+    {
+        if (comp->getType() != CompType::PinchBar) { continue; }
+        if (layout.orientation == LdOrientation::Horizontal) { decreaseBy += comp->layout.scaling.horizontal.value; }
+        else { decreaseBy += comp->layout.scaling.vertical.value; }
+    }
+    for (const auto& comp : getNodes())
+    {
+        if (comp->getType() == CompType::PinchBar) { continue; }
+        if (layout.orientation == LdOrientation::Horizontal)
+        {
+
+            comp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
+            comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x /
+                                                    (getTransformRead().scale.x - decreaseBy);
+        }
+        else
+        {
+            comp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
+            comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y /
+                                                  (getTransformRead().scale.y - decreaseBy);
         }
     }
 }
 
 void PinchDiv::separatorClickedMove(int16_t x, int16_t y, int16_t index)
 {
-    //
-    for (const auto& comp : getNodes())
-    {
-        if (comp->getType() == CompType::PinchDiv)
-        {
-            const auto& pDivNodes = comp->getNodes();
-            for (const auto& pDivChild : pDivNodes)
-            {
-                if (pDivChild->getType() == CompType::PinchBar)
-                {
-                    if (pDivChild->getId() == pinchedId)
-                    {
-                        dynamic_cast<PinchBar*>(pDivChild)->mouseMoveClickedCb(x, y);
-                    }
-                    if (pDivChild->getId() == pinchedId2)
-                    {
-                        dynamic_cast<PinchBar*>(pDivChild)->mouseMoveClickedCb(x, y);
-                    }
-                }
-            }
-        }
-    }
-    //
+    /* Simulate movement on other PinchBars first due to click on this PinchBar */
+    if (firstBar) firstBar->mouseMoveClickedCb(x, y);
+    if (secondBar) secondBar->mouseMoveClickedCb(x, y);
 
+    /* Add size to the PaneId-1 and subtract it from the PaneId+1, effectively pinching and resizing the panes */
     PinchPair& pp = pinchPairs[index];
     if (layout.orientation == LdOrientation::Horizontal)
     {
-
         delta = x - prevX;
         pp.first->layout.scaling.horizontal.value += delta;
         pp.second->layout.scaling.horizontal.value -= delta;
@@ -250,8 +184,24 @@ void PinchDiv::separatorClickedMove(int16_t x, int16_t y, int16_t index)
     refreshLayout();
 }
 
-void PinchDiv::separatorMove(int16_t x, int16_t y, PinchBar* thisBar)
+void PinchDiv::separatorGeneralMove(int16_t x, int16_t y)
 {
+    /* If we are currently dragging, all side bars we need have been already set. No reason to recompute. */
+    if (currentlyDragging) { return; }
+
+    /* Simulate on mouse exit for the closest PinchBars from before. Since we are not dragging anymore, these need to be
+       reset & recalculated */
+    if (firstBar) { firstBar->onMouseExitEvent(); }
+    if (secondBar) { secondBar->onMouseExitEvent(); }
+
+    firstBar = nullptr;
+    secondBar = nullptr;
+
+    /* Find inside the children of this PinchDiv other PinchDivs and calculate which PinchBars of those are in
+       "separatorSize" distance from the clicked PinchBar. These new PinchBars will be used for 3-way and 4-way pane
+       pinch. */
+    bool putInFirst = true;
+    glm::vec2 start, end;
     for (const auto& comp : getNodes())
     {
         if (comp->getType() == CompType::PinchDiv)
@@ -261,17 +211,54 @@ void PinchDiv::separatorMove(int16_t x, int16_t y, PinchBar* thisBar)
             {
                 if (pDivChild->getType() == CompType::PinchBar)
                 {
-                    float d = utils::dist(glm::vec2(x, y), pDivChild->getTransformRead().pos);
-                    float d2 = utils::dist(glm::vec2(x, y),
-                        pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale);
-                    if (d <= separatorSize || d2 <= separatorSize)
+                    if (layout.orientation == LdOrientation::Horizontal)
                     {
-                        dynamic_cast<PinchBar*>(pDivChild)->onMouseEnterEvent();
+                        start = pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale;
+                        start.y -= separatorSize;
+                        end = start + glm::vec2(separatorSize, separatorSize);
                     }
                     else
                     {
-                        // ee
-                        dynamic_cast<PinchBar*>(pDivChild)->onMouseExitEvent();
+                        start = pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale;
+                        start.x -= separatorSize;
+                        end = start + glm::vec2(separatorSize, separatorSize);
+                    }
+
+                    bool xCEnd = x >= start.x && x <= end.x;
+                    bool yCEnd = y >= start.y && y <= end.y;
+
+                    if (layout.orientation == LdOrientation::Horizontal)
+                    {
+                        start = pDivChild->getTransformRead().pos;
+                        start.x -= separatorSize;
+                        end = start + glm::vec2(separatorSize, separatorSize);
+                    }
+                    else
+                    {
+                        start = pDivChild->getTransformRead().pos;
+                        start.y -= separatorSize;
+                        end = start + glm::vec2(separatorSize, separatorSize);
+                    }
+
+                    bool xCStart = x >= start.x && x <= end.x;
+                    bool yCStart = y >= start.y && y <= end.y;
+
+                    if ((xCEnd && yCEnd) || (xCStart && yCStart))
+                    {
+                        const auto pb = dynamic_cast<PinchBar*>(pDivChild);
+                        if (!pb)
+                        {
+                            utils::printlne("FATAL dynamic_cast error for {}", pDivChild->getId());
+                            return;
+                        }
+
+                        /* Simulate on mouse enter for the closest PinchBar */
+                        pb->onMouseEnterEvent();
+
+                        /* Populate the 2 possible additional PinchBars */
+                        if (putInFirst) { firstBar = pb; }
+                        else { secondBar = pb; }
+                        putInFirst = !putInFirst;
                     }
                 }
             }

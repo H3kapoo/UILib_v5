@@ -77,16 +77,6 @@ void PinchBar::addMoveListener(std::function<void(int16_t, int16_t)> func)
     mouseMoveCb = func;
 }
 
-void PinchBar::addSideBar(PinchBar* _sideBar)
-{
-    sideBar = _sideBar;
-}
-
-void PinchBar::rmSideBar()
-{
-    sideBar = nullptr;
-}
-
 void PinchBar::onClickEvent()
 {
     // println("Button element id {} has been clicked!", getId());
@@ -100,20 +90,16 @@ void PinchBar::onClickEvent()
     {
         if (mouseReleaseCb) mouseReleaseCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
     }
-
-    if (sideBar) { sideBar->onClickEvent(); }
 };
 
 void PinchBar::onMouseEnterEvent()
 {
     style.color = utils::hexToVec4("#606160ff");
-    if (sideBar) { sideBar->onMouseEnterEvent(); }
 }
 
 void PinchBar::onMouseExitEvent()
 {
     style.color = utils::hexToVec4("#404140ff");
-    if (sideBar) { sideBar->onMouseExitEvent(); }
 }
 
 void PinchBar::onMoveEvent()
@@ -128,7 +114,6 @@ void PinchBar::onMoveEvent()
     {
         if (mouseMoveClickedCb) mouseMoveClickedCb(s->mouseX, s->mouseY);
     }
-    if (sideBar) { sideBar->onMoveEvent(); }
 }
 
 bool PinchBar::onLayoutUpdate()

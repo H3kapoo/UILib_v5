@@ -1,10 +1,7 @@
 #pragma once
 
-#include "../renderer/LightWeightRenderer.hpp"
 #include "AbstractComponent.hpp"
 #include "PinchBar.hpp"
-#include "compUtils/LightWeightDummy.hpp"
-#include "layoutCalc/LayoutData.hpp"
 #include "layoutCalc/PinchLayoutCalculator.hpp"
 #include <cstdint>
 
@@ -37,10 +34,10 @@ private:
         AbstractComponent* second;
     };
 
-    void separatorClick(int16_t x, int16_t y, MouseButton b, PinchBar* pb);
-    void separatorRelease(int16_t x, int16_t y, MouseButton b, PinchBar* pb);
+    void separatorClick(int16_t x, int16_t y, MouseButton btn);
+    void separatorRelease(int16_t x, int16_t y, MouseButton btn);
     void separatorClickedMove(int16_t x, int16_t y, int16_t index);
-    void separatorMove(int16_t x, int16_t y, PinchBar* pb);
+    void separatorGeneralMove(int16_t x, int16_t y);
 
     /* User shall not be able to add or remove children to button */
     bool remove();
@@ -56,18 +53,16 @@ private:
     void onStart() override;
     bool onLayoutUpdate() override;
 
-    // computils::LightWeightDummy imageDummy;
-    // renderer::LightWeightRenderer lwr;
-
     std::vector<PinchBar*> separators;
     std::vector<PinchPair> pinchPairs;
 
     int16_t prevX{0};
     int16_t prevY{0};
     int16_t delta{0};
-    int16_t pinchedId{0};
-    int16_t pinchedId2{0};
     int16_t separatorSize{15};
+    PinchBar* firstBar{nullptr};
+    PinchBar* secondBar{nullptr};
+    bool currentlyDragging{false};
 
     /* Layout related */
     layoutcalc::PinchLayoutCalculator layoutCalc{this};

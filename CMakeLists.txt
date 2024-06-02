@@ -29,6 +29,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         src/Utility.cpp
         src/assetLoaders/TextureLoader.cpp
         src/components/ScrollBar.cpp
+        src/components/PinchBar.cpp
         src/components/Div.cpp
         src/components/PinchDiv.cpp
         src/components/Button.cpp

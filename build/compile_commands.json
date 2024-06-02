@@ -26,6 +26,11 @@
 },
 {
   "directory": "/home/hekapoo/newTryAtUI/build",
+  "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/PinchBar.cpp.o -c /home/hekapoo/newTryAtUI/src/components/PinchBar.cpp",
+  "file": "/home/hekapoo/newTryAtUI/src/components/PinchBar.cpp"
+},
+{
+  "directory": "/home/hekapoo/newTryAtUI/build",
   "command": "/usr/bin/c++ -I/home/hekapoo/Downloads/glew-2.1.0/include -I/home/hekapoo/Downloads/glfw-3.3.8/include  -Wall -Wextra -Wshadow -ggdb -g -std=gnu++23 -o CMakeFiles/test.dir/src/components/Div.cpp.o -c /home/hekapoo/newTryAtUI/src/components/Div.cpp",
   "file": "/home/hekapoo/newTryAtUI/src/components/Div.cpp"
 },
