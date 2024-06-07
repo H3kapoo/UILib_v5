@@ -64,7 +64,8 @@ struct LayoutData
     struct ScalePair
     {
         ScalePolicy policy;
-        float value;
+        float value{10};
+        float aux{0.0f};
     };
 
     struct Scaling

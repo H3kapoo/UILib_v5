@@ -31,7 +31,8 @@ void App::start(int initialWidth, int initialHeight)
     div5.style.color = utils::hexToVec4("#151061ff");
     div6.style.color = utils::hexToVec4("#5e0667ff");
     div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 600}};
-    div6.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+    // div6.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+    div5.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
     pdiv.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
     pdiv.layout.orientation = LdOrientation::Horizontal;
@@ -52,13 +53,27 @@ void App::start(int initialWidth, int initialHeight)
     rootDiv.append(&pdiv);
 
     div4.layout.orientation = LdOrientation::Vertical;
-    div9.append(&div7);
+    // div9.append(&div7);
     div9.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
     // div9.append(&pdiv2);
 
-    pdiv.append({&div4, &pdiv2, &div5});
+    div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
+    div5.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
+    // div6.layout.scaling = LdScaling{
+    //     {LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
+
+    // div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 1, 400}, {LdScalePolicy::Relative, .5f, 50,
+    // 1000}}; div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 1, 300}, {LdScalePolicy::Relative, .5f,
+    // 50, 1000}}; div5.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 1, 200}, {LdScalePolicy::Relative,
+    // .5f, 50, 1000}}; div6.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 1, 500},
+    // {LdScalePolicy::Relative, .5f, 50, 1000}};
+
+    // pdiv.append({&div2, &div4, &div5, &div6});
+    // pdiv.append({&div2, &div4, &div5});
+    pdiv.append({&div2, &div4});
     // pdiv2.append({&pdiv3, &div9});
-    pdiv2.append({&div9, &div2});
+    // pdiv2.append({&div9, &div2});
     // pdiv3.append({&div2, &div3});
 
     rootDiv.showTree();

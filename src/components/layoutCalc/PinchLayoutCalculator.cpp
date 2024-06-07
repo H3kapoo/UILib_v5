@@ -1,7 +1,9 @@
 #include "PinchLayoutCalculator.hpp"
 #include "../../Utility.hpp"
 #include "LayoutData.hpp"
+#include <algorithm>
 #include <cstdint>
+#include <cstdlib>
 
 namespace components::layoutcalc
 {
@@ -28,7 +30,8 @@ void PinchLayoutCalculator::calculateAndApplyScale()
 {
     auto rootScale = root->getTransformRead().scale;
     auto& rootNodes = root->getNodes();
-    glm::i16vec2 runningTotoal = {0, 0};
+    int relativeComps = 0;
+    glm::i16vec2 runningTotal = {0, 0};
     glm::i16vec2 absSubtract = {0, 0};
     const bool isLayoutHorizontal = root->layout.orientation == LdOrientation::Horizontal;
 
@@ -76,21 +79,35 @@ void PinchLayoutCalculator::calculateAndApplyScale()
             comp->getTransformRW().scale.y = std::round(comp->getTransformRead().scale.y);
         }
 
-        runningTotoal += comp->getTransformRW().scale;
+        // if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
+        // {
+        //     const float uncappedX = comp->getTransformRW().scale.x;
+        //     const bool undershrunk = 300 > uncappedX;
+        //     if (undershrunk)
+        //     {
+        //         reachedMinComps++;
+        //         comp->getTransformRW().scale.x = 300; // comp->layout.scaling.horizontal.minValue;
+        //         rootScale.x -= 300;
+
+        //     }
+        // }
+
+        // pos = 1;
+        runningTotal += comp->getTransformRW().scale;
     }
 
     /* Accounting for rounding error unable to be caught above. This makes sure the last element doesn't get past the
        parent */
-    if (isLayoutHorizontal && (int)runningTotoal.x != (int)root->getTransformRead().scale.x && rootNodes.size() >= 2)
+    if (isLayoutHorizontal && (int)runningTotal.x != (int)root->getTransformRead().scale.x && rootNodes.size() >= 2)
     {
         const auto lastComp = rootNodes[rootNodes.size() - 1];
-        lastComp->getTransformRW().scale.x += (root->getTransformRead().scale.x - runningTotoal.x);
+        lastComp->getTransformRW().scale.x += (root->getTransformRead().scale.x - runningTotal.x);
     }
 
-    if (!isLayoutHorizontal && (int)runningTotoal.y != (int)root->getTransformRead().scale.y && rootNodes.size() >= 2)
+    if (!isLayoutHorizontal && (int)runningTotal.y != (int)root->getTransformRead().scale.y && rootNodes.size() >= 2)
     {
         const auto lastComp = rootNodes[rootNodes.size() - 1];
-        lastComp->getTransformRW().scale.y += (root->getTransformRead().scale.y - runningTotoal.y);
+        lastComp->getTransformRW().scale.y += (root->getTransformRead().scale.y - runningTotal.y);
     }
 }
 
@@ -119,8 +136,6 @@ void PinchLayoutCalculator::resetPositions()
 {
     for (const auto& childNode : root->getNodes())
     {
-        SKIP_SCROLLBAR(childNode)
-
         childNode->getTransformRW().pos = {0, 0};
     }
 }
@@ -132,12 +147,9 @@ glm::vec2 PinchLayoutCalculator::getRemainingSpaceAfterScale()
     const auto rootTopBorder = root->layout.border.top;
     const auto rootBotBorder = root->layout.border.bottom;
 
-    // glm::vec2 accumulatedSize = {0, 0};
     glm::i16vec2 accumulatedSize = {0, 0};
     for (const auto& childNode : root->getNodes())
     {
-        SKIP_SCROLLBAR(childNode)
-
         const auto& childTransform = getAdjustedTransform(childNode);
         if (root->layout.orientation == LdOrientation::Horizontal)
         {
@@ -164,8 +176,6 @@ PinchLayoutCalculator::Bounds PinchLayoutCalculator::getChildrenBound(const std:
     Bounds result;
     for (const auto& comp : childComps)
     {
-        SKIP_SCROLLBAR(comp)
-
         /* X related */
         const auto& childTransform = getAdjustedTransform(comp);
 
