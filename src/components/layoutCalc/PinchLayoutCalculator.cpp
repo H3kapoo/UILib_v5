@@ -26,7 +26,11 @@ void PinchLayoutCalculator::calculate(const bool firstUpdate)
     }
 
     /* Calculate scale */
-    if (doneFirst) { calculateAndApplyScale(); }
+    if (doneFirst)
+    {
+        calculateAndApplyScale();
+        calculateAndApplyScale();
+    }
 
     /* Calculate position based on FillPolicy & Orientation */
     calculateAndApplyPosition();
@@ -133,6 +137,7 @@ void PinchLayoutCalculator::calculateAndApplyScale()
     if (isLayoutHorizontal) { rootIncrease = rootScale.x - compsSize.x; }
     else { rootIncrease = rootScale.y - compsSize.y; }
 
+    // utils::printlne("rootInc {}", rootIncrease);
     if (nr == 0) { nr = 1; }
     float incEqual = rootIncrease / nr;
     for (const auto& comp : rootNodes)
