@@ -14,6 +14,7 @@ App::~App()
 void App::start(int initialWidth, int initialHeight)
 {
     componentManager.setRoot(&rootDiv);
+    componentManager.resizeEvent(initialWidth, initialHeight);
 
     rootDiv.style.color = utils::hexToVec4("#125ea9ff");
     rootDiv.layout.padding = {5, 5, 5, 5};
@@ -38,7 +39,7 @@ void App::start(int initialWidth, int initialHeight)
     pdiv.layout.orientation = LdOrientation::Horizontal;
 
     pdiv2.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
-    pdiv2.layout.orientation = LdOrientation::Vertical;
+    pdiv2.layout.orientation = LdOrientation::Horizontal;
 
     pdiv3.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
     pdiv3.layout.orientation = LdOrientation::Horizontal;
@@ -71,14 +72,13 @@ void App::start(int initialWidth, int initialHeight)
 
     // pdiv.append({&div2, &div4, &div5, &div6});
     // pdiv.append({&div2, &div4, &div5});
-    pdiv.append({&div2, &div4});
-    // pdiv2.append({&pdiv3, &div9});
+    pdiv.append({&div2, &div3, &div9});
+    // pdiv2.append({&div3, &div9});
     // pdiv2.append({&div9, &div2});
     // pdiv3.append({&div2, &div3});
 
     rootDiv.showTree();
 
-    componentManager.resizeEvent(initialWidth, initialHeight);
     rootDiv.showTree();
     // utils::printlne("X1 {} X2 {}", div2.getTransformRead().scale.x, div3.getTransformRead().scale.x);
 }

@@ -16,7 +16,7 @@ class PinchLayoutCalculator
 {
 public:
     PinchLayoutCalculator(AbstractComponent* comp);
-    void calculate();
+    void calculate(const bool firstUpdate);
 
 private:
     struct AdjustedTransform
@@ -44,6 +44,7 @@ private:
     };
 
     void resetPositions();
+    void calculateAndApplyRelativeScale();
     void calculateAndApplyPosition();
     void calculateAndApplyScale();
     float getNextFillPolicyPosition(float& bufferPos, float compScale, float remainingSpace);
@@ -59,5 +60,6 @@ private:
 
     /* TODO: Maybe in the future this root can be removed and class can be made static so we are fully stateless */
     AbstractComponent* root;
+    bool doneFirst{false};
 };
 } // namespace components::layoutcalc

@@ -45,11 +45,8 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
         /* Occupy an equal part on H or V depending on the orientation. Fill the other orientation completely. */
         if (layout.orientation == LdOrientation::Horizontal)
         {
-            inComp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
-            inComp->layout.scaling.horizontal.value = scalingFactor;
-            inComp->layout.scaling.horizontal.aux = scalingFactor;
-            inComp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
-            inComp->layout.scaling.vertical.value = 1.0f;
+            inComp->layout.scaling = LdScaling{
+                {LdScalePolicy::Relative, scalingFactor}, {LdScalePolicy::Relative, 1.0f}};
         }
         else
         {
@@ -113,6 +110,9 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
         /* If we have no other children, simply push the first one in. */
         AbstractComponent::append(inComp);
     }
+
+    firstUpdate = true;
+    refreshLayout();
 }
 
 void PinchDiv::separatorClick(int16_t x, int16_t y, MouseButton b)
@@ -133,12 +133,12 @@ void PinchDiv::separatorClick(int16_t x, int16_t y, MouseButton b)
         if (layout.orientation == LdOrientation::Horizontal)
         {
             comp->layout.scaling.horizontal.policy = LdScalePolicy::Absolute;
-            comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x;
+            // comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x;
         }
         else
         {
             comp->layout.scaling.vertical.policy = LdScalePolicy::Absolute;
-            comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y;
+            // comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y;
         }
     }
 }
@@ -165,24 +165,24 @@ void PinchDiv::separatorRelease(int16_t x, int16_t y, MouseButton b)
         else { decreaseBy += comp->layout.scaling.vertical.value; }
     }
 
-    for (const auto& comp : getNodes())
-    {
-        if (comp->getType() == CompType::PinchBar) { continue; }
-        if (layout.orientation == LdOrientation::Horizontal)
-        {
-            comp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
-            comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x /
-                                                    (getTransformRead().scale.x - decreaseBy);
-        }
-        else
-        {
-            comp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
-            comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y /
-                                                  (getTransformRead().scale.y - decreaseBy);
-        }
-    }
+    // for (const auto& comp : getNodes())
+    // {
+    //     if (comp->getType() == CompType::PinchBar) { continue; }
+    //     if (layout.orientation == LdOrientation::Horizontal)
+    //     {
+    //         comp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
+    //         comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x /
+    //                                                 (getTransformRead().scale.x - decreaseBy);
+    //     }
+    //     else
+    //     {
+    //         comp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
+    //         comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y /
+    //                                               (getTransformRead().scale.y - decreaseBy);
+    //     }
+    // }
 
-    refreshLayout();
+    // refreshLayout();
 }
 
 void PinchDiv::separatorClickedMove(int16_t x, int16_t y, int16_t index)
@@ -323,7 +323,8 @@ void PinchDiv::onMoveEvent() {}
 
 bool PinchDiv::onLayoutUpdate()
 {
-    layoutCalc.calculate();
+    layoutCalc.calculate(firstUpdate);
+    firstUpdate = false;
     return false;
 }
 

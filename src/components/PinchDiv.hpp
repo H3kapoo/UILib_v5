@@ -62,6 +62,7 @@ private:
     PinchBar* firstBar{nullptr};
     PinchBar* secondBar{nullptr};
     bool currentlyDragging{false};
+    bool firstUpdate{false};
 
     /* Layout related */
     layoutcalc::PinchLayoutCalculator layoutCalc{this};

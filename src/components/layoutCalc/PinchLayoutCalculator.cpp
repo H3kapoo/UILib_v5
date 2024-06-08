@@ -14,24 +14,29 @@ PinchLayoutCalculator::PinchLayoutCalculator(AbstractComponent* comp)
     : root{comp}
 {}
 
-void PinchLayoutCalculator::calculate()
+void PinchLayoutCalculator::calculate(const bool firstUpdate)
 {
     /* Reset positions */
     resetPositions();
 
+    if (firstUpdate)
+    {
+        calculateAndApplyRelativeScale();
+        doneFirst = true;
+    }
+
     /* Calculate scale */
-    calculateAndApplyScale();
+    if (doneFirst) { calculateAndApplyScale(); }
 
     /* Calculate position based on FillPolicy & Orientation */
     calculateAndApplyPosition();
 }
 
-void PinchLayoutCalculator::calculateAndApplyScale()
+void PinchLayoutCalculator::calculateAndApplyRelativeScale()
 {
+    utils::printlne("Entered here");
     auto rootScale = root->getTransformRead().scale;
     auto& rootNodes = root->getNodes();
-    int relativeComps = 0;
-    glm::i16vec2 runningTotal = {0, 0};
     glm::i16vec2 absSubtract = {0, 0};
     const bool isLayoutHorizontal = root->layout.orientation == LdOrientation::Horizontal;
 
@@ -51,6 +56,7 @@ void PinchLayoutCalculator::calculateAndApplyScale()
     }
     rootScale -= absSubtract;
 
+    utils::printlne("Entered here {}", rootScale.x);
     for (const auto& comp : rootNodes)
     {
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
@@ -69,6 +75,9 @@ void PinchLayoutCalculator::calculateAndApplyScale()
 
             /* Needed so we don't get pixel imperfect visual artifacts */
             comp->getTransformRW().scale.x = std::round(comp->getTransformRead().scale.x);
+
+            comp->layout.scaling.horizontal.policy = LdScalePolicy::Absolute;
+            comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x;
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
@@ -77,38 +86,73 @@ void PinchLayoutCalculator::calculateAndApplyScale()
 
             /* Needed so we don't get pixel imperfect visual artifacts */
             comp->getTransformRW().scale.y = std::round(comp->getTransformRead().scale.y);
+
+            comp->layout.scaling.vertical.policy = LdScalePolicy::Absolute;
+            comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y;
         }
 
-        // if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
+        utils::printlne("Entered here {}", comp->getTransformRead().scale.x);
+    }
+}
+
+void PinchLayoutCalculator::calculateAndApplyScale()
+{
+    // return;
+    auto rootScale = root->getTransformRead().scale;
+    auto& rootNodes = root->getNodes();
+    glm::i16vec2 compsSize = {0, 0};
+    glm::i16vec2 runningTotal = {0, 0};
+
+    int nr = 0;
+    const bool isLayoutHorizontal = root->layout.orientation == LdOrientation::Horizontal;
+    for (const auto& comp : rootNodes)
+    {
+        if (isLayoutHorizontal)
+        {
+            compsSize.x += comp->layout.scaling.horizontal.value;
+            if (comp->layout.scaling.horizontal.value > 300) { nr++; }
+        }
+        else { compsSize.y += comp->layout.scaling.vertical.value; }
+    }
+    // rootScale -= absSubtract;
+    if (nr == 0) { nr = 1; }
+
+    float rootIncrease = rootScale.x - compsSize.x;
+    float incEqual = rootIncrease / nr;
+    // float incEqual = rootIncrease; // / 2.0f;
+    for (const auto& comp : rootNodes)
+    {
+        if (comp->getType() == AbstractComponent::CompType::PinchBar) { continue; }
+        // utils::printlne("compVal {}", comp->layout.scaling.horizontal.value);
+        utils::printlne("inc eq {}", incEqual);
+        comp->layout.scaling.horizontal.value += incEqual;
+        // comp->getTransformRW().scale.x += incEqual;
+        comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value;
+        comp->getTransformRW().scale.x = std::round(comp->getTransformRead().scale.x);
+        comp->getTransformRW().scale.x = std::clamp(comp->getTransformRW().scale.x, 300.0f, 20000.0f);
+        comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x;
+        // runningTotal += comp->getTransformRW().scale;
+        // if ((int)comp->getTransformRW().scale.x < 301)
         // {
-        //     const float uncappedX = comp->getTransformRW().scale.x;
-        //     const bool undershrunk = 300 > uncappedX;
-        //     if (undershrunk)
-        //     {
-        //         reachedMinComps++;
-        //         comp->getTransformRW().scale.x = 300; // comp->layout.scaling.horizontal.minValue;
-        //         rootScale.x -= 300;
-
-        //     }
+        //     utils::printlne("Enter heregg");
+        //     incEqual += incEqual;
         // }
-
-        // pos = 1;
-        runningTotal += comp->getTransformRW().scale;
     }
 
+    // utils::printlne("Size {}", root->getTransformRead().scale.x);
     /* Accounting for rounding error unable to be caught above. This makes sure the last element doesn't get past the
        parent */
-    if (isLayoutHorizontal && (int)runningTotal.x != (int)root->getTransformRead().scale.x && rootNodes.size() >= 2)
-    {
-        const auto lastComp = rootNodes[rootNodes.size() - 1];
-        lastComp->getTransformRW().scale.x += (root->getTransformRead().scale.x - runningTotal.x);
-    }
+    // if (isLayoutHorizontal && (int)runningTotal.x != (int)root->getTransformRead().scale.x && rootNodes.size() >= 2)
+    // {
+    //     const auto lastComp = rootNodes[rootNodes.size() - 1];
+    //     lastComp->getTransformRW().scale.x += (root->getTransformRead().scale.x - runningTotal.x);
+    // }
 
-    if (!isLayoutHorizontal && (int)runningTotal.y != (int)root->getTransformRead().scale.y && rootNodes.size() >= 2)
-    {
-        const auto lastComp = rootNodes[rootNodes.size() - 1];
-        lastComp->getTransformRW().scale.y += (root->getTransformRead().scale.y - runningTotal.y);
-    }
+    // if (!isLayoutHorizontal && (int)runningTotal.y != (int)root->getTransformRead().scale.y && rootNodes.size() >= 2)
+    // {
+    //     const auto lastComp = rootNodes[rootNodes.size() - 1];
+    //     lastComp->getTransformRW().scale.y += (root->getTransformRead().scale.y - runningTotal.y);
+    // }
 }
 
 void PinchLayoutCalculator::calculateAndApplyPosition()
