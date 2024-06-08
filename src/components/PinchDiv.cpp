@@ -45,8 +45,10 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
         /* Occupy an equal part on H or V depending on the orientation. Fill the other orientation completely. */
         if (layout.orientation == LdOrientation::Horizontal)
         {
-            inComp->layout.scaling = LdScaling{
-                {LdScalePolicy::Relative, scalingFactor}, {LdScalePolicy::Relative, 1.0f}};
+            inComp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
+            inComp->layout.scaling.horizontal.value = scalingFactor;
+            inComp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
+            inComp->layout.scaling.vertical.value = 1.0f;
         }
         else
         {
@@ -196,8 +198,8 @@ void PinchDiv::separatorClickedMove(int16_t x, int16_t y, int16_t index)
     if (layout.orientation == LdOrientation::Horizontal)
     {
         delta = x - prevX;
-        if (pp.first->layout.scaling.horizontal.value + delta > 300 &&
-            pp.second->layout.scaling.horizontal.value - delta > 300)
+        if (pp.first->layout.scaling.horizontal.value + delta > pp.first->layout.scaling.horizontal.min &&
+            pp.second->layout.scaling.horizontal.value - delta > pp.second->layout.scaling.horizontal.min)
         {
             pp.first->layout.scaling.horizontal.value += delta;
             pp.second->layout.scaling.horizontal.value -= delta;

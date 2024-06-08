@@ -65,7 +65,8 @@ struct LayoutData
     {
         ScalePolicy policy;
         float value{10};
-        float aux{0.0f};
+        float min{1.0f};
+        float max{10'000.0f};
     };
 
     struct Scaling

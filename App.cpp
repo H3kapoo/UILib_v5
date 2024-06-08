@@ -58,9 +58,9 @@ void App::start(int initialWidth, int initialHeight)
     div9.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
     // div9.append(&pdiv2);
 
-    div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
-    div5.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
+    div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 300}, {LdScalePolicy::Relative, .5f}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 300}, {LdScalePolicy::Relative, .5f}};
+    div5.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 500}, {LdScalePolicy::Relative, .5f}};
     // div6.layout.scaling = LdScaling{
     //     {LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
 
@@ -71,8 +71,8 @@ void App::start(int initialWidth, int initialHeight)
     // {LdScalePolicy::Relative, .5f, 50, 1000}};
 
     // pdiv.append({&div2, &div4, &div5, &div6});
-    // pdiv.append({&div2, &div4, &div5});
-    pdiv.append({&div2, &div3, &div9});
+    pdiv.append({&div2, &div4, &div5});
+    // pdiv.append({&div2, &div3, &div9});
     // pdiv2.append({&div3, &div9});
     // pdiv2.append({&div9, &div2});
     // pdiv3.append({&div2, &div3});
