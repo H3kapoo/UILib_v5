@@ -2,7 +2,6 @@
 #include "../../Utility.hpp"
 #include "LayoutData.hpp"
 #include <algorithm>
-#include <cstdint>
 #include <cstdlib>
 
 namespace components::layoutcalc
@@ -14,29 +13,27 @@ PinchLayoutCalculator::PinchLayoutCalculator(AbstractComponent* comp)
     : root{comp}
 {}
 
-void PinchLayoutCalculator::calculate(const bool firstUpdate)
+void PinchLayoutCalculator::calculate(const bool firstUpdateAfterAppendChildren)
 {
     /* Reset positions */
     resetPositions();
 
-    if (firstUpdate)
+    if (firstUpdateAfterAppendChildren)
     {
-        calculateAndApplyRelativeScale();
-        doneFirst = true;
+        /* Panes come in relative sizes to the parent initially. Transform them in absolute ones that are easier to work
+           with down the line. */
+        calculateAndApplyAbsoluteScale();
+        firstUpdateDone = true;
     }
 
     /* Calculate scale */
-    if (doneFirst)
-    {
-        calculateAndApplyScale();
-        calculateAndApplyScale();
-    }
+    if (firstUpdateDone) { calculateAndApplyScale(); }
 
     /* Calculate position based on FillPolicy & Orientation */
     calculateAndApplyPosition();
 }
 
-void PinchLayoutCalculator::calculateAndApplyRelativeScale()
+void PinchLayoutCalculator::calculateAndApplyAbsoluteScale()
 {
     auto rootScale = root->getTransformRead().scale;
     auto& rootNodes = root->getNodes();
@@ -61,43 +58,48 @@ void PinchLayoutCalculator::calculateAndApplyRelativeScale()
 
     for (const auto& comp : rootNodes)
     {
+        auto& compScale = comp->getTransformRW().scale;
+
+        /* Absolute component parts remain the same vertically & horizontally */
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Absolute)
         {
-            comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value;
+            compScale.x = comp->layout.scaling.horizontal.value;
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Absolute)
         {
-            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value;
+            compScale.y = comp->layout.scaling.vertical.value;
         }
 
         if (comp->layout.scaling.horizontal.policy == LdScalePolicy::Relative)
         {
-            comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value * rootScale.x;
-            comp->getTransformRW().scale.x = std::clamp(comp->getTransformRW().scale.x,
-                comp->layout.scaling.horizontal.min, 20000.0f);
+            compScale.x = comp->layout.scaling.horizontal.value * rootScale.x;
+            compScale.x = std::clamp(compScale.x, comp->layout.scaling.horizontal.min, 20000.0f);
 
             /* Needed so we don't get pixel imperfect visual artifacts */
-            comp->getTransformRW().scale.x = std::round(comp->getTransformRead().scale.x);
+            compScale.x = std::round(compScale.x);
 
+            /* If the layout is horizontal we need to switch from Relative initial scaling to Absolute scaling */
             if (isLayoutHorizontal)
             {
                 comp->layout.scaling.horizontal.policy = LdScalePolicy::Absolute;
-                comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x;
+                comp->layout.scaling.horizontal.value = compScale.x;
             }
         }
 
         if (comp->layout.scaling.vertical.policy == LdScalePolicy::Relative)
         {
-            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value * rootScale.y;
+            compScale.y = comp->layout.scaling.vertical.value * rootScale.y;
+            compScale.y = std::clamp(compScale.y, comp->layout.scaling.vertical.min, 20000.0f);
 
             /* Needed so we don't get pixel imperfect visual artifacts */
-            comp->getTransformRW().scale.y = std::round(comp->getTransformRead().scale.y);
+            compScale.y = std::round(compScale.y);
 
+            /* If the layout is vertical we need to switch from Relative initial scaling to Absolute scaling */
             if (!isLayoutHorizontal)
             {
                 comp->layout.scaling.vertical.policy = LdScalePolicy::Absolute;
-                comp->layout.scaling.vertical.value = comp->getTransformRead().scale.y;
+                comp->layout.scaling.vertical.value = compScale.y;
             }
         }
     }
@@ -109,7 +111,9 @@ void PinchLayoutCalculator::calculateAndApplyScale()
     auto& rootNodes = root->getNodes();
     glm::i16vec2 compsSize = {0, 0};
 
-    int nr = 0;
+    /* Count how many components have reached their minimum size value. Also calculate how much horizontal space all
+       components occupy horizontally or vertically depending on the layout orientation */
+    int nonMinnedComps = 0;
     const bool isLayoutHorizontal = root->layout.orientation == LdOrientation::Horizontal;
     for (const auto& comp : rootNodes)
     {
@@ -119,7 +123,7 @@ void PinchLayoutCalculator::calculateAndApplyScale()
             if (comp->getType() != AbstractComponent::CompType::PinchBar &&
                 comp->layout.scaling.horizontal.value > comp->layout.scaling.horizontal.min)
             {
-                nr++;
+                nonMinnedComps++;
             }
         }
         else
@@ -128,51 +132,69 @@ void PinchLayoutCalculator::calculateAndApplyScale()
             if (comp->getType() != AbstractComponent::CompType::PinchBar &&
                 comp->layout.scaling.vertical.value > comp->layout.scaling.vertical.min)
             {
-                nr++;
+                nonMinnedComps++;
             }
         }
     }
 
-    float rootIncrease = 0;
-    if (isLayoutHorizontal) { rootIncrease = rootScale.x - compsSize.x; }
-    else { rootIncrease = rootScale.y - compsSize.y; }
+    /* Each component non-minned will have to increase/decrease by a small percentage. If we deduce all objects are
+       minned, cap this to 1 so we don't get by zero division exception. */
+    if (nonMinnedComps == 0) { nonMinnedComps = 1; }
 
-    // utils::printlne("rootInc {}", rootIncrease);
-    if (nr == 0) { nr = 1; }
-    float incEqual = rootIncrease / nr;
+    /* Determine, depending on the orientation, how much each non-minned component should scale. */
+    float rootIncrease = isLayoutHorizontal ? rootScale.x - compsSize.x : rootScale.y - compsSize.y;
+    float incEqual = rootIncrease / nonMinnedComps;
+
+    glm::i16vec2 runningTotal = {0, 0};
     for (const auto& comp : rootNodes)
     {
+        auto& compScale = comp->getTransformRW().scale;
+
         if (isLayoutHorizontal)
         {
-            comp->getTransformRW().scale.y = comp->layout.scaling.vertical.value * rootScale.y;
+            compScale.y = comp->layout.scaling.vertical.value * rootScale.y;
+            compScale.y = std::round(compScale.y);
+            runningTotal.x += compScale.x;
 
-            /* Needed so we don't get pixel imperfect visual artifacts */
-            comp->getTransformRW().scale.y = std::round(comp->getTransformRead().scale.y);
             if (comp->getType() == AbstractComponent::CompType::PinchBar) { continue; }
 
             comp->layout.scaling.horizontal.value += incEqual;
-            comp->getTransformRW().scale.x = comp->layout.scaling.horizontal.value;
-            comp->getTransformRW().scale.x = std::round(comp->getTransformRead().scale.x);
-            comp->getTransformRW().scale.x = std::clamp(comp->getTransformRW().scale.x,
-                comp->layout.scaling.horizontal.min, 20000.0f);
-            comp->layout.scaling.horizontal.value = comp->getTransformRead().scale.x;
+            compScale.x = comp->layout.scaling.horizontal.value;
+            compScale.x = std::round(compScale.x);
+            compScale.x = std::clamp(compScale.x, comp->layout.scaling.horizontal.min, 20'000.0f);
+            comp->layout.scaling.horizontal.value = compScale.x;
+            runningTotal.x += compScale.x;
+        }
+        else
+        {
+            compScale.x = comp->layout.scaling.horizontal.value * rootScale.x;
+            compScale.x = std::round(compScale.x);
+            runningTotal.y += compScale.y;
+
+            if (comp->getType() == AbstractComponent::CompType::PinchBar) { continue; }
+
+            comp->layout.scaling.vertical.value += incEqual;
+            compScale.y = comp->layout.scaling.vertical.value;
+            compScale.y = std::round(compScale.y);
+            compScale.y = std::clamp(compScale.y, comp->layout.scaling.vertical.min, 20'000.0f);
+            comp->layout.scaling.vertical.value = compScale.y;
+            runningTotal.y += compScale.y;
         }
     }
 
-    // utils::printlne("Size {}", root->getTransformRead().scale.x);
     /* Accounting for rounding error unable to be caught above. This makes sure the last element doesn't get past the
        parent */
-    // if (isLayoutHorizontal && (int)runningTotal.x != (int)root->getTransformRead().scale.x && rootNodes.size() >= 2)
-    // {
-    //     const auto lastComp = rootNodes[rootNodes.size() - 1];
-    //     lastComp->getTransformRW().scale.x += (root->getTransformRead().scale.x - runningTotal.x);
-    // }
+    if (isLayoutHorizontal && (int)runningTotal.x != (int)rootScale.x)
+    {
+        const auto lastComp = rootNodes[rootNodes.size() - 1];
+        lastComp->getTransformRW().scale.x += std::clamp((rootScale.x - runningTotal.x), -1.0f, 1.0f);
+    }
 
-    // if (!isLayoutHorizontal && (int)runningTotal.y != (int)root->getTransformRead().scale.y && rootNodes.size() >= 2)
-    // {
-    //     const auto lastComp = rootNodes[rootNodes.size() - 1];
-    //     lastComp->getTransformRW().scale.y += (root->getTransformRead().scale.y - runningTotal.y);
-    // }
+    if (!isLayoutHorizontal && (int)runningTotal.y != (int)rootScale.y)
+    {
+        const auto lastComp = rootNodes[rootNodes.size() - 1];
+        lastComp->getTransformRW().scale.y += std::clamp((rootScale.y - runningTotal.y), -1.0f, 1.0f);
+    }
 }
 
 void PinchLayoutCalculator::calculateAndApplyPosition()

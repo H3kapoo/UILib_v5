@@ -17,7 +17,9 @@ void App::start(int initialWidth, int initialHeight)
     componentManager.resizeEvent(initialWidth, initialHeight);
 
     rootDiv.style.color = utils::hexToVec4("#125ea9ff");
+    rootDiv.style.borderColor = utils::hexToVec4("#4e025bff");
     rootDiv.layout.padding = {5, 5, 5, 5};
+    rootDiv.layout.border = {5, 5, 5, 5};
 
     ts.style.color = utils::hexToVec4("#c85c0fff");
     ts.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
@@ -33,7 +35,7 @@ void App::start(int initialWidth, int initialHeight)
     div6.style.color = utils::hexToVec4("#5e0667ff");
     div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 600}};
     // div6.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
-    div5.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+    div6.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
     pdiv.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
     pdiv.layout.orientation = LdOrientation::Horizontal;
@@ -58,25 +60,32 @@ void App::start(int initialWidth, int initialHeight)
     div9.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
     // div9.append(&pdiv2);
 
-    div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 500}, {LdScalePolicy::Relative, .5f}};
-    div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 300}, {LdScalePolicy::Relative, .5f}};
-    div5.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 300}, {LdScalePolicy::Relative, .5f}};
-    div6.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 200}, {LdScalePolicy::Relative, .5f}};
+    float xs = 1.0f / 2.0f;
+    // div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 150}, {LdScalePolicy::Relative, .5f}};
+    // div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 100}, {LdScalePolicy::Relative, .5f}};
+    // div5.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 400}, {LdScalePolicy::Relative, .5f}};
+    // div6.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 200}, {LdScalePolicy::Relative, .5f}};
 
-    // div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 1, 400}, {LdScalePolicy::Relative, .5f, 50,
-    // 1000}}; div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 1, 300}, {LdScalePolicy::Relative, .5f,
-    // 50, 1000}}; div5.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 1, 200}, {LdScalePolicy::Relative,
-    // .5f, 50, 1000}}; div6.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 1, 500},
-    // {LdScalePolicy::Relative, .5f, 50, 1000}};
+    pdiv2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 400}, {LdScalePolicy::Relative, .5f}};
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 200}, {LdScalePolicy::Relative, .5f}};
+    div9.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 200}, {LdScalePolicy::Relative, .5f}};
 
-    pdiv.append({&div2, &div4, &div5, &div6});
-    // pdiv.append({&div2, &div4, &div5});
+    div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, xs, 200}};
+    pdiv2.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.5f}, {LdScalePolicy::Relative, xs, 200}};
+
+    pdiv2.layout.orientation = LdOrientation::Horizontal;
+
+    div3.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 200}, {LdScalePolicy::Relative, .5f}};
+    div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 200}, {LdScalePolicy::Relative, .5f}};
+
+    pdiv.append({&div3, &div4});
+    // pdiv2.append({&div3, &div4});
+    // pdiv.append({&div2, &div4, &div5, &div6});
+    // pdiv.append({&div2, &pdiv2});
     // pdiv.append({&div2, &div3, &div9});
     // pdiv2.append({&div3, &div9});
     // pdiv2.append({&div9, &div2});
     // pdiv3.append({&div2, &div3});
-
-    rootDiv.showTree();
 
     rootDiv.showTree();
     // utils::printlne("X1 {} X2 {}", div2.getTransformRead().scale.x, div3.getTransformRead().scale.x);

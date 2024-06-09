@@ -37,8 +37,6 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
         return;
     }
 
-    // TODO: User should be able to decide the percentage sizes
-    const float scalingFactor = 1.0f / comps.size();
     const auto& nodes = getNodes();
     for (const auto& inComp : comps)
     {
@@ -46,14 +44,14 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
         if (layout.orientation == LdOrientation::Horizontal)
         {
             inComp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
-            inComp->layout.scaling.horizontal.value = scalingFactor;
             inComp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
             inComp->layout.scaling.vertical.value = 1.0f;
         }
         else
         {
-            inComp->layout.scaling = LdScaling{
-                {LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, scalingFactor}};
+            inComp->layout.scaling.vertical.policy = LdScalePolicy::Relative;
+            inComp->layout.scaling.horizontal.policy = LdScalePolicy::Relative;
+            inComp->layout.scaling.horizontal.value = 1.0f;
         }
 
         /* If we are not empty, means there's already at least one pane as a child. When addin the next pane child, put
@@ -113,7 +111,7 @@ void PinchDiv::append(std::vector<AbstractComponent*>&& comps)
         AbstractComponent::append(inComp);
     }
 
-    firstUpdate = true;
+    firstUpdateAfterAppend = true;
     refreshLayout();
 }
 
@@ -198,8 +196,8 @@ void PinchDiv::separatorClickedMove(int16_t x, int16_t y, int16_t index)
     if (layout.orientation == LdOrientation::Horizontal)
     {
         delta = x - prevX;
-        if (pp.first->layout.scaling.horizontal.value + delta > pp.first->layout.scaling.horizontal.min &&
-            pp.second->layout.scaling.horizontal.value - delta > pp.second->layout.scaling.horizontal.min)
+        if (pp.first->layout.scaling.horizontal.value + delta >= pp.first->layout.scaling.horizontal.min &&
+            pp.second->layout.scaling.horizontal.value - delta >= pp.second->layout.scaling.horizontal.min)
         {
             pp.first->layout.scaling.horizontal.value += delta;
             pp.second->layout.scaling.horizontal.value -= delta;
@@ -208,8 +206,12 @@ void PinchDiv::separatorClickedMove(int16_t x, int16_t y, int16_t index)
     else
     {
         delta = y - prevY;
-        pp.first->layout.scaling.vertical.value += delta;
-        pp.second->layout.scaling.vertical.value -= delta;
+        if (pp.first->layout.scaling.vertical.value + delta >= pp.first->layout.scaling.vertical.min &&
+            pp.second->layout.scaling.vertical.value - delta >= pp.second->layout.scaling.vertical.min)
+        {
+            pp.first->layout.scaling.vertical.value += delta;
+            pp.second->layout.scaling.vertical.value -= delta;
+        }
     }
 
     prevX = x;
@@ -325,8 +327,8 @@ void PinchDiv::onMoveEvent() {}
 
 bool PinchDiv::onLayoutUpdate()
 {
-    layoutCalc.calculate(firstUpdate);
-    firstUpdate = false;
+    layoutCalc.calculate(firstUpdateAfterAppend);
+    firstUpdateAfterAppend = false;
     return false;
 }
 

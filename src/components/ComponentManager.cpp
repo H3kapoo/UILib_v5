@@ -128,6 +128,12 @@ void ComponentManager::mouseClickEvent(MouseButton button, HIDAction action, Act
             break;
         }
     }
+
+    /* Because we are not calculating who's hovered when the mouse is clicked, after a click+drag action, on mouse
+       release, we might not be hovering over the original component we hovered on at the beggining. Due to this, we
+       need to retrigger a calculation on release to better decide if the original hovered component is still the
+       hovered one or not. */
+    if (action == HIDAction::Released) { mouseMoveEvent(state.mouseX, state.mouseY); }
 }
 
 void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
@@ -166,7 +172,7 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
 
         if (xConstraint && yConstraint)
         {
-            /* This means we are still the currently hoeverd node, no need to do anything */
+            /* This means we are still the currently hovered node, no need to do anything */
             if (state.hoveredId == childNode->getId()) { break; }
 
             /* Hovered node is now another one, set and notify */
@@ -261,6 +267,7 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
        displayed correctly. A trick to solving this is to somehow "sense" that the window might of been resized to
        fullscreen or restored to previous size, in which case, trigger a layout updated again. This is not related only
        to scrollbars, but this is where the bug was found.*/
+    // TODO: This really needs to be investigated in the future
     if (sensedWindowFullscreen)
     {
         utils::printlni("Sensed window going fullscreen or reverse.");
@@ -270,8 +277,9 @@ void ComponentManager::resizeEvent(int newWidth, int newHeight)
 
 void ComponentManager::windowMaximizedEvent(int maximized)
 {
-    (void)maximized;
     /* Note: On linux, this is called before 'resizeEvent' */
+    (void)maximized;
+    updateLayout();
 }
 
 void ComponentManager::updateInternalTreeStructure(const std::string& action)

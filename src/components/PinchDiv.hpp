@@ -58,11 +58,11 @@ private:
 
     int16_t prevX{0}, prevY{0};
     int16_t delta{0};
-    int16_t separatorSize{5};
+    int16_t separatorSize{15};
     PinchBar* firstBar{nullptr};
     PinchBar* secondBar{nullptr};
     bool currentlyDragging{false};
-    bool firstUpdate{false};
+    bool firstUpdateAfterAppend{false};
 
     /* Layout related */
     layoutcalc::PinchLayoutCalculator layoutCalc{this};
