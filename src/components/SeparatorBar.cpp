@@ -1,4 +1,4 @@
-#include "PinchBar.hpp"
+#include "SeparatorBar.hpp"
 
 #include "../Utility.hpp"
 #include <cstdint>
@@ -6,21 +6,21 @@
 
 namespace components
 {
-PinchBar::PinchBar()
-    : AbstractComponent({.type = CompType::PinchBar,
+SeparatorBar::SeparatorBar()
+    : AbstractComponent({.type = CompType::SeparatorBar,
           .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
     , imageDummy("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl")
     , textureLoader(TextureLoader::get())
 
 {
     style.color = utils::hexToVec4("#404140ff");
-    sideImage.path.onReload = std::bind(&PinchBar::reloadImage, this);
+    sideImage.path.onReload = std::bind(&SeparatorBar::reloadImage, this);
     imageDummy.options.isForTextures = true;
 }
 
-PinchBar::~PinchBar() {}
+SeparatorBar::~SeparatorBar() {}
 
-void PinchBar::onPrepareToRender()
+void SeparatorBar::onPrepareToRender()
 {
     auto border = glm::vec4(layout.border.top, layout.border.bottom, layout.border.left, layout.border.right);
 
@@ -30,19 +30,19 @@ void PinchBar::onPrepareToRender()
     getShader().setVec4f("uBorderSize", border);
     getShader().setVec2f("uResolution", getTransformRead().scale);
 }
-void PinchBar::onStart()
+void SeparatorBar::onStart()
 {
     imageDummy.transform.layer = getDepth() + 1;
     utils::printlni("[INF] I am node {} and onStart() called {}", getId(), imageDummy.transform.layer);
 }
 
-void PinchBar::onRenderDone()
+void SeparatorBar::onRenderDone()
 {
     if (textureData == nullptr) { return; }
     lwr.render(getState()->projectionMatrix, imageDummy);
 }
 
-void PinchBar::reloadImage()
+void SeparatorBar::reloadImage()
 {
     if (std::string_view{sideImage.path.value}.empty())
     {
@@ -57,30 +57,33 @@ void PinchBar::reloadImage()
     }
 }
 
-void PinchBar::addClickListener(std::function<void(int, int, MouseButton)> func)
+void SeparatorBar::addClickListener(std::function<void(int, int, MouseButton)> func)
 {
     mouseClickCb = func;
 }
 
-void PinchBar::addReleaseListener(std::function<void(int, int, MouseButton)> func)
+void SeparatorBar::addReleaseListener(std::function<void(int, int, MouseButton)> func)
 {
     mouseReleaseCb = func;
 }
 
-void PinchBar::addMoveClickedListener(std::function<void(int16_t, int16_t)> func)
+void SeparatorBar::addMoveClickedListener(std::function<void(int16_t, int16_t)> func)
 {
     mouseMoveClickedCb = func;
 }
 
-void PinchBar::addMoveListener(std::function<void(int16_t, int16_t)> func)
+void SeparatorBar::addMoveListener(std::function<void(int16_t, int16_t)> func)
 {
     mouseMoveCb = func;
 }
 
-void PinchBar::onClickEvent()
+void SeparatorBar::addOnExitListener(std::function<void()> func)
 {
-    // println("Button element id {} has been clicked!", getId());
+    mouseExitCb = func;
+}
 
+void SeparatorBar::onClickEvent()
+{
     const auto& s = getState();
     if (s->mouseAction == HIDAction::Pressed)
     {
@@ -92,17 +95,18 @@ void PinchBar::onClickEvent()
     }
 };
 
-void PinchBar::onMouseEnterEvent()
+void SeparatorBar::onMouseEnterEvent()
 {
     style.color = utils::hexToVec4("#606160ff");
 }
 
-void PinchBar::onMouseExitEvent()
+void SeparatorBar::onMouseExitEvent()
 {
     style.color = utils::hexToVec4("#404140ff");
+    if (mouseExitCb) { mouseExitCb(); }
 }
 
-void PinchBar::onMoveEvent()
+void SeparatorBar::onMoveEvent()
 {
     // getBoxModelRW().pos.z = getDepth(); // TODO: Shall not exist
     // utils::printlni("[INF] I am node {} and onStart() called", getId());
@@ -116,7 +120,7 @@ void PinchBar::onMoveEvent()
     }
 }
 
-bool PinchBar::onLayoutUpdate()
+bool SeparatorBar::onLayoutUpdate()
 {
     imageDummy.transform.pos = getTransformRead().pos + glm::vec2{10, 10};
     auto scale = getTransformRead().scale.y - 20;

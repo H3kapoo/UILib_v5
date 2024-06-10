@@ -13,7 +13,7 @@ namespace components
 
 using namespace layoutcalc;
 using namespace assetloaders;
-class PinchBar : public AbstractComponent
+class SeparatorBar : public AbstractComponent
 {
 
 public:
@@ -30,16 +30,14 @@ public:
         LdAlign align{LdAlign::Left};
     };
 
-    PinchBar();
-    ~PinchBar();
+    SeparatorBar();
+    ~SeparatorBar();
 
     void addClickListener(std::function<void(int, int, MouseButton)> func);
     void addReleaseListener(std::function<void(int, int, MouseButton)> func);
     void addMoveClickedListener(std::function<void(int16_t, int16_t)> func);
     void addMoveListener(std::function<void(int16_t, int16_t)> func);
-
-    void addSideBar(PinchBar* sideBar);
-    void rmSideBar();
+    void addOnExitListener(std::function<void()> func);
 
     Style style;
     std::string text;
@@ -50,7 +48,7 @@ public:
     std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
     std::function<void(int16_t, int16_t)> mouseMoveClickedCb{nullptr};
     std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
-    // std::function<void()> mouseHoverCb{nullptr};
+    std::function<void()> mouseExitCb{nullptr};
 
     void onClickEvent() override;
     void onMoveEvent() override;
@@ -81,7 +79,7 @@ private:
     TextureLoader::TextureDataPtr textureData{nullptr};
     TextureLoader& textureLoader;
 
-    PinchBar* sideBar{nullptr};
+    SeparatorBar* sideBar{nullptr};
 
     // std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
     // std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};

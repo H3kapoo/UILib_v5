@@ -25,8 +25,8 @@ public:
         Div,
         ScrollBar,
         TabSwitcher,
-        PinchDiv,
-        PinchBar
+        ResizeDiv,
+        SeparatorBar
     };
 
     struct Options

@@ -143,11 +143,11 @@ void AbstractComponent::details()
         case CompType::TabSwitcher:
             stringType = "TabSwitcher";
             break;
-        case CompType::PinchDiv:
-            stringType = "PinchDiv";
+        case CompType::ResizeDiv:
+            stringType = "ResizeDiv";
             break;
-        case CompType::PinchBar:
-            stringType = "PinchBar";
+        case CompType::SeparatorBar:
+            stringType = "SeparatorBar";
             break;
         default:
             stringType = "Unknown";

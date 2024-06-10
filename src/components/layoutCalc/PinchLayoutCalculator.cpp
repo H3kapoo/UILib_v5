@@ -120,7 +120,7 @@ void PinchLayoutCalculator::calculateAndApplyScale()
         if (isLayoutHorizontal)
         {
             compsSize.x += comp->layout.scaling.horizontal.value;
-            if (comp->getType() != AbstractComponent::CompType::PinchBar &&
+            if (comp->getType() != AbstractComponent::CompType::SeparatorBar &&
                 comp->layout.scaling.horizontal.value > comp->layout.scaling.horizontal.min)
             {
                 nonMinnedComps++;
@@ -129,7 +129,7 @@ void PinchLayoutCalculator::calculateAndApplyScale()
         else
         {
             compsSize.y += comp->layout.scaling.vertical.value;
-            if (comp->getType() != AbstractComponent::CompType::PinchBar &&
+            if (comp->getType() != AbstractComponent::CompType::SeparatorBar &&
                 comp->layout.scaling.vertical.value > comp->layout.scaling.vertical.min)
             {
                 nonMinnedComps++;
@@ -156,7 +156,7 @@ void PinchLayoutCalculator::calculateAndApplyScale()
             compScale.y = std::round(compScale.y);
             runningTotal.x += compScale.x;
 
-            if (comp->getType() == AbstractComponent::CompType::PinchBar) { continue; }
+            if (comp->getType() == AbstractComponent::CompType::SeparatorBar) { continue; }
 
             comp->layout.scaling.horizontal.value += incEqual;
             compScale.x = comp->layout.scaling.horizontal.value;
@@ -171,7 +171,7 @@ void PinchLayoutCalculator::calculateAndApplyScale()
             compScale.x = std::round(compScale.x);
             runningTotal.y += compScale.y;
 
-            if (comp->getType() == AbstractComponent::CompType::PinchBar) { continue; }
+            if (comp->getType() == AbstractComponent::CompType::SeparatorBar) { continue; }
 
             comp->layout.scaling.vertical.value += incEqual;
             compScale.y = comp->layout.scaling.vertical.value;
