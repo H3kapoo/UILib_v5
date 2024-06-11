@@ -1,8 +1,9 @@
 #include "Renderer.hpp"
 
-#include "../Utility.hpp"
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "src/Utility.hpp"
 
 namespace renderer
 {

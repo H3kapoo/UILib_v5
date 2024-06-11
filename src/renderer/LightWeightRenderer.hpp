@@ -1,13 +1,17 @@
 #pragma once
 
-#include "../Utility.hpp"
-#include "../components/compUtils/LightWeightDummy.hpp"
-#include "../shaderManagement/ShaderLoader.hpp"
+#include "src/Utility.hpp"
+#include "src/components/compUtils/LightWeightDummy.hpp"
+#include "src/shaderManagement/ShaderLoader.hpp"
 
 namespace renderer
 {
 using namespace components::computils;
 
+/**
+ * @brief Simple class for quick render of LIghWeightDummy objects
+ *
+ */
 class LightWeightRenderer
 {
 public:

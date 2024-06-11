@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "IMesh.hpp"
+#include "src/mesh/IMesh.hpp"
 
 namespace mesh
 {

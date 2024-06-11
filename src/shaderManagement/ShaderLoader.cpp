@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "../Utility.hpp"
+#include "src/Utility.hpp"
 
 namespace shaderManagement
 {

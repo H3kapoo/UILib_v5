@@ -2,12 +2,11 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include <string>
 #include <unordered_map>
 
-#include "../components/AbstractComponent.hpp"
-#include "../shaderManagement/ShaderLoader.hpp"
+#include "src/components/AbstractComponent.hpp"
+#include "src/shaderManagement/ShaderLoader.hpp"
 
 namespace renderer
 {

@@ -5,6 +5,10 @@
 
 namespace components::computils
 {
+/**
+ * @brief Basic class serving as a container for object transforms and getting the model matric of that transform.
+ *
+ */
 class Transform
 {
 public:

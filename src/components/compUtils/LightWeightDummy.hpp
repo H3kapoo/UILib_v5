@@ -1,14 +1,17 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <string>
 
-#include <glm/glm.hpp>
-
-#include "../../mesh/QuadMesh.hpp"
-#include "Transform.hpp"
+#include "src/components/compUtils/Transform.hpp"
+#include "src/mesh/QuadMesh.hpp"
 
 namespace components::computils
 {
+/**
+ * @brief Simple class used to hold a dummy object for non-component quick rendering.
+ *
+ */
 class LightWeightDummy
 {
 public:
