@@ -27,7 +27,7 @@ public:
         glm::vec4 borderColor{1.0f};
     };
 
-    /* General options for the SideImage that can be present in the separator */
+    /* General options for the InternalImage that can be present in the separator */
     struct InternalImage
     {
         AssignReloadable<const char*> path{""};
@@ -55,7 +55,7 @@ public:
 
 private:
     /**
-     * @brief Trigger runtime reloading of associated internal image data
+     * @brief Trigger runtime reloading of associated internal image data.
      *
      */
     void reloadImage();

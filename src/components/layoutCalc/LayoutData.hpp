@@ -5,8 +5,6 @@
 #include <glm/glm.hpp>
 #include <sys/types.h>
 
-#include "../../Utility.hpp"
-
 namespace components::layoutcalc
 {
 /**

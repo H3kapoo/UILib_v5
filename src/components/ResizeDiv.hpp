@@ -102,14 +102,8 @@ private:
     bool removeAux();
 
     /* Events */
-    void onPrepareToRender() override;
-    void onRenderDone() override;
-    void onClickEvent() override;
-    void onMoveEvent() override;
-    void onMouseExitEvent() override;
-    void onMouseEnterEvent() override;
-    void onStart() override;
     bool onLayoutUpdate() override;
+    void onPrepareToRender() override;
 
     using PanePair = std::pair<AbstractComponent*, AbstractComponent*>;
     std::vector<SeparatorBar*> separators;

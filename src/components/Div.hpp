@@ -1,21 +1,21 @@
 #pragma once
 
-#include "AbstractComponent.hpp"
-#include "ScrollBar.hpp"
-#include "layoutCalc/LayoutCalculator.hpp"
-
-#include "../assetLoaders/TextureLoader.hpp"
 #include <functional>
+
+#include "src/assetLoaders/TextureLoader.hpp"
+#include "src/components/AbstractComponent.hpp"
+#include "src/components/ScrollBar.hpp"
+#include "src/components/layoutCalc/LayoutCalculator.hpp"
 
 namespace components
 {
-
 using namespace assetloaders;
 
 class Div : public AbstractComponent
 {
 
 public:
+    /* General style parameters associated with this component in particular */
     struct Style
     {
         glm::vec4 borderColor{0.0f};
@@ -31,10 +31,10 @@ public:
     Div();
     ~Div();
 
-    void addClickListener(std::function<void(int, int, MouseButton)>&& func);
-    void addOnEnterListener(std::function<void()>&& func);
-    void addOnExitListener(std::function<void()>&& func);
-    void addOnKeyListener(std::function<void(const HIDAction*)>&& func);
+    void addClickListener(std::function<void(int, int, MouseButton)>&& cb);
+    void addOnEnterListener(std::function<void()>&& cb);
+    void addOnExitListener(std::function<void()>&& cb);
+    void addOnKeyListener(std::function<void(const HIDAction*)>&& cb);
 
     Style style;
 
@@ -42,32 +42,38 @@ public:
     AssignReloadable<const char*> imagePath{""};
 
 private:
+    /**
+     * @brief Trigger runtime reloading of associated internal image data.
+     *
+     */
     void reloadImage();
 
-    void onPrepareToRender() override;
-    void onRenderDone() override;
+    /* Events */
+    bool onLayoutUpdate() override;
     void onClickEvent() override;
     void onKeyEvent() override;
     void onMouseEnterEvent() override;
     void onMouseExitEvent() override;
     void onMoveEvent() override;
+    void onPrepareToRender() override;
+    void onRenderDone() override;
     void onStart() override;
-    bool onLayoutUpdate() override;
 
+    /* This Div can display an image. This are helpers for that. */
     TextureLoader::TextureDataPtr textureData{nullptr};
     TextureLoader& textureLoader;
 
-    /* Layout related */
-    layoutcalc::LayoutCalculator layoutCalc{this};
+    /* Callbacks related*/
+    std::function<void()> mouseEnterCb{nullptr};
+    std::function<void()> mouseExitCb{nullptr};
+    std::function<void(const HIDAction*)> keyEventCb{nullptr};
+    std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
 
-    /*Note: Pointers to due memory consumption reasons. Create/delete on demand. */
+    /* Note: Pointers to due memory consumption reasons. Create/delete on demand. */
     computils::ScrollBar* hsb{nullptr};
     computils::ScrollBar* vsb{nullptr};
 
-    /* Callbacks related*/
-    std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
-    std::function<void(const HIDAction*)> keyEventCb{nullptr};
-    std::function<void()> mouseEnterCb{nullptr};
-    std::function<void()> mouseExitCb{nullptr};
+    /* Layout related */
+    layoutcalc::LayoutCalculator layoutCalc{this};
 };
 } // namespace components

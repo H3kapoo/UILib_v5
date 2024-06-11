@@ -1,45 +1,23 @@
 #include "Button.hpp"
 
-#include "../Utility.hpp"
 #include <cstdint>
 #include <string_view>
+
+#include "src/Utility.hpp"
 
 namespace components
 {
 Button::Button()
-    : AbstractComponent({.type = CompType::Button,
-          .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
-    , imageDummy("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl")
+    : AbstractComponent({.type = CompType::Button, .shaderPath = "src/assets/shaders/bordered.glsl"})
+    , imgHolder("src/assets/shaders/baseTextured.glsl")
     , textureLoader(TextureLoader::get())
 
 {
     sideImage.path.onReload = std::bind(&Button::reloadImage, this);
-    imageDummy.options.isForTextures = true;
+    imgHolder.options.isForTextures = true;
 }
 
 Button::~Button() {}
-
-void Button::onPrepareToRender()
-{
-    auto border = glm::vec4(layout.border.top, layout.border.bottom, layout.border.left, layout.border.right);
-
-    getShader().setActiveShaderId(getShaderId());
-    getShader().setVec4f("uInnerColor", style.color);
-    getShader().setVec4f("uBorderColor", style.borderColor);
-    getShader().setVec4f("uBorderSize", border);
-    getShader().setVec2f("uResolution", getTransformRead().scale);
-}
-void Button::onStart()
-{
-    imageDummy.transform.layer = getDepth() + 1;
-    utils::printlni("[INF] I am node {} and onStart() called {}", getId(), imageDummy.transform.layer);
-}
-
-void Button::onRenderDone()
-{
-    if (textureData == nullptr) { return; }
-    lwr.render(getState()->projectionMatrix, imageDummy);
-}
 
 void Button::reloadImage()
 {
@@ -51,24 +29,33 @@ void Button::reloadImage()
     else
     {
         textureData = textureLoader.loadTexture(sideImage.path.value);
-        imageDummy.options.textureId = textureData->id;
+        imgHolder.options.textureId = textureData->id;
         // utils::printlni("Button {} reloaded image to {}", getId(), sideImage.path.value);
     }
 }
 
-void Button::addClickListener(std::function<void(int, int, MouseButton)> func)
+void Button::onPrepareToRender()
 {
-    mouseClickCb = func;
+    auto border = glm::vec4(layout.border.top, layout.border.bottom, layout.border.left, layout.border.right);
+
+    getShader().setActiveShaderId(getShaderId());
+    getShader().setVec4f("uInnerColor", style.color);
+    getShader().setVec4f("uBorderColor", style.borderColor);
+    getShader().setVec4f("uBorderSize", border);
+    getShader().setVec2f("uResolution", getTransformRead().scale);
 }
 
-void Button::addReleaseListener(std::function<void(int, int, MouseButton)> func)
+void Button::onStart()
 {
-    mouseReleaseCb = func;
+    imgHolder.transform.layer = getDepth() + 1;
+    // utils::printlni("[INF] I am node {} and onStart() called {}", getId(), imgHolder.transform.layer);
 }
 
-void Button::addMouseMoveListener(std::function<void(int16_t, int16_t)> func)
+void Button::onRenderDone()
 {
-    mouseMoveCb = func;
+    /* No need to try to render internal image if we don't have one */
+    if (textureData == nullptr) { return; }
+    lwr.render(getState()->projectionMatrix, imgHolder);
 }
 
 void Button::onClickEvent()
@@ -88,24 +75,16 @@ void Button::onClickEvent()
 
 void Button::onMouseEnterEvent()
 {
-    // utils::printlni("Button element id {} has been entered!", getId());
     style.color = utils::hexToVec4("#606160ff");
-    // const auto& s = getState();
-    // println("For Button {} mouse position is {}-{}", getId(), s->mouseX, s->mouseY);
 }
 
 void Button::onMouseExitEvent()
 {
-    // utils::printlni("Button element id {} has been exited!", getId());
     style.color = utils::hexToVec4("#404140ff");
-    // const auto& s = getState();
-    // println("For Button {} mouse position is {}-{}", getId(), s->mouseX, s->mouseY);
 }
 
 void Button::onMoveEvent()
 {
-    // getBoxModelRW().pos.z = getDepth(); // TODO: Shall not exist
-    // utils::printlni("[INF] I am node {} and onStart() called", getId());
     const auto& s = getState();
     if (s->mouseAction == HIDAction::Pressed && s->clickedButton == MouseButton::Left)
     {
@@ -115,11 +94,26 @@ void Button::onMoveEvent()
 
 bool Button::onLayoutUpdate()
 {
-    imageDummy.transform.pos = getTransformRead().pos + glm::vec2{10, 10};
+    imgHolder.transform.pos = getTransformRead().pos + glm::vec2{10, 10};
     auto scale = getTransformRead().scale.y - 20;
-    imageDummy.transform.scale = {scale, scale};
-    imageDummy.transform.markDirty();
+    imgHolder.transform.scale = {scale, scale};
+    imgHolder.transform.markDirty();
     return false;
+}
+
+void Button::addClickListener(std::function<void(int, int, MouseButton)> func)
+{
+    mouseClickCb = func;
+}
+
+void Button::addReleaseListener(std::function<void(int, int, MouseButton)> func)
+{
+    mouseReleaseCb = func;
+}
+
+void Button::addMouseMoveListener(std::function<void(int16_t, int16_t)> func)
+{
+    mouseMoveCb = func;
 }
 
 } // namespace components

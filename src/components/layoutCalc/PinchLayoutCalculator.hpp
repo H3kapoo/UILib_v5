@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../AbstractComponent.hpp"
-#include "LayoutUtils.hpp"
-#include <cstdint>
-#include <glm/fwd.hpp>
+#include <cstdlib>
+
+#include "src/components/AbstractComponent.hpp"
+#include "src/components/layoutCalc/LayoutUtils.hpp"
 
 namespace components::layoutcalc
 {

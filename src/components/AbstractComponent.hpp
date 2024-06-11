@@ -1,13 +1,12 @@
 #pragma once
 
-#include <glm/fwd.hpp>
 #include <string>
 #include <vector>
 
-#include "../UIState.hpp"
-#include "../shaderManagement/ShaderLoader.hpp"
-#include "compUtils/Transform.hpp"
-#include "layoutCalc/LayoutData.hpp"
+#include "src/UIState.hpp"
+#include "src/components/compUtils/Transform.hpp"
+#include "src/components/layoutCalc/LayoutData.hpp"
+#include "src/shaderManagement/ShaderLoader.hpp"
 
 namespace components
 {

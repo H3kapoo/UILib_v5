@@ -264,18 +264,6 @@ void ResizeDiv::onPrepareToRender()
     getShader().setVec2f("uResolution", getTransformRead().scale);
 }
 
-void ResizeDiv::onStart() {}
-
-void ResizeDiv::onRenderDone() {}
-
-void ResizeDiv::onClickEvent() {}
-
-void ResizeDiv::onMouseEnterEvent() {}
-
-void ResizeDiv::onMouseExitEvent() {}
-
-void ResizeDiv::onMoveEvent() {}
-
 bool ResizeDiv::onLayoutUpdate()
 {
     layoutCalc.calculate(firstUpdateAfterAppend);

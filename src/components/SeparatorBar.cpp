@@ -7,9 +7,8 @@
 namespace components
 {
 SeparatorBar::SeparatorBar()
-    : AbstractComponent({.type = CompType::SeparatorBar,
-          .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
-    , imgHolder("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl")
+    : AbstractComponent({.type = CompType::SeparatorBar, .shaderPath = "src/assets/shaders/bordered.glsl"})
+    , imgHolder("src/assets/shaders/baseTextured.glsl")
     , textureLoader(TextureLoader::get())
 
 {

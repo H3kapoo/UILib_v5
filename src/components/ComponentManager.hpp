@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../renderer/Renderer.hpp"
-#include "AbstractComponent.hpp"
 #include <vector>
+
+#include "src/components/AbstractComponent.hpp"
+#include "src/renderer/Renderer.hpp"
 
 namespace components
 {

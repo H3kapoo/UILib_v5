@@ -1,17 +1,16 @@
 #include "Div.hpp"
 
-#include "AbstractComponent.hpp"
-
-#include "../Utility.hpp"
-#include "ScrollBar.hpp"
-#include "layoutCalc/LayoutData.hpp"
 #include <string_view>
+
+#include "src/Utility.hpp"
+#include "src/components/AbstractComponent.hpp"
+#include "src/components/ScrollBar.hpp"
+#include "src/components/layoutCalc/LayoutData.hpp"
 
 namespace components
 {
 Div::Div()
-    : AbstractComponent({.type = CompType::Div,
-          .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
+    : AbstractComponent({.type = CompType::Div, .shaderPath = "src/assets/shaders/bordered.glsl"})
     //   .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl"})
 
     , textureLoader(assetloaders::TextureLoader::get())
@@ -21,6 +20,7 @@ Div::Div()
 
 Div::~Div()
 {
+    /* Deallocate scrollbars if needed */
     if (hsb) { delete hsb; }
     if (vsb) { delete vsb; }
 }
@@ -57,51 +57,21 @@ void Div::onPrepareToRender()
     else { getShader().set2DTextureUnit("uTexture", textureData->id, GL_TEXTURE0); }
 }
 
-void Div::onRenderDone() {}
-
-void Div::addClickListener(std::function<void(int, int, MouseButton)>&& func)
-{
-    mouseClickCb = func;
-}
-
-void Div::addOnEnterListener(std::function<void()>&& func)
-{
-    mouseEnterCb = func;
-}
-
-void Div::addOnExitListener(std::function<void()>&& func)
-{
-    mouseExitCb = func;
-}
-
-void Div::addOnKeyListener(std::function<void(const HIDAction*)>&& func)
-{
-    keyEventCb = func;
-}
-
 void Div::onClickEvent()
 {
-    // utils::printlni("[INF] I am node {} and onClick() called", getId());
-
     const auto& s = getState();
     if (mouseClickCb && s->mouseAction == HIDAction::Pressed) { mouseClickCb(s->mouseX, s->mouseY, s->clickedButton); }
 }
 
-void Div::onKeyEvent() {}
-
 void Div::onMouseEnterEvent()
 {
-
     if (mouseEnterCb) { mouseEnterCb(); }
 }
 
 void Div::onMouseExitEvent()
 {
-
     if (mouseExitCb) { mouseExitCb(); }
 }
-
-void Div::onMoveEvent() {}
 
 void Div::onStart()
 {
@@ -177,6 +147,26 @@ bool Div::onLayoutUpdate()
         vsb->updateOverflow(deducedOverflow.y);
     }
     return needsUpdate;
+}
+
+void Div::addClickListener(std::function<void(int, int, MouseButton)>&& func)
+{
+    mouseClickCb = func;
+}
+
+void Div::addOnEnterListener(std::function<void()>&& func)
+{
+    mouseEnterCb = func;
+}
+
+void Div::addOnExitListener(std::function<void()>&& func)
+{
+    mouseExitCb = func;
+}
+
+void Div::addOnKeyListener(std::function<void(const HIDAction*)>&& func)
+{
+    keyEventCb = func;
 }
 
 } // namespace components

@@ -2,12 +2,10 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <cstdlib>
-#include <glm/fwd.hpp>
 #include <ranges>
 
-#include "../Utility.hpp"
-#include "AbstractComponent.hpp"
+#include "src/Utility.hpp"
+#include "src/components/AbstractComponent.hpp"
 
 namespace components
 {

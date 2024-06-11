@@ -1,7 +1,7 @@
 #include "LayoutCalculator.hpp"
-#include "../../Utility.hpp"
-#include "LayoutData.hpp"
-#include <cstdint>
+
+#include "src/Utility.hpp"
+#include "src/components/layoutCalc/LayoutData.hpp"
 
 namespace components::layoutcalc
 {

@@ -1,8 +1,8 @@
 #include "AbstractComponent.hpp"
 
-#include "../Utility.hpp"
-#include "../mesh/QuadMesh.hpp"
-#include "layoutCalc/LayoutData.hpp"
+#include "src/Utility.hpp"
+#include "src/components/layoutCalc/LayoutData.hpp"
+#include "src/mesh/QuadMesh.hpp"
 
 namespace components
 {

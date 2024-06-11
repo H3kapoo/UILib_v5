@@ -1,8 +1,9 @@
 #include "PinchLayoutCalculator.hpp"
-#include "../../Utility.hpp"
-#include "LayoutData.hpp"
+
 #include <algorithm>
-#include <cstdlib>
+
+#include "src/Utility.hpp"
+#include "src/components/layoutCalc/LayoutData.hpp"
 
 namespace components::layoutcalc
 {
