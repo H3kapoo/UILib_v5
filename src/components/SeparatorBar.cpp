@@ -1,24 +1,39 @@
 #include "SeparatorBar.hpp"
 
-#include "../Utility.hpp"
-#include <cstdint>
 #include <string_view>
+
+#include "src/Utility.hpp"
 
 namespace components
 {
 SeparatorBar::SeparatorBar()
     : AbstractComponent({.type = CompType::SeparatorBar,
           .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/bordered.glsl"})
-    , imageDummy("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl")
+    , imgHolder("/home/hekapoo/newTryAtUI/src/assets/shaders/baseTextured.glsl")
     , textureLoader(TextureLoader::get())
 
 {
     style.color = utils::hexToVec4("#404140ff");
-    sideImage.path.onReload = std::bind(&SeparatorBar::reloadImage, this);
-    imageDummy.options.isForTextures = true;
+    internalImg.path.onReload = std::bind(&SeparatorBar::reloadImage, this);
+    imgHolder.options.isForTextures = true;
 }
 
 SeparatorBar::~SeparatorBar() {}
+
+void SeparatorBar::reloadImage()
+{
+    if (std::string_view{internalImg.path.value}.empty())
+    {
+        // Empty
+        textureData = nullptr;
+    }
+    else
+    {
+        textureData = textureLoader.loadTexture(internalImg.path.value);
+        imgHolder.options.textureId = textureData->id;
+        // utils::printlni("Button {} reloaded image to {}", getId(), sideImage.path.value);
+    }
+}
 
 void SeparatorBar::onPrepareToRender()
 {
@@ -32,54 +47,15 @@ void SeparatorBar::onPrepareToRender()
 }
 void SeparatorBar::onStart()
 {
-    imageDummy.transform.layer = getDepth() + 1;
-    utils::printlni("[INF] I am node {} and onStart() called {}", getId(), imageDummy.transform.layer);
+    imgHolder.transform.layer = getDepth() + 1;
+    // utils::printlni("[INF] I am node {} and onStart() called {}", getId(), imgHolder.transform.layer);
 }
 
 void SeparatorBar::onRenderDone()
 {
+    /* No need to try to render internal image if we don't have one */
     if (textureData == nullptr) { return; }
-    lwr.render(getState()->projectionMatrix, imageDummy);
-}
-
-void SeparatorBar::reloadImage()
-{
-    if (std::string_view{sideImage.path.value}.empty())
-    {
-        // Empty
-        textureData = nullptr;
-    }
-    else
-    {
-        textureData = textureLoader.loadTexture(sideImage.path.value);
-        imageDummy.options.textureId = textureData->id;
-        // utils::printlni("Button {} reloaded image to {}", getId(), sideImage.path.value);
-    }
-}
-
-void SeparatorBar::addClickListener(std::function<void(int, int, MouseButton)> func)
-{
-    mouseClickCb = func;
-}
-
-void SeparatorBar::addReleaseListener(std::function<void(int, int, MouseButton)> func)
-{
-    mouseReleaseCb = func;
-}
-
-void SeparatorBar::addMoveClickedListener(std::function<void(int16_t, int16_t)> func)
-{
-    mouseMoveClickedCb = func;
-}
-
-void SeparatorBar::addMoveListener(std::function<void(int16_t, int16_t)> func)
-{
-    mouseMoveCb = func;
-}
-
-void SeparatorBar::addOnExitListener(std::function<void()> func)
-{
-    mouseExitCb = func;
+    lwr.render(getState()->projectionMatrix, imgHolder);
 }
 
 void SeparatorBar::onClickEvent()
@@ -108,9 +84,6 @@ void SeparatorBar::onMouseExitEvent()
 
 void SeparatorBar::onMoveEvent()
 {
-    // getBoxModelRW().pos.z = getDepth(); // TODO: Shall not exist
-    // utils::printlni("[INF] I am node {} and onStart() called", getId());
-
     const auto& s = getState();
     if (mouseMoveCb) mouseMoveCb(s->mouseX, s->mouseY);
 
@@ -122,11 +95,36 @@ void SeparatorBar::onMoveEvent()
 
 bool SeparatorBar::onLayoutUpdate()
 {
-    imageDummy.transform.pos = getTransformRead().pos + glm::vec2{10, 10};
+    imgHolder.transform.pos = getTransformRead().pos + glm::vec2{10, 10};
     auto scale = getTransformRead().scale.y - 20;
-    imageDummy.transform.scale = {scale, scale};
-    imageDummy.transform.markDirty();
+    imgHolder.transform.scale = {scale, scale};
+    imgHolder.transform.markDirty();
     return false;
+}
+
+void SeparatorBar::addClickListener(std::function<void(int, int, MouseButton)> cb)
+{
+    mouseClickCb = cb;
+}
+
+void SeparatorBar::addReleaseListener(std::function<void(int, int, MouseButton)> cb)
+{
+    mouseReleaseCb = cb;
+}
+
+void SeparatorBar::addMoveClickedListener(std::function<void(int16_t, int16_t)> cb)
+{
+    mouseMoveClickedCb = cb;
+}
+
+void SeparatorBar::addMoveListener(std::function<void(int16_t, int16_t)> cb)
+{
+    mouseMoveCb = cb;
+}
+
+void SeparatorBar::addOnExitListener(std::function<void()> cb)
+{
+    mouseExitCb = cb;
 }
 
 } // namespace components

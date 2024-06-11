@@ -12,7 +12,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -ggdb -g -DRENDER_FRONT_TO_BACK")
 
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../debug)
-    set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
     # set(HKUI_LIBRARY_INCLUDE_DIRECTORY "/home/hekapoo/lib_hkui/include")
     set(FT_LIBRARY_INCLUDE_DIRECTORY "/home/hekapoo/Downloads/freeType2/freetype-2.13.1/include/")
@@ -22,16 +21,16 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     # include_directories (${HKUI_LIBRARY_INCLUDE_DIRECTORY})
     include_directories (${GLEW_LIBRARY_INCLUDE_DIRECTORY})
     include_directories (${GLFW_LIBRARY_INCLUDE_DIRECTORY})
-
+    
     add_executable(${PROJECT_NAME}
         main.cpp
         App.cpp
         src/Utility.cpp
         src/assetLoaders/TextureLoader.cpp
         src/components/ScrollBar.cpp
-        src/components/PinchBar.cpp
+        src/components/SeparatorBar.cpp
         src/components/Div.cpp
-        src/components/PinchDiv.cpp
+        src/components/ResizeDiv.cpp
         src/components/Button.cpp
         src/components/TabSwitcher.cpp
         src/components/AbstractComponent.cpp
@@ -42,12 +41,11 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         src/mesh/QuadMesh.cpp
         src/renderer/Renderer.cpp
         src/shaderManagement/ShaderLoader.cpp
-
-        /home/hekapoo/Downloads/tracy/public/TracyClient.cpp
-    )
+        )
     target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
-
-    # add_subdirectory(src/Components)
+    
+    # Needed for absolute include paths
+    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR})
 
     # set(HKUI_LIBRARY_PATH_DIRECTORY "/home/hekapoo/lib_hkui/lib/")
     set(FT_LIBRARY_PATH_DIRECTORY "/home/hekapoo/Downloads/freeType2/freetype-2.13.1/objs/.libs")

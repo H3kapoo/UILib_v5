@@ -86,11 +86,22 @@ private:
      */
     void onMouseMoveOverSeparator(const int16_t x, const int16_t y);
 
+    /**
+     * @brief Determine if the separator is within separatorSize of x,y position square wise from each separator end.
+     *
+     * @param sep  Separator to calculate square box distance to
+     * @param x    Mouse X position
+     * @param y    Mouse Y position
+     * @return     True if within range, false otherwise
+     */
+    bool isSeparatorClose(AbstractComponent* sep, const int16_t x, const int16_t y);
+
     /* User shall not be able to use these for now. */
     bool remove();
     bool appendAux();
     bool removeAux();
 
+    /* Events */
     void onPrepareToRender() override;
     void onRenderDone() override;
     void onClickEvent() override;

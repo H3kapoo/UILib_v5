@@ -187,70 +187,70 @@ void ResizeDiv::onMouseMoveOverSeparator(int16_t x, int16_t y)
        "style.separatorSize" distance from the clicked SeparatorBar. These new SeparatorBars will be used for 3-way and
        4-way pane pinch. */
     bool putInFirstSupportingSlot = true;
-    glm::vec2 start, end;
     for (const auto& comp : getNodes())
     {
-        if (comp->getType() == CompType::ResizeDiv)
+        if (comp->getType() != CompType::ResizeDiv) { continue; }
+
+        const auto& pDivNodes = comp->getNodes();
+        for (const auto& pDivChild : pDivNodes)
         {
-            const auto& pDivNodes = comp->getNodes();
-            for (const auto& pDivChild : pDivNodes)
+            if (pDivChild->getType() != CompType::SeparatorBar || !isSeparatorClose(pDivChild, x, y)) { continue; }
+
+            const auto sepBar = dynamic_cast<SeparatorBar*>(pDivChild);
+            if (!sepBar)
             {
-                if (pDivChild->getType() == CompType::SeparatorBar)
-                {
-                    // TODO: These checks need to be extracted to separate function
-                    if (layout.orientation == LdOrientation::Horizontal)
-                    {
-                        start = pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale;
-                        start.y -= style.separatorSize;
-                        end = start + glm::vec2(style.separatorSize, style.separatorSize);
-                    }
-                    else
-                    {
-                        start = pDivChild->getTransformRead().pos + pDivChild->getTransformRead().scale;
-                        start.x -= style.separatorSize;
-                        end = start + glm::vec2(style.separatorSize, style.separatorSize);
-                    }
-
-                    bool xCEnd = x >= start.x && x <= end.x;
-                    bool yCEnd = y >= start.y && y <= end.y;
-
-                    if (layout.orientation == LdOrientation::Horizontal)
-                    {
-                        start = pDivChild->getTransformRead().pos;
-                        start.x -= style.separatorSize;
-                        end = start + glm::vec2(style.separatorSize, style.separatorSize);
-                    }
-                    else
-                    {
-                        start = pDivChild->getTransformRead().pos;
-                        start.y -= style.separatorSize;
-                        end = start + glm::vec2(style.separatorSize, style.separatorSize);
-                    }
-
-                    bool xCStart = x >= start.x && x <= end.x;
-                    bool yCStart = y >= start.y && y <= end.y;
-
-                    if ((xCEnd && yCEnd) || (xCStart && yCStart))
-                    {
-                        const auto pb = dynamic_cast<SeparatorBar*>(pDivChild);
-                        if (!pb)
-                        {
-                            utils::printlne("FATAL dynamic_cast error for {}", pDivChild->getId());
-                            return;
-                        }
-
-                        /* Simulate on mouse enter for the closest SeparatorBar */
-                        pb->onMouseEnterEvent();
-
-                        /* Populate the 2 possible additional SeparatorBars */
-                        if (putInFirstSupportingSlot) { suppBarOne = pb; }
-                        else { suppBarTwo = pb; }
-                        putInFirstSupportingSlot = false;
-                    }
-                }
+                utils::printlne("FATAL dynamic_cast error for {}", pDivChild->getId());
+                return;
             }
+
+            /* Simulate on mouse enter for the closest SeparatorBar */
+            sepBar->onMouseEnterEvent();
+
+            /* Populate the 2 possible additional SeparatorBars */
+            if (putInFirstSupportingSlot) { suppBarOne = sepBar; }
+            else { suppBarTwo = sepBar; }
+            putInFirstSupportingSlot = false;
         }
     }
+}
+
+bool ResizeDiv::isSeparatorClose(AbstractComponent* sep, const int16_t x, const int16_t y)
+{
+    glm::vec2 start, end;
+    auto& sepTrans = sep->getTransformRead();
+    if (layout.orientation == LdOrientation::Horizontal)
+    {
+        start = sepTrans.pos + sepTrans.scale;
+        start.y -= style.separatorSize;
+        end = start + glm::vec2(style.separatorSize, style.separatorSize);
+    }
+    else
+    {
+        start = sepTrans.pos + sepTrans.scale;
+        start.x -= style.separatorSize;
+        end = start + glm::vec2(style.separatorSize, style.separatorSize);
+    }
+
+    bool xCEnd = x >= start.x && x <= end.x;
+    bool yCEnd = y >= start.y && y <= end.y;
+
+    if (layout.orientation == LdOrientation::Horizontal)
+    {
+        start = sepTrans.pos;
+        start.x -= style.separatorSize;
+        end = start + glm::vec2(style.separatorSize, style.separatorSize);
+    }
+    else
+    {
+        start = sepTrans.pos;
+        start.y -= style.separatorSize;
+        end = start + glm::vec2(style.separatorSize, style.separatorSize);
+    }
+
+    bool xCStart = x >= start.x && x <= end.x;
+    bool yCStart = y >= start.y && y <= end.y;
+
+    return (xCEnd && yCEnd) || (xCStart && yCStart);
 }
 
 void ResizeDiv::onPrepareToRender()
