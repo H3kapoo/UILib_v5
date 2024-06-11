@@ -1,15 +1,14 @@
 #include "ScrollBar.hpp"
 
-#include "layoutCalc/LayoutData.hpp"
-#include <cstdint>
+#include "src/Utility.hpp"
+#include "src/components/layoutCalc/LayoutData.hpp"
 
 namespace components::computils
 {
 
 ScrollBar::ScrollBar()
-    : AbstractComponent({.type = CompType::ScrollBar,
-          .shaderPath = "/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl"})
-    , knob("/home/hekapoo/newTryAtUI/src/assets/shaders/base.glsl")
+    : AbstractComponent({.type = CompType::ScrollBar, .shaderPath = "src/assets/shaders/base.glsl"})
+    , knob("src/assets/shaders/base.glsl")
 {
     // knob.options.color = utils::hexToVec4("#C0C0C1ff");
     knob.options.color = utils::hexToVec4("#3E3D3Dff");
@@ -114,7 +113,6 @@ void ScrollBar::onScroll()
 
 void ScrollBar::onStart()
 {
-    // Later note: doesnt really work. Needs fixing. BUG.
     /* Note: In order for the scrollbars to render correctly, they need to be rendered in a "above playground" depth
      setting. SB_DEPTH_COUNTUP value was arbitrarly choosen. Otherwise if we don't do this trick, it may happen that
      scrollbars are rendered on top of another one or that an element will render above another scrollbar. This

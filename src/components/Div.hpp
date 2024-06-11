@@ -51,12 +51,9 @@ private:
     /* Events */
     bool onLayoutUpdate() override;
     void onClickEvent() override;
-    void onKeyEvent() override;
     void onMouseEnterEvent() override;
     void onMouseExitEvent() override;
-    void onMoveEvent() override;
     void onPrepareToRender() override;
-    void onRenderDone() override;
     void onStart() override;
 
     /* This Div can display an image. This are helpers for that. */

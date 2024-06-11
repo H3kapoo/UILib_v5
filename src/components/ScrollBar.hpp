@@ -2,18 +2,17 @@
 
 #include <cstdint>
 
-#include "AbstractComponent.hpp"
-
-#include "../Utility.hpp"
-#include "../renderer/LightWeightRenderer.hpp"
-#include "compUtils/LightWeightDummy.hpp"
-#include "layoutCalc/LayoutData.hpp"
+#include "src/components/AbstractComponent.hpp"
+#include "src/components/compUtils/LightWeightDummy.hpp"
+#include "src/components/layoutCalc/LayoutData.hpp"
+#include "src/renderer/LightWeightRenderer.hpp"
 
 namespace components::computils
 {
 class ScrollBar : public AbstractComponent
 {
 public:
+    /* General options parameters associated with this component in particular */
     struct Options
     {
         layoutcalc::LdOrientation orientation{layoutcalc::LdOrientation::Horizontal};
@@ -24,17 +23,20 @@ public:
 
     ScrollBar();
 
-    void onPrepareToRender() override;
-    void onRenderDone() override;
-    void onMoveEvent() override;
-    void onClickEvent() override;
-    void onStart() override;
-    void onScroll() override;
-
+    /**
+     * @brief Calculates new position for the knob along the scrollbar background.
+     *
+     * @param x  Mouse X position
+     * @param y  Mouse Y position
+     */
     void adjustKnobOnMouseEvent(const int x, const int y);
-    void notifyLayoutHasChanged();
 
-    void show(const glm::mat4& projMatrix);
+    /**
+     * @brief Notify scrollbar with the new overflow value. This positions scrollbar in relationship with it's
+     *        container and also the scrollbar. Usually called when parent container changes size.
+     *
+     */
+    void notifyLayoutHasChanged();
 
     void updateOverflow(int newOverflow);
 
@@ -50,6 +52,14 @@ public:
     Options options;
 
 private:
+    /* Events */
+    void onPrepareToRender() override;
+    void onRenderDone() override;
+    void onMoveEvent() override;
+    void onClickEvent() override;
+    void onStart() override;
+    void onScroll() override;
+
     int16_t overflow{0};
     int16_t scrollValue{0};
 
@@ -61,6 +71,7 @@ private:
     float knobPercentageAlongBg{0};
     float mouseOffset{0};
 
+    /* Knob rendering related */
     renderer::LightWeightRenderer lwr;
     computils::LightWeightDummy knob;
 };

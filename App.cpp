@@ -22,8 +22,10 @@ void App::start(int initialWidth, int initialHeight)
     rootDiv.layout.border = {5, 5, 5, 5};
 
     ts.style.color = utils::hexToVec4("#c85c0fff");
-    ts.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
-    ts2.style.color = utils::hexToVec4("#c85c0fff");
+    ts.addTab("First", 0, &div8);
+    ts.addTab("Second", 1, &div9);
+    // ts.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
+    // ts2.style.color = utils::hexToVec4("#c85c0fff");
     // ts2.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 400}, {LdScalePolicy::Absolute, 400}};
 
     div2.style.color = utils::hexToVec4("#c85c0fff");
@@ -35,7 +37,7 @@ void App::start(int initialWidth, int initialHeight)
     div6.style.color = utils::hexToVec4("#5e0667ff");
     div6.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 800}, {LdScalePolicy::Absolute, 600}};
     // div6.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
-    div6.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
+    // div6.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
 
     pdiv.layout.scaling = LdScaling{{LdScalePolicy::Relative, 1.0f}, {LdScalePolicy::Relative, 1.0f}};
     pdiv.layout.orientation = LdOrientation::Vertical;
@@ -51,8 +53,8 @@ void App::start(int initialWidth, int initialHeight)
     div9.style.color = utils::hexToVec4("#1b021aff");
 
     div7.imagePath = "/home/hekapoo/newTryAtUI/src/assets/textures/container.jpg";
-    div7.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
-    // div7.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 400}};
+    // div7.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, .5f}};
+    div7.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 300}, {LdScalePolicy::Absolute, 400}};
     rootDiv.append(&pdiv);
 
     div4.layout.orientation = LdOrientation::Vertical;
@@ -68,23 +70,20 @@ void App::start(int initialWidth, int initialHeight)
 
     pdiv2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 400}, {LdScalePolicy::Relative, .5f}};
     div3.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 200}, {LdScalePolicy::Relative, .5f}};
-    div9.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 200}, {LdScalePolicy::Relative, .5f}};
+    // div9.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f, 200}, {LdScalePolicy::Relative, .5f}};
 
     div2.layout.scaling = LdScaling{{LdScalePolicy::Relative, .5f}, {LdScalePolicy::Relative, xs, 200}};
     pdiv2.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.5f}, {LdScalePolicy::Relative, xs, 200}};
 
-    div3.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 200}, {LdScalePolicy::Relative, .5f}};
+    // div3.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 200}, {LdScalePolicy::Relative, .5f}};
+    ts.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 200}, {LdScalePolicy::Relative, .5f}};
     div4.layout.scaling = LdScaling{{LdScalePolicy::Relative, xs, 200}, {LdScalePolicy::Relative, .5f}};
 
     pdiv3.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.5f}, {LdScalePolicy::Relative, xs, 200}};
+    div6.append(&div7);
 
     pdiv.append({&pdiv3, &pdiv2});
-    pdiv2.append({&div3, &div4});
-    // pdiv.append({&div2, &div4, &div5, &div6});
-    // pdiv.append({&div2, &pdiv2});
-    // pdiv.append({&div2, &div3, &div9});
-    // pdiv2.append({&div3, &div9});
-    // pdiv2.append({&div9, &div2});
+    pdiv2.append({&ts, &div4});
     pdiv3.append({&div5, &div6});
 
     rootDiv.showTree();

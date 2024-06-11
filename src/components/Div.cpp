@@ -60,6 +60,7 @@ void Div::onPrepareToRender()
 void Div::onClickEvent()
 {
     const auto& s = getState();
+    if (s->mouseAction == HIDAction::Pressed) utils::printlni("[INF] I am node {} and click", getId());
     if (mouseClickCb && s->mouseAction == HIDAction::Pressed) { mouseClickCb(s->mouseX, s->mouseY, s->clickedButton); }
 }
 

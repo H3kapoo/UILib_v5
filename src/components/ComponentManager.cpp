@@ -72,7 +72,7 @@ void ComponentManager::render()
 
     /* Note: glScissor normally has start coords in lower left corner. This UI has start coords in top left corner,
      * so calculations on where Scissors start on Y axis are reversed.*/
-    // glEnable(GL_SCISSOR_TEST);
+    glEnable(GL_SCISSOR_TEST);
 
     /* Note: For alpha blending to work, we unfortunatelly have to render objects back to front and disable depth
        testing. This introduces a bit of overdraw sadly. If it's know there will be no alpha blending, 'reverse' can be
