@@ -25,7 +25,8 @@ public:
         ScrollBar,
         TabSwitcher,
         ResizeDiv,
-        SeparatorBar
+        SeparatorBar,
+        CheckBox
     };
 
     struct Options

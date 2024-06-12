@@ -149,6 +149,9 @@ void AbstractComponent::details()
         case CompType::SeparatorBar:
             stringType = "SeparatorBar";
             break;
+        case CompType::CheckBox:
+            stringType = "CheckBox";
+            break;
         default:
             stringType = "Unknown";
     }

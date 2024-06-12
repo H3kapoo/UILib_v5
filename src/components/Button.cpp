@@ -75,12 +75,12 @@ void Button::onClickEvent()
 
 void Button::onMouseEnterEvent()
 {
-    style.color = utils::hexToVec4("#606160ff");
+    // style.color = utils::hexToVec4("#606160ff");
 }
 
 void Button::onMouseExitEvent()
 {
-    style.color = utils::hexToVec4("#404140ff");
+    // style.color = utils::hexToVec4("#404140ff");
 }
 
 void Button::onMoveEvent()
