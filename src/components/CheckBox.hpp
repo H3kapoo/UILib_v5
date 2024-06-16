@@ -38,19 +38,16 @@ public:
     ~CheckBox();
 
     /* Event listeners */
-    void addClickListener(std::function<void(int, int, MouseButton)> cb);
-    void addMouseMoveListener(std::function<void(int16_t, int16_t)> cb);
-    void addReleaseListener(std::function<void(int, int, MouseButton)> cb);
-
-    bool isChecked();
-    bool isDisabled();
-    bool setDisabled();
+    void addCheckedListener(std::function<void(bool)> cb);
+    // void addClickListener(std::function<void(int, int, MouseButton)> cb);
+    // void addMouseMoveListener(std::function<void(int16_t, int16_t)> cb);
+    // void addReleaseListener(std::function<void(int, int, MouseButton)> cb);
 
     Style style;
     std::string text;
     // SideImage sideImage;
 
-    bool clicked{false};
+    bool checked{false};
     AssignReloadable<bool> disabled{false};
 
 private:
@@ -86,9 +83,10 @@ private:
     TextureLoader& textureLoader;
 
     /* Callback holders */
-    std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
-    std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
-    std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
+    // std::function<void(int, int, MouseButton)> mouseClickCb{nullptr};
+    // std::function<void(int, int, MouseButton)> mouseReleaseCb{nullptr};
+    // std::function<void(int16_t, int16_t)> mouseMoveCb{nullptr};
+    std::function<void(bool)> checkedCb{nullptr};
 
     /* Layout related */
     layoutcalc::LayoutCalculator layoutCalc{this};

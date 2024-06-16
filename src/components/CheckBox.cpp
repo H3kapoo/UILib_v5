@@ -1,8 +1,5 @@
 #include "CheckBox.hpp"
 
-#include <cstdint>
-#include <string_view>
-
 #include "src/UIState.hpp"
 #include "src/Utility.hpp"
 
@@ -14,8 +11,11 @@ CheckBox::CheckBox()
     , textureLoader(TextureLoader::get())
 
 {
+    /* Don't show children of this component. Set to True if you want to see them displayed in the prints. */
+    setDetailChildrenOnPrint(false);
+
     btn.style.color = utils::hexToVec4("#d7d7d7ff");
-    btn.style.borderColor = utils::hexToVec4("#000000ff");
+    btn.style.borderColor = utils::hexToVec4("#cd4444ff");
 
     btn.layout.scaling = LdScaling{{LdScalePolicy::Relative, 0.3f}, {LdScalePolicy::Relative, 1.0f}};
     btn.layout.margin = {2, 2, 2, 2};
@@ -28,17 +28,10 @@ CheckBox::CheckBox()
             {
                 if (disabled.value) { return; }
 
-                clicked = !clicked;
-                if (clicked)
-                {
-                    // Empty
-                    btn.style.color = utils::hexToVec4("#332e2eff");
-                }
-                else
-                {
-                    // Empty
-                    btn.style.color = utils::hexToVec4("#ffffffff");
-                }
+                checked = !checked;
+                if (checked) { btn.style.color = utils::hexToVec4("#332e2eff"); }
+                else { btn.style.color = utils::hexToVec4("#ffffffff"); }
+                if (checkedCb) checkedCb(checked);
             }
         });
 
@@ -47,7 +40,7 @@ CheckBox::CheckBox()
     {
         if (disabled.value) { btn.style.color = utils::hexToVec4("#727272ff"); }
         else { btn.style.color = utils::hexToVec4("#ffffffff"); }
-        clicked = false;
+        checked = false;
     };
 
     AbstractComponent::append(&btn);
@@ -79,17 +72,16 @@ void CheckBox::onRenderDone()
     // lwr.render(getState()->projectionMatrix, imgHolder);
 }
 
-void CheckBox::onClickEvent()
-{
-    const auto& s = getState();
-    if (s->mouseAction == HIDAction::Pressed)
-    {
-        if (mouseClickCb) mouseClickCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
-    }
-    else if (s->mouseAction == HIDAction::Released)
-    {
-        if (mouseReleaseCb) mouseReleaseCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
-    }
+void CheckBox::onClickEvent() {
+    // const auto& s = getState();
+    // if (s->mouseAction == HIDAction::Pressed)
+    // {
+    //     if (mouseClickCb) mouseClickCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
+    // }
+    // else if (s->mouseAction == HIDAction::Released)
+    // {
+    //     if (mouseReleaseCb) mouseReleaseCb(s->mouseX, s->mouseY, (MouseButton)s->clickedButton);
+    // }
 };
 
 void CheckBox::onMouseEnterEvent() {}
@@ -98,11 +90,11 @@ void CheckBox::onMouseExitEvent() {}
 
 void CheckBox::onMoveEvent()
 {
-    const auto& s = getState();
-    if (s->mouseAction == HIDAction::Pressed && s->clickedButton == MouseButton::Left)
-    {
-        if (mouseMoveCb) mouseMoveCb(s->mouseX, s->mouseY);
-    }
+    // const auto& s = getState();
+    // if (s->mouseAction == HIDAction::Pressed && s->clickedButton == MouseButton::Left)
+    // {
+    //     if (mouseMoveCb) mouseMoveCb(s->mouseX, s->mouseY);
+    // }
 }
 
 bool CheckBox::onLayoutUpdate()
@@ -112,19 +104,24 @@ bool CheckBox::onLayoutUpdate()
     return false;
 }
 
-void CheckBox::addClickListener(std::function<void(int, int, MouseButton)> func)
+void CheckBox::addCheckedListener(std::function<void(bool)> cb)
 {
-    mouseClickCb = func;
+    checkedCb = cb;
 }
 
-void CheckBox::addReleaseListener(std::function<void(int, int, MouseButton)> func)
-{
-    mouseReleaseCb = func;
-}
+// void CheckBox::addClickListener(std::function<void(int, int, MouseButton)> func)
+// {
+//     mouseClickCb = func;
+// }
 
-void CheckBox::addMouseMoveListener(std::function<void(int16_t, int16_t)> func)
-{
-    mouseMoveCb = func;
-}
+// void CheckBox::addReleaseListener(std::function<void(int, int, MouseButton)> func)
+// {
+//     mouseReleaseCb = func;
+// }
+
+// void CheckBox::addMouseMoveListener(std::function<void(int16_t, int16_t)> func)
+// {
+//     mouseMoveCb = func;
+// }
 
 } // namespace components

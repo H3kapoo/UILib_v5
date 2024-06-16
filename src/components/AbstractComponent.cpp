@@ -35,6 +35,16 @@ bool AbstractComponent::append(AbstractComponent* comp)
     return false;
 }
 
+bool AbstractComponent::appendAt(AbstractComponent* comp, const int32_t index)
+{
+    if (appendAux(comp, index))
+    {
+        triggerTreeChangedAction("Append");
+        return true;
+    }
+    return false;
+}
+
 bool AbstractComponent::append(const std::vector<AbstractComponent*>& comps)
 {
     bool didAppendSomething = false;
@@ -120,62 +130,6 @@ void AbstractComponent::changeShaderTo(const std::string& newShaderPath)
     compShaderPtr = shaderLoaderRef.loadFromPath(newShaderPath);
 }
 
-void AbstractComponent::details()
-{
-    const auto pid = parent ? std::to_string(parent->getId()) : "N/A";
-    const auto dep = depth ? std::to_string(depth) : "Root(0)";
-    std::string stringType, layoutType;
-
-    switch (type)
-    {
-        case CompType::Unknown:
-            stringType = "Unknown";
-            break;
-        case CompType::Div:
-            stringType = "Div";
-            break;
-        case CompType::Button:
-            stringType = "Button";
-            break;
-        case CompType::ScrollBar:
-            stringType = "ScrollBar";
-            break;
-        case CompType::TabSwitcher:
-            stringType = "TabSwitcher";
-            break;
-        case CompType::ResizeDiv:
-            stringType = "ResizeDiv";
-            break;
-        case CompType::SeparatorBar:
-            stringType = "SeparatorBar";
-            break;
-        case CompType::CheckBox:
-            stringType = "CheckBox";
-            break;
-        default:
-            stringType = "Unknown";
-    }
-
-    switch (layout.fillPolicy)
-    {
-        case components::layoutcalc::LdFillPolicy::Tightly:
-            layoutType = "Tightly";
-            break;
-        case components::layoutcalc::LdFillPolicy::SpaceBetween:
-            layoutType = "SpaceBetween";
-            break;
-        case components::layoutcalc::LdFillPolicy::EvenlySpaced:
-            layoutType = "EvenlySpaced";
-            break;
-        case components::layoutcalc::LdFillPolicy::Grid:
-            layoutType = "Grid";
-            break;
-        case components::layoutcalc::LdFillPolicy::COUNT:
-            layoutType = "Unknown";
-    }
-    utils::println("{{id: {}, pid={}, depth={}, type: {}, layout: {}}}", id, pid, dep, stringType, layoutType);
-}
-
 void AbstractComponent::showTree()
 {
     showTree(0);
@@ -250,12 +204,27 @@ bool AbstractComponent::isComponentParented() const
     return isParented;
 }
 
+bool AbstractComponent::isComponentIgnoringScroll() const
+{
+    return ignoreScrollEvent;
+}
+
 void AbstractComponent::setRenderable(const bool canBeRendered)
 {
     isRenderable = canBeRendered;
 }
 
-bool AbstractComponent::appendAux(AbstractComponent* node)
+void AbstractComponent::setDetailChildrenOnPrint(const bool detailChildren)
+{
+    detailMyChildren = detailChildren;
+}
+
+void AbstractComponent::setIgnoreScrollEvent(const bool ignore)
+{
+    ignoreScrollEvent = ignore;
+}
+
+bool AbstractComponent::appendAux(AbstractComponent* node, const int32_t index)
 {
     if (!node)
     {
@@ -273,7 +242,13 @@ bool AbstractComponent::appendAux(AbstractComponent* node)
     node->depth = depth + 1;
     node->parent = this;
     node->isParented = true;
-    children.push_back(node);
+
+    if (index >= 0)
+    {
+        utils::printlnw("Inserting at custom index {}", index);
+        children.insert(children.begin() + index, node);
+    }
+    else { children.push_back(node); }
 
     return true;
 }
@@ -336,6 +311,9 @@ void AbstractComponent::showTree(int currentDepth)
     utils::print("\\---");
     details();
 
+    /* User doesn't want this node to print data about it's children */
+    if (!detailMyChildren) { return; }
+
     for (const auto& node : children)
     {
         node->showTree(currentDepth + 1);
@@ -370,7 +348,7 @@ void AbstractComponent::updateNodeStructure()
            means the node is already ok. */
         if (!node->state)
         {
-            utils::printlnw("Node nId {} came from unparented at that point subtree {}!", node->getId(), getId());
+            // utils::printlnw("Node nId {} came from unparented at that point subtree {}!", node->getId(), getId());
             node->setState(state);
             node->depth = getDepth() + 1;
             node->getTransformRW().layer = getDepth();
@@ -388,6 +366,53 @@ void AbstractComponent::manuallyAdjustDepthTo(const int newDepth)
 {
     depth = newDepth;
     getTransformRW().layer = getDepth();
+}
+
+void AbstractComponent::details()
+{
+#define WRITE_TYPE(x)                                                                                                  \
+    case CompType::x:                                                                                                  \
+        stringType = #x;                                                                                               \
+        break;
+
+#define WRITE_POLICY(x)                                                                                                \
+    case components::layoutcalc::LdFillPolicy::x:                                                                      \
+        layoutType = #x;                                                                                               \
+        break;
+
+    const auto pid = parent ? std::to_string(parent->getId()) : "N/A";
+    const auto dep = depth ? std::to_string(depth) : "Root(0)";
+    std::string stringType, layoutType;
+
+    switch (type)
+    {
+        WRITE_TYPE(Unknown)
+        WRITE_TYPE(Div)
+        WRITE_TYPE(Button)
+        WRITE_TYPE(ScrollBar)
+        WRITE_TYPE(TabSwitcher)
+        WRITE_TYPE(ResizeDiv)
+        WRITE_TYPE(SeparatorBar)
+        WRITE_TYPE(CheckBox)
+        WRITE_TYPE(List)
+        default:
+            stringType = "Unknown";
+    }
+
+    switch (layout.fillPolicy)
+    {
+        WRITE_POLICY(Tightly);
+        WRITE_POLICY(SpaceBetween);
+        WRITE_POLICY(EvenlySpaced);
+        WRITE_POLICY(Grid);
+        case components::layoutcalc::LdFillPolicy::COUNT:
+            layoutType = "Unknown";
+    }
+
+    utils::println("{{id: {}, pid={}, depth={}, type: {}, layout: {}}}", id, pid, dep, stringType, layoutType);
+
+#undef WRITE_TYPE
+#undef WRITE_POLICY
 }
 
 void AbstractComponent::onClickEvent() {}

@@ -438,8 +438,6 @@ LayoutCalculator::OverflowResult LayoutCalculator::calculateAndApplyOverflow(con
     const int16_t scrollOffsetY,
     const ScrollBarDetails& sbDetails)
 {
-    if (!sbDetails.isHBarActive && !sbDetails.isVBarActive) { return {0, 0}; }
-
     /* If Y_BAR is active, it means overflow (if exists) needs to be increased by 'scrollbar' size so we can scroll past
        that bar and show all the content. Without this, some content will be hidden under the scrollbar. This applies
        vice-versa aswell.*/

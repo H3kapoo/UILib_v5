@@ -3,8 +3,10 @@
 #include "src/UIState.hpp"
 #include "src/components/AbstractComponent.hpp"
 #include "src/components/Button.hpp"
+#include "src/components/CheckBox.hpp"
 #include "src/components/ComponentManager.hpp"
 #include "src/components/Div.hpp"
+#include "src/components/List.hpp"
 #include "src/components/ResizeDiv.hpp"
 #include "src/components/TabSwitcher.hpp"
 
@@ -32,6 +34,8 @@ private:
     Div rootDiv;
     Div div2, div3, div4, div5, div6, div7, div8, div9;
     // Button btn;
+    CheckBox cb;
+    List list;
     TabSwitcher ts, ts2;
     ResizeDiv pdiv, pdiv2, pdiv3;
     std::vector<AbstractComponent*> divs;

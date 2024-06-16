@@ -33,6 +33,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         src/components/ResizeDiv.cpp
         src/components/Button.cpp
         src/components/TabSwitcher.cpp
+        src/components/CheckBox.cpp
+        src/components/List.cpp
         src/components/AbstractComponent.cpp
         src/components/ComponentManager.cpp
         src/components/layoutCalc/LayoutCalculator.cpp

@@ -26,7 +26,8 @@ public:
         TabSwitcher,
         ResizeDiv,
         SeparatorBar,
-        CheckBox
+        CheckBox,
+        List
     };
 
     struct Options
@@ -54,7 +55,14 @@ public:
     /**
      * @brief Append single component to this component.
      *
-     * @note DO NOT APPEND if parent isnt part of the tree yet. This will set depth incorrectly.
+     * @param comp - trivial
+     *
+     * @return True if comp got appended successfully. False otherwise.
+     */
+    bool appendAt(AbstractComponent* comp, const int32_t index);
+
+    /**
+     * @brief Append single component to this component.
      *
      * @param comp - trivial
      *
@@ -65,7 +73,6 @@ public:
     /**
      * @brief Append multiple components to this component.
      *
-     * @note DO NOT APPEND if parent isnt part of the tree yet. This will set depth incorrectly.
      *
      * @param comps - trivial
      *
@@ -125,7 +132,7 @@ public:
      *
      * @return True if at least one comp got appended successfully. False otherwise.
      **/
-    bool appendAux(AbstractComponent* node);
+    bool appendAux(AbstractComponent* node, const int32_t index = -1);
 
     /**
      * @brief Remove single component from this component. This doesn't call layout update. Use with care.
@@ -171,9 +178,14 @@ public:
     computils::Transform& getTransformRead();
     bool isComponentRenderable() const;
     bool isComponentParented() const;
+    bool isComponentIgnoringScroll() const;
 
     /* Trivial setters */
     void setRenderable(const bool canBeRendered);
+    void setDetailChildrenOnPrint(const bool detailChildren);
+
+    /* Event transparency */
+    void setIgnoreScrollEvent(const bool ignore);
 
     /* Direct getters */
     layoutcalc::LayoutData layout;
@@ -193,8 +205,14 @@ private:
     /* Should only be used for the tree Root node. Accessible only via CM */
     void setState(UIState* newState);
 
+    /* Printing related */
+    bool detailMyChildren{true};
+
     /* Ctor options */
     Options options;
+
+    /* Event transparency vars */
+    bool ignoreScrollEvent{false};
 
     /* Rendering related */
     ViewableArea viewArea;

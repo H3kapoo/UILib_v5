@@ -94,10 +94,15 @@ void ComponentManager::render()
         else
         {
             /* Note: No point in rendering invisible components. Maybe this could be extended to layout updates too,
-             * make them more conservative. */
-            const auto& parentVA = childNode->getParent()->viewArea;
-            if (parentVA.scale.x <= 0 || parentVA.scale.y <= 0) { continue; }
+               make them more conservative. */
+            const auto& childVA = childNode->viewArea;
+            if (childVA.scale.x <= 0 || childVA.scale.y <= 0)
+            {
+                // utils::printlnw("Node {} invisible and will not be rendered", childNode->getId());
+                continue;
+            }
 
+            const auto& parentVA = childNode->getParent()->viewArea;
             glScissor(parentVA.start.x, state.windowHeight - (parentVA.start.y + parentVA.scale.y), parentVA.scale.x,
                 parentVA.scale.y);
         }
@@ -213,7 +218,20 @@ void ComponentManager::mouseScrollEvent(double offsetX, double offsetY)
 
     for (const auto& childNode : flattenedNodes)
     {
-        if (childNode->getId() == state.hoveredId) { childNode->onScroll(); }
+        if (childNode->getId() == state.hoveredId)
+        {
+            if (childNode->isComponentIgnoringScroll())
+            {
+                /* Bubble up to parent instead. Barebones for now.
+                   TODO: Parent might not exist or parent might also ignore scroll. */
+                childNode->getParent()->onScroll();
+            }
+            else
+            {
+                // Empty
+                childNode->onScroll();
+            }
+        }
     }
 }
 
