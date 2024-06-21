@@ -16,7 +16,7 @@ public:
     struct Options
     {
         layoutcalc::LdOrientation orientation{layoutcalc::LdOrientation::Horizontal};
-        int16_t barSize{11};
+        int16_t barSize{21};
         int16_t knobInset{2};
         float scrollSensitivity{10.0f};
     };
@@ -48,6 +48,7 @@ public:
     bool isBarActive();
 
     int16_t getScrollValue();
+    int16_t getDeltaScrollValue();
 
     Options options;
 
@@ -62,6 +63,7 @@ private:
 
     int16_t overflow{0};
     int16_t scrollValue{0};
+    int16_t lastScrollValue{0};
 
     bool isDragging{false};
     bool isActive{false};

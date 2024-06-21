@@ -22,9 +22,9 @@ void App::start(int initialWidth, int initialHeight)
     rootDiv.layout.padding = {5, 5, 5, 5};
     rootDiv.layout.border = {5, 5, 5, 5};
     rootDiv.layout.orientation = LdOrientation::Vertical;
-    // rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
+    rootDiv.layout.align = LdAlignment{LdAlign::Center, LdAlign::Center};
 
-    list.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Relative, 1.0f}};
+    list.layout.scaling = LdScaling{{LdScalePolicy::Absolute, 200}, {LdScalePolicy::Relative, 0.9f}};
 
     rootDiv.append(&list);
 

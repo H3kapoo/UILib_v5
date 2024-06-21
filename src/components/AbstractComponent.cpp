@@ -243,11 +243,9 @@ bool AbstractComponent::appendAux(AbstractComponent* node, const int32_t index)
     node->parent = this;
     node->isParented = true;
 
-    if (index >= 0)
-    {
-        utils::printlnw("Inserting at custom index {}", index);
-        children.insert(children.begin() + index, node);
-    }
+    /* Since we are using a vector container, inserting at specific index positions is costly. Use with this in mind.
+       For small number of elements it might not matter, but for large lists consider changing container to list. */
+    if (index >= 0) { children.insert(children.begin() + index, node); }
     else { children.push_back(node); }
 
     return true;
@@ -348,7 +346,7 @@ void AbstractComponent::updateNodeStructure()
            means the node is already ok. */
         if (!node->state)
         {
-            // utils::printlnw("Node nId {} came from unparented at that point subtree {}!", node->getId(), getId());
+            utils::printlnw("Node nId {} came from unparented at that point subtree {}!", node->getId(), getId());
             node->setState(state);
             node->depth = getDepth() + 1;
             node->getTransformRW().layer = getDepth();

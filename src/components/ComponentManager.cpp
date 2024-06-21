@@ -72,7 +72,7 @@ void ComponentManager::render()
 
     /* Note: glScissor normally has start coords in lower left corner. This UI has start coords in top left corner,
      * so calculations on where Scissors start on Y axis are reversed.*/
-    glEnable(GL_SCISSOR_TEST);
+    // glEnable(GL_SCISSOR_TEST);
 
     /* Note: For alpha blending to work, we unfortunatelly have to render objects back to front and disable depth
        testing. This introduces a bit of overdraw sadly. If it's know there will be no alpha blending, 'reverse' can be
@@ -99,7 +99,7 @@ void ComponentManager::render()
             if (childVA.scale.x <= 0 || childVA.scale.y <= 0)
             {
                 // utils::printlnw("Node {} invisible and will not be rendered", childNode->getId());
-                continue;
+                // continue;
             }
 
             const auto& parentVA = childNode->getParent()->viewArea;
@@ -212,6 +212,7 @@ void ComponentManager::mouseMoveEvent(double mouseX, double mouseY)
 
 void ComponentManager::mouseScrollEvent(double offsetX, double offsetY)
 {
+    // BIG TODO: If anything gets added/removed while iterating, it breaks stuff
     (void)offsetX;
 
     state.scrollDirection = offsetY;
@@ -225,12 +226,10 @@ void ComponentManager::mouseScrollEvent(double offsetX, double offsetY)
                 /* Bubble up to parent instead. Barebones for now.
                    TODO: Parent might not exist or parent might also ignore scroll. */
                 childNode->getParent()->onScroll();
+                continue;
             }
-            else
-            {
-                // Empty
-                childNode->onScroll();
-            }
+
+            childNode->onScroll();
         }
     }
 }
@@ -356,7 +355,7 @@ void ComponentManager::computeViewableArea()
 
 void ComponentManager::flattenRoot()
 {
-    utils::printlni("Flattening tree due to {}", state.lastActionOnTree);
+    // utils::printlni("Flattening tree due to {}", state.lastActionOnTree);
     flattenedNodes.clear();
     recursivelyPushNodes(root);
 

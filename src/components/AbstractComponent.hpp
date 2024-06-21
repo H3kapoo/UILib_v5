@@ -53,8 +53,9 @@ public:
 
     /* Funcs acting on node */
     /**
-     * @brief Append single component to this component.
+     * @brief Append single component to this component at specified index.
      *
+     * @param index - trivial
      * @param comp - trivial
      *
      * @return True if comp got appended successfully. False otherwise.

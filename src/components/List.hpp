@@ -27,13 +27,15 @@ public:
         glm::vec4 color{0.0f};
         glm::vec4 hoveredColor{0.0f};
         glm::vec4 borderColor{1.0f};
+        int32_t entrySize{15};
+        int32_t entrySpacing{5};
     };
 
     struct Entry
     {
         std::string entry;
         uint32_t id{0};
-        uint32_t referencedLabelId{0};
+        // uint32_t referencedLabelId{0};
     };
 
     List();
@@ -48,7 +50,10 @@ public:
     AssignReloadable<bool> disabled{false};
 
 private:
-    void recycleLastEntry();
+    bool maxEntriesReached();
+
+    bool appendOrRemove();
+    void recycleLastEntry(const float push);
 
     /* User shall not be able to add or remove children to button */
     bool append();
@@ -78,10 +83,18 @@ private:
         - View End -
         -- Ent 5  --  <- not shown, should be recycled
     */
+
     /* Holder */
-    Div holder;
-    std::vector<AbstractComponent*> entries; // this should be a Label in the future
-    // std::vector<Entry> entries; // this should be a Label in the future
+    std::vector<Entry> entries;
+
+    computils::ScrollBar* vsb{nullptr};
+
+    const float sensitivity{2.0f};
+
+    float currentScrollDownOffset{0.0f};
+    float maxAllowedScrollOffset{0.0f};
+    float scrollOffset{0.0f};
+    uint32_t maxEntries{40};
 
     /* Internal image related */
     computils::LightWeightDummy imgHolder;

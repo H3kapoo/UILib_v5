@@ -90,6 +90,7 @@ void ScrollBar::onScroll()
         knob.transform.pos.x -= getState()->scrollDirection * options.scrollSensitivity;
         knob.transform.pos.x = std::clamp(knob.transform.pos.x, sPos, ePos);
 
+        lastScrollValue = scrollValue;
         scrollValue = utils::remap(knob.transform.pos.x, sPos, ePos, 0.0f, overflow);
     }
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
@@ -102,7 +103,9 @@ void ScrollBar::onScroll()
         knob.transform.pos.y -= getState()->scrollDirection * options.scrollSensitivity;
         knob.transform.pos.y = std::clamp(knob.transform.pos.y, sPos, ePos);
 
+        lastScrollValue = scrollValue;
         scrollValue = utils::remap(knob.transform.pos.y, sPos, ePos, 0.0f, overflow);
+        // utils::printlne("lsv {} sv {} df {}", lastScrollValue, scrollValue, scrollValue - lastScrollValue);
     }
 
     knob.transform.markDirty();
@@ -142,6 +145,7 @@ void ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
         knob.transform.pos.x = x - mouseOffset;
         knob.transform.pos.x = std::clamp(knob.transform.pos.x, sPos, ePos);
 
+        lastScrollValue = scrollValue;
         scrollValue = utils::remap(knob.transform.pos.x, sPos, ePos, 0.0f, overflow);
     }
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
@@ -154,6 +158,7 @@ void ScrollBar::adjustKnobOnMouseEvent(const int x, const int y)
         knob.transform.pos.y = y - mouseOffset;
         knob.transform.pos.y = std::clamp(knob.transform.pos.y, sPos, ePos);
 
+        lastScrollValue = scrollValue;
         scrollValue = utils::remap(knob.transform.pos.y, sPos, ePos, 0.0f, overflow);
     }
 
@@ -205,6 +210,7 @@ void ScrollBar::notifyLayoutHasChanged()
 
         /* Value needs to be recalculated here based on new overflow value and knob position. It kinda scrolls by
         itself when container is resized. */
+        lastScrollValue = scrollValue;
         scrollValue = utils::remap(knob.transform.pos.x, sPos, ePos, 0.0f, overflow);
     }
     else if (options.orientation == layoutcalc::LdOrientation::Vertical)
@@ -233,7 +239,6 @@ void ScrollBar::notifyLayoutHasChanged()
         }
 
         /* Calculate position and scale for knob to be in bounds */
-        // const int niceifyCornerOffset = isOppositeActive ? options.knobInset : 0;
         const int niceifyCornerOffset = isOppositeActive ? 0 : options.knobInset;
         const auto sPos = getTransformRW().pos.y + options.knobInset;
         const auto ePos = sPos + getTransformRW().scale.y - (knobSizeY + niceifyCornerOffset);
@@ -242,6 +247,7 @@ void ScrollBar::notifyLayoutHasChanged()
 
         /* Value needs to be recalculated here based on new overflow value and knob position. It kinda scrolls by
         itself when container is resized. */
+        lastScrollValue = scrollValue;
         scrollValue = utils::remap(knob.transform.pos.y, sPos, ePos, 0.0f, overflow);
     }
 
@@ -259,6 +265,7 @@ void ScrollBar::setInactive()
 {
     isActive = false;
     scrollValue = 0;
+    lastScrollValue = 0;
     knobPercentageAlongBg = 0;
     knob.transform.pos = getTransformRW().pos;
     knob.transform.markDirty();
@@ -287,5 +294,10 @@ void ScrollBar::setOppositeScrollBarInactive()
 int16_t ScrollBar::getScrollValue()
 {
     return scrollValue;
+}
+
+int16_t ScrollBar::getDeltaScrollValue()
+{
+    return scrollValue - lastScrollValue;
 }
 } // namespace components::computils

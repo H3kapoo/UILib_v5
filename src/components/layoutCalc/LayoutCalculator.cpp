@@ -45,8 +45,8 @@ glm::i16vec2 LayoutCalculator::calculate(const int scrollOffsetX,
 
     /* Overflow calculation */
     const auto overflow = calculateAndApplyOverflow(scrollOffsetX, scrollOffsetY, sbDetails);
-    // utils::printlne("OX {}", overflow.overflowX);
     return {overflow.overflowX, overflow.overflowY};
+    // return {0, 0};
 }
 
 void LayoutCalculator::gridCalculateAndApplyScale(const ScrollBarDetails& sbDetails)

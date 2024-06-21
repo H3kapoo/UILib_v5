@@ -105,7 +105,8 @@ private:
 
     /**
      * @brief Updates node structure by calling the update function on every node and child node of the tree. Also
-     * flattens the nodes in a depth descending way suited for fast click detection.
+     * flattens the nodes in a depth descending way suited for fast click detection. Use if adding/removing nodes
+     * inside another node.
      *
      * @param action - action that was performed to trigger this function.
      */

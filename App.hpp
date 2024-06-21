@@ -34,9 +34,9 @@ private:
     Div rootDiv;
     Div div2, div3, div4, div5, div6, div7, div8, div9;
     // Button btn;
-    CheckBox cb;
+    // CheckBox cb;
     List list;
-    TabSwitcher ts, ts2;
-    ResizeDiv pdiv, pdiv2, pdiv3;
+    // TabSwitcher ts, ts2;
+    // ResizeDiv pdiv, pdiv2, pdiv3;
     std::vector<AbstractComponent*> divs;
 };

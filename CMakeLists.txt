@@ -28,12 +28,12 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         src/Utility.cpp
         src/assetLoaders/TextureLoader.cpp
         src/components/ScrollBar.cpp
-        src/components/SeparatorBar.cpp
+        # src/components/SeparatorBar.cpp
         src/components/Div.cpp
-        src/components/ResizeDiv.cpp
+        # src/components/ResizeDiv.cpp
         src/components/Button.cpp
-        src/components/TabSwitcher.cpp
-        src/components/CheckBox.cpp
+        # src/components/TabSwitcher.cpp
+        # src/components/CheckBox.cpp
         src/components/List.cpp
         src/components/AbstractComponent.cpp
         src/components/ComponentManager.cpp
